@@ -1,5 +1,3 @@
+## 👋  Hi there, I'm Carlos Natanauan!
 
-name: "CarlosNatanauan"
-username: "kuyscarly"
-location: "Digital Realm"
 
