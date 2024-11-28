@@ -5,9 +5,9 @@ I’m a software developer who loves creating solutions and learning new things.
 I may not know all the answers, but I’m definitely good at Googling.
 
 
-<br>
+
 <img src="https://user-images.githubusercontent.com/74038190/212747107-5b654ba5-31c6-4366-b42b-51b822e9bc52.gif" width="600">
-<br>
+
 
 ## 🌐 Socials:
 <a href="https://linkedin.com/in/carlosnatanauan/" target="blank"><img align="center" src="https://raw.githubusercontent.com/rahuldkjain/github-profile-readme-generator/master/src/images/icons/Social/linked-in-alt.svg" alt="carlosnatanauan/" height="30" width="40" /></a>
