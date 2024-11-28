@@ -1,8 +1,9 @@
 # 💫 About Me:
-## 👋 Hi there, I’m **Carlos Benedict Natanauan**!
+<h1 align="center">👋 Hi there, I’m Carlos Benedict Natanauan!</h1>
 
-I’m a **software developer** who loves creating solutions and learning new things. <br>
-I might not know everything, but I’m **pretty good at making the internet work for me**!
+<h5 align="center">I’m a <strong>Software Developer</strong> who loves creating solutions and learning new things.</h5>
+
+<h5 align="center">I might not know everything, but I’m <strong>pretty good at making the internet work for me</strong>!</h5>
 
 
 
