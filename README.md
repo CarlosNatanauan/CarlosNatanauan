@@ -4,7 +4,8 @@ Hi there, I’m Carlos Benedict Natanauan! 👋
 I’m a software developer who loves creating solutions and learning new things.<br>
 I may not know all the answers, but I’m definitely good at Googling.
 
-
+<img src="https://user-images.githubusercontent.com/74038190/212747107-5b654ba5-31c6-4366-b42b-51b822e9bc52.gif" width="400">
+<br><br>
 ## 🌐 Socials:
 <a href="https://linkedin.com/in/carlosnatanauan/" target="blank"><img align="center" src="https://raw.githubusercontent.com/rahuldkjain/github-profile-readme-generator/master/src/images/icons/Social/linked-in-alt.svg" alt="carlosnatanauan/" height="30" width="40" /></a>
 <a href="https://fb.com/carlosbenedict.natanauan/" target="blank"><img align="center" src="https://raw.githubusercontent.com/rahuldkjain/github-profile-readme-generator/master/src/images/icons/Social/facebook.svg" alt="carlosbenedict.natanauan/" height="30" width="40" /></a>
