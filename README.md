@@ -6,11 +6,10 @@ I may not know all the answers, but I’m definitely good at Googling.
 
 
 ## 🌐 Socials:
-<p align="left" style="white-space: nowrap; line-height: 0;">
-  <img src="https://img.shields.io/badge/LinkedIn-%230077B5.svg?logo=linkedin&logoColor=white" alt="LinkedIn" height="30" onclick="window.open('https://linkedin.com/in/carlosnatanauan/')" style="cursor: pointer; display: inline; margin-right: 20px;">
-  <img src="https://img.shields.io/badge/Instagram-%23E4405F.svg?logo=Instagram&logoColor=white" alt="Instagram" height="30" onclick="window.open('https://www.instagram.com/kuys.carlyy/')" style="cursor: pointer; display: inline;">
+<a href="https://linkedin.com/in/carlosnatanauan/" target="blank"><img align="center" src="https://raw.githubusercontent.com/rahuldkjain/github-profile-readme-generator/master/src/images/icons/Social/linked-in-alt.svg" alt="carlosnatanauan/" height="30" width="40" /></a>
+<a href="https://fb.com/carlosbenedict.natanauan/" target="blank"><img align="center" src="https://raw.githubusercontent.com/rahuldkjain/github-profile-readme-generator/master/src/images/icons/Social/facebook.svg" alt="carlosbenedict.natanauan/" height="30" width="40" /></a>
+<a href="https://instagram.com/kuys.carlyy/" target="blank"><img align="center" src="https://raw.githubusercontent.com/rahuldkjain/github-profile-readme-generator/master/src/images/icons/Social/instagram.svg" alt="kuys.carlyy/" height="30" width="40" /></a>
 </p>
-
 
 
 
