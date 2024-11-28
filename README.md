@@ -7,8 +7,8 @@ I may not know all the answers, but I’m definitely good at Googling.
 
 ## 🌐 Socials:
 <p align="left" style="white-space: nowrap; line-height: 0;">
-  <img src="https://img.shields.io/badge/LinkedIn-%230077B5.svg?logo=linkedin&logoColor=white" alt="LinkedIn" height="40" onclick="window.open('https://linkedin.com/in/carlosnatanauan')" style="cursor: pointer; display: inline; margin-right: 20px;">
-  <img src="https://img.shields.io/badge/Instagram-%23E4405F.svg?logo=Instagram&logoColor=white" alt="Instagram" height="40" onclick="window.open('https://instagram.com/kuys.carlyy')" style="cursor: pointer; display: inline;">
+  <img src="https://img.shields.io/badge/LinkedIn-%230077B5.svg?logo=linkedin&logoColor=white" alt="LinkedIn" height="30" onclick="window.open('https://linkedin.com/in/carlosnatanauan')" style="cursor: pointer; display: inline; margin-right: 20px;">
+  <img src="https://img.shields.io/badge/Instagram-%23E4405F.svg?logo=Instagram&logoColor=white" alt="Instagram" height="30" onclick="window.open('https://instagram.com/kuys.carlyy')" style="cursor: pointer; display: inline;">
 </p>
 
 
