@@ -1,7 +1,9 @@
+<img src="https://github.com/Anmol-Baranwal/Cool-GIFs-For-GitHub/assets/74038190/0c7eb6ed-663b-4ce4-bfbd-18239a38ba1b" width="500">
+<br><br>
 # 💫 About Me:
-Hi 👋, I'm Carlos Natanauan
+Hi there, I’m Carlos Benedict Natanauan! 👋
 
-I enjoy learning about software development and technology.
+I’m a software developer who loves creating solutions and learning new things. I may not know all the answers, but I’m definitely good at Googling.
 
 ## 🌐 Socials:
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-%230077B5.svg?logo=linkedin&logoColor=white)](https://linkedin.com/in/carlosnatanauan) [![Instagram](https://img.shields.io/badge/Instagram-%23E4405F.svg?logo=Instagram&logoColor=white)](https://instagram.com/kuys.carlyy) 
@@ -26,9 +28,6 @@ I enjoy learning about software development and technology.
 ![HTML5](https://img.shields.io/badge/html5-%23E34F26.svg?style=flat&logo=html5&logoColor=white) ![CSS3](https://img.shields.io/badge/css3-%231572B6.svg?style=flat&logo=css3&logoColor=white)
 
 
-
-
- 
 # 📊 GitHub Stats:
 
 ![](https://github-readme-stats.vercel.app/api/top-langs/?username=CarlosNatanauan&theme=dark&hide_border=false&include_all_commits=true&count_private=true&layout=compact)
