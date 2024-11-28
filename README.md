@@ -1,7 +1,7 @@
 # 💫 About Me:
 ### 👋 Hi there, I’m Carlos
 
-I’m a **software developer** who loves creating solutions and learning new things. <br>
+I’m a **Software Developer** who loves creating solutions and learning new things. <br>
 I might not know everything, but I’m **pretty good at making the internet work for me**!
 
 
