@@ -71,7 +71,15 @@
 
 <!-- About Section -->
 <div class="about center">
-  <h1>Hi, I am <span class="about__name">Carlos.</span></h1>
+
+  <h1 class="typewrite" data-period="2000" data-type='[ "Carlos", "Batman"]'>
+    <span class="static-text">Hello, I'm</span>
+    <span class="wrap"></span>
+  </h1>
+  
+  
+  
+  
   <h2 class="about__role">A Software Developer.</h2>
   <p class="about__desc">
     Currently a <strong>Flutter Developer</strong> with a passion for turning ideas into sleek, functional apps. I hold a degree in <strong>BSIT</strong> from <strong>STI College</strong>, where I gained experience with <strong>C#</strong>, <strong>.NET</strong>, and <strong>MS SQL</strong>. During my internship, I worked as a software developer, focusing on mobile app development with <strong>Flutter</strong>—yes, the app actually worked (most of the time)!. When I'm not immersed in code, I'm usually plotting my next nap, debating whether to go for a run or just scroll through memes, and pretending I have everything together.
@@ -141,7 +149,7 @@
       <ul class="project__stack">
         <li class="project__stack-item">Dart</li>
         <li class="project__stack-item">Flutter</li>
-        <li class="project__stack-item">MongoDB</li>
+        <li class="project__stack-item">MongoDB Atlas</li>
         <li class="project__stack-item">Node.js</li>
       </ul>
 
@@ -206,7 +214,6 @@
 
     </div>
 
-
   </div>
 </section>
 
@@ -214,72 +221,116 @@
 
 
 
-
-<!-- Skills Section -->
 <!-- Skills Section -->
 <section class="section skills" id="tech-stack">
   <h2 class="section__title">Tech Stack</h2>
-  <!-- Container for Skills List -->
+  <!-- Container for Skills Categories -->
   <div class="skills__container">
-    <!-- Skills List with Badge Icons -->
-    <div class="skills__list">
-      <img src="https://img.shields.io/badge/dart-%230175C2.svg?style=for-the-badge&logo=dart&logoColor=white" alt="Dart" />
-      <img src="https://img.shields.io/badge/Flutter-%2302569B.svg?style=for-the-badge&logo=Flutter&logoColor=white" alt="Flutter" />
-      <img src="https://img.shields.io/badge/c%23-%23239120.svg?style=for-the-badge&logo=csharp&logoColor=white" alt="C#" />
-      <img src="https://img.shields.io/badge/.NET-5C2D91?style=for-the-badge&logo=.net&logoColor=white" alt=".NET" />
-      <img src="https://img.shields.io/badge/blazor-%235C2D91.svg?style=for-the-badge&logo=blazor&logoColor=white" alt="Blazor" />
-      <img src="https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white" alt="Java" />
-      <img src="https://img.shields.io/badge/javafx-%23FF0000.svg?style=for-the-badge&logo=javafx&logoColor=white" alt="JavaFX" />
-      <img src="https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54" alt="Python" />
-      <img src="https://img.shields.io/badge/html5-%23E34F26.svg?style=for-the-badge&logo=html5&logoColor=white" alt="HTML5" />
-      <img src="https://img.shields.io/badge/css3-%231572B6.svg?style=for-the-badge&logo=css3&logoColor=white" alt="CSS3" />
-      <img src="https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E" alt="JavaScript" />
-      <img src="https://img.shields.io/badge/bootstrap-%238511FA.svg?style=for-the-badge&logo=bootstrap&logoColor=white" alt="Bootstrap" />
-      <img src="https://img.shields.io/badge/MongoDB-%234ea94b.svg?style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB" />
-      <img src="https://img.shields.io/badge/Microsoft%20SQL%20Server-CC2927?style=for-the-badge&logo=microsoft%20sql%20server&logoColor=white" alt="Microsoft SQL Server" />
-      <img src="https://img.shields.io/badge/mysql-4479A1.svg?style=for-the-badge&logo=mysql&logoColor=white" alt="MySQL" />
-      <img src="https://img.shields.io/badge/sqlite-%2307405e.svg?style=for-the-badge&logo=sqlite&logoColor=white" alt="SQLite" />
-      <img src="https://img.shields.io/badge/strapi-%232E7EEA.svg?style=for-the-badge&logo=strapi&logoColor=white" alt="Strapi" />
-      <img src="https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white" alt="NodeJS" />
-      <img src="https://img.shields.io/badge/git-%23F05033.svg?style=for-the-badge&logo=git&logoColor=white" alt="Git" />
-      <img src="https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white" alt="GitHub" />
-      <img src="https://img.shields.io/badge/figma-%23F24E1E.svg?style=for-the-badge&logo=figma&logoColor=white" alt="Figma" />
-      <img src="https://img.shields.io/badge/heroku-%23430098.svg?style=for-the-badge&logo=heroku&logoColor=white" alt="Heroku" />
-      <img src="https://img.shields.io/badge/Render-%46E3B7.svg?style=for-the-badge&logo=render&logoColor=white" alt="Render" />
+    <!-- Programming Languages -->
+    <div class="skills__category">
+      <h3 class="skills__category-title">Languages</h3>
+      <div class="skills__list">
+        <img src="https://img.shields.io/badge/dart-%230175C2.svg?style=for-the-badge&logo=dart&logoColor=white" alt="Dart" />
+        <img src="https://img.shields.io/badge/c%23-%23239120.svg?style=for-the-badge&logo=csharp&logoColor=white" alt="C#" />
+        <img src="https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white" alt="Java" />
+        <img src="https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54" alt="Python" />
+        <img src="https://img.shields.io/badge/html5-%23E34F26.svg?style=for-the-badge&logo=html5&logoColor=white" alt="HTML5" />
+        <img src="https://img.shields.io/badge/css3-%231572B6.svg?style=for-the-badge&logo=css3&logoColor=white" alt="CSS3" />
+        <img src="https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E" alt="JavaScript" />
+      </div>
+    </div>
+    <!-- Frameworks -->
+    <div class="skills__category">
+      <h3 class="skills__category-title">Frameworks</h3>
+      <div class="skills__list">
+        <img src="https://img.shields.io/badge/Flutter-%2302569B.svg?style=for-the-badge&logo=Flutter&logoColor=white" alt="Flutter" />
+        <img src="https://img.shields.io/badge/.NET-5C2D91?style=for-the-badge&logo=.net&logoColor=white" alt=".NET" />
+        <img src="https://img.shields.io/badge/blazor-%235C2D91.svg?style=for-the-badge&logo=blazor&logoColor=white" alt="Blazor" />
+        <img src="https://img.shields.io/badge/javafx-%23FF0000.svg?style=for-the-badge&logo=javafx&logoColor=white" alt="JavaFX" />
+        <img src="https://img.shields.io/badge/bootstrap-%238511FA.svg?style=for-the-badge&logo=bootstrap&logoColor=white" alt="Bootstrap" />
+        <img src="https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js" />
+        <img src="https://img.shields.io/badge/strapi-%232E7EEA.svg?style=for-the-badge&logo=strapi&logoColor=white" alt="Strapi" />
+      </div>
+    </div>
+    <!-- Databases -->
+    <div class="skills__category">
+      <h3 class="skills__category-title">Databases</h3>
+      <div class="skills__list">
+        <img src="https://img.shields.io/badge/MongoDB-%234ea94b.svg?style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB" />
+        <img src="https://img.shields.io/badge/Microsoft%20SQL%20Server-CC2927?style=for-the-badge&logo=microsoft%20sql%20server&logoColor=white" alt="Microsoft SQL Server" />
+        <img src="https://img.shields.io/badge/mysql-4479A1.svg?style=for-the-badge&logo=mysql&logoColor=white" alt="MySQL" />
+        <img src="https://img.shields.io/badge/sqlite-%2307405e.svg?style=for-the-badge&logo=sqlite&logoColor=white" alt="SQLite" />
+      </div>
+    </div>
+    <!-- Tools & Platforms -->
+    <div class="skills__category">
+      <h3 class="skills__category-title">Tools & Platforms</h3>
+      <div class="skills__list">
+        <img src="https://img.shields.io/badge/git-%23F05033.svg?style=for-the-badge&logo=git&logoColor=white" alt="Git" />
+        <img src="https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white" alt="GitHub" />
+        <img src="https://img.shields.io/badge/figma-%23F24E1E.svg?style=for-the-badge&logo=figma&logoColor=white" alt="Figma" />
+        <img src="https://img.shields.io/badge/heroku-%23430098.svg?style=for-the-badge&logo=heroku&logoColor=white" alt="Heroku" />
+        <img src="https://img.shields.io/badge/Render-%46E3B7.svg?style=for-the-badge&logo=render&logoColor=white" alt="Render" />
+      </div>
     </div>
   </div>
 </section>
 
 
 
-      <!-- Contact Section -->
-      <section class="section contact center" id="contact">
-        <h2 class="section__title">Contact</h2>
-        <!-- Email Link -->
-        <a href="mailto:carlosbenedictn@gmail.com">
-          <span class="btn btn--outline">Email me</span>
-        </a>
-      </section>
+
+<!-- Contact Section -->
+  <section class="section contact center" id="contact">
+    <h2 class="section__title">Contact</h2>
+    <!-- Email Link -->
+
+    <!-- Contact Form -->
+    <form action="https://formspree.io/f/mldekgro" method="POST" id="contactForm">
+      <label>
+        Your Name:
+        <input type="text" name="name" required>
+      </label>
+
+      <label>
+        Your Email:
+        <input type="email" name="email" required>
+      </label>
+
+      <label>
+        Your Message:
+        <textarea name="message" required></textarea>
+      </label>
+
+      <button type="submit">send</button>
+    </form>
+  </section>
+
     </main>
 
-    <!-- Footer Section -->
-    <footer class="footer">
-      <a
-        href="https://kuyacarlos.is-a.dev"
-        class="link footer__link"
-      >
-        © 2024 Carlos Benedict Natanauan
-      </a>
-    </footer>
 
-    <!-- Scroll to Top Button -->
-    <div class="scroll-container">
-      <div class="scroll-top">
-        <a aria-label="Scroll up" href="#top">
-          <i aria-hidden="true" class="fas fa-arrow-up"></i>
-        </a>
+
+<!-- Footer Section -->
+<footer class="footer">
+
+  
+  <!-- Additional Information Card -->
+  <div class="card">
+    <div class="card-content">
+      <!-- Image on the Left -->
+      <div class="card-image">
+        <img src="carlos_profile.png" alt="Card Image">
+      </div>
+      <!-- Text for Credits on the Right -->
+      <div class="card-text">
+        <p class="text-title">You made it to the end. I’m flattered... or maybe you just ran out of distractions?</p>
+        <p class="text-body">Carlos Benedict Natanauan | 2024</p>
       </div>
     </div>
+    <!-- Link/Button to Scroll to Top -->
+    <a class="card-button" href="#top">Back to top</a>
+  </div>
+</footer>
+
 
     <!-- External JavaScript -->
     <script src="./script.js"></script>

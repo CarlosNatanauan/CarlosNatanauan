@@ -213,6 +213,25 @@ button {
   transform: translateY(-5px);
 }
 
+
+.btn--icon {
+  background: none;
+  border: none; 
+}
+
+/* Remove background on hover, focus, and active states */
+.btn--icon:hover,
+.btn--icon:focus,
+.btn--icon:active {
+  background: none;  
+  color: var(--clr-primary); 
+  outline: none; 
+}
+
+
+
+
+
 /* =================
   Layout and Grid
 ================= */
@@ -272,25 +291,109 @@ main {
 /* About Section */
 .about {
   flex-direction: column;
-  margin-top: 3em;
+  margin-top: 1em;
 }
 
-.about__name {
+
+/* My Name - Static Text (Hello, I) */
+.typewrite .static-text {
+  color: var(--clr-fg); 
+  font-size: 1rem;
+}
+
+/* Dynamic Text (Typing Effect) */
+.typewrite .wrap {
   color: var(--clr-primary);
+  font-size: 1rem; 
 }
 
+/* Cursor for Typing Effect */
+.typewrite > .wrap {
+  border-right: 0.08em solid var(--clr-primary);
+}
+
+/* Light Mode Overrides */
+.light .typewrite .static-text {
+  color: var(--clr-fg); 
+}
+
+.light .typewrite > .wrap {
+  border-right: 0.08em solid var(--clr-primary);
+}
+
+/* Dark Mode Overrides */
+.dark .typewrite .static-text {
+  color: var(--clr-fg-alt);
+}
+
+.dark .typewrite > .wrap {
+  border-right: 0.08em solid var(--clr-primary); 
+}
+
+
+/* Responsive Font Sizes */
+/* Small */
+@media (max-width: 600px) {
+  .typewrite .static-text,
+  .typewrite .wrap {
+    font-size: 2.4rem; 
+  }
+
+  .about__role {
+    font-size: 1.4rem;
+  }
+
+  .about__desc {
+    font-size: 0.9rem; 
+  }
+}
+
+/* Medium */
+@media (min-width: 601px) and (max-width: 1024px) {
+  .typewrite .static-text,
+  .typewrite .wrap {
+    font-size: 3.4rem; 
+  }
+
+  .about__role {
+    font-size: 1.8rem; 
+  }
+
+  .about__desc {
+    font-size: 1rem; 
+  }
+}
+
+
+/* Large */
+@media (min-width: 1025px) {
+  .typewrite .static-text,
+  .typewrite .wrap {
+    font-size: 4.4rem; 
+  }
+
+  .about__role {
+    font-size: 2.2rem; 
+  }
+
+  .about__desc {
+    font-size: 1.1rem; 
+  }
+}
+
+
+/* Additional Styles for About Section */
 .about__role {
-  margin-top: 1.2em;
+  margin-top: 0.5em;
 }
 
 .about__desc {
-  font-size: 1rem;
   max-width: 600px;
 }
 
 .about__desc,
 .about__contact {
-  margin-top: 2.4em;
+  margin-top: 2em;
 }
 
 .about .link--icon {
@@ -300,6 +403,7 @@ main {
 .about .btn--outline {
   margin-right: 1em;
 }
+
 
 
 /* Social Icons Wrapper */
@@ -448,18 +552,24 @@ main {
 
 /* Projects Section */
 .projects__grid {
-  max-width: 1100px;
+  max-width: 1100px; 
   margin: 0 auto;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(18em, 1fr));
+  display: grid; 
+  grid-template-columns: repeat(auto-fit, minmax(18em, 1fr)); 
   grid-gap: 2em;
+  justify-items: center; 
+  justify-content: center;
 }
 
+/* Individual Project Card */
 .project {
-  padding: 2em;
-  margin: 0 auto;
-  text-align: center;
-  box-shadow: var(--shadow);
+  padding-top: 0.5em;
+  padding-right: 2em;
+  padding-left: 2em;
+  padding-bottom: 0.5em; 
+  margin: 0 auto; 
+  text-align: center; 
+  box-shadow: var(--shadow); 
   transition: transform 0.2s linear;
 }
 
@@ -467,38 +577,114 @@ main {
   transform: translateY(-7px);
 }
 
+/* Project Description */
 .project__description {
   margin-top: 1em;
-  font-size: 0.85rem; 
-  line-height: 1.4;  
-  color: var(--clr-fg-alt); 
+  line-height: 1.4;
+  color: var(--clr-fg-alt);
 }
 
+/* Project Stack */
 .project__stack {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  margin: 1.2em 0;
+  margin: 1em 0;
 }
 
+/* Project Stack Item */
 .project__stack-item {
   margin: 0.5em;
   font-weight: 500;
-  font-size: 0.8rem;
   color: var(--clr-fg-alt);
 }
 
+/* Link Icon Margin */
 .project .link--icon {
   margin-left: 0.5em;
 }
 
+/* Project Preview Image */
 .project__preview {
-  max-width: 100%;
-  height: auto;
+  max-width: 100%; 
+  width: 100%; 
+  height: auto; 
   margin-top: 1em; 
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+  border-radius: 8px; 
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
+
+/* Project Titles */
+.project h3 {
+  color: var(--clr-primary);
+}
+
+/* Highlight for Stack Items */
+.project__stack-item {
+  color: var(--clr-primary);
+  font-weight: bold;
+}
+
+/* Responsive Adjustments */
+
+
+@media (min-width: 1025px) {
+  .projects__grid {
+    grid-template-columns: repeat(auto-fit, minmax(10em, 1fr)); /* Adjust for large screens */
+  }
+
+  .project__description {
+    font-size: 0.9rem; 
+  }
+
+  .project__stack-item {
+    font-size: 0.8rem; 
+  }
+
+  .project h3 {
+    font-size: 1.6rem; 
+  }
+}
+
+
+@media (max-width: 900px) {
+  .projects__grid {
+    grid-template-columns: repeat(auto-fit, minmax(16em, 1fr)); /* Adjust for medium screens */
+  }
+
+  .project__description {
+    font-size: 0.9rem;
+  }
+
+  .project__stack-item {
+    font-size: 0.8rem; 
+  }
+
+  .project h3 {
+    font-size: 1.8rem; 
+  }
+}
+
+@media (max-width: 600px) {
+  .projects__grid {
+    grid-template-columns: repeat(auto-fit, minmax(10em 1fr)); /* Single-column for small screens */
+  }
+
+  .project__description {
+    font-size: 1rem; 
+  }
+
+  .project__stack-item {
+    font-size: 0.8rem; 
+  }
+
+  .project h3 {
+    font-size: 1.6rem; 
+  }
+}
+
+
+
 
 
 
@@ -506,44 +692,418 @@ main {
 
 /* Skills Section */
 .skills__container {
-  max-width: 1100px; 
-  width: 95%;
+  max-width: 1100px;
   margin: 0 auto;
-  padding: 15px; 
+  padding: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
 }
 
+/* Individual Categories */
+.skills__category {
+  flex: 1 1 calc(33.333% - 40px);
+  max-width: 300px; 
+  background: var(--clr-background-secondary); 
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+/* Adjust for smaller screens */
+@media (max-width: 900px) {
+  .skills__category {
+    flex: 1 1 calc(50% - 40px); /
+  }
+}
+
+@media (max-width: 600px) {
+  .skills__category {
+    flex: 1 1 100%; 
+  }
+}
+
+/* Skills List */
 .skills__list {
   display: flex;
   flex-wrap: wrap;
-  gap: 20px; 
+  gap: 15px;
   justify-content: center; 
 }
 
 .skills__list img {
-  height: 30px; 
+  height: 30px;
   width: auto;
 }
+
+/* Skills Category Title */
+.skills__category-title {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  color: var(--clr-primary);
+}
+
+/* Media Queries for Badge Size */
+@media (max-width: 600px) {
+  .skills__category-title {
+    font-size: 1.25rem;
+  }
+  .skills__list img {
+    height: 25px;
+  }
+}
+
+
+
+
 
 
 
 
 /* Contact Section */
 .contact {
+  display: flex;
   flex-direction: column;
+  align-items: center;
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 0 20px;
 }
 
-/* Footer */
+/* Contact Form */
+#contactForm {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  margin-top: 0.5em; 
+}
+
+#contactForm label {
+  display: flex;
+  flex-direction: column;
+  font-weight: 500;
+  color: var(--clr-fg-alt);
+}
+
+#contactForm input,
+#contactForm textarea {
+  padding: 0.8em;
+  margin-top: 0.5em;
+  border: 1px solid var(--clr-primary);
+  border-radius: 5px;
+  background-color: var(--clr-bg-alt);
+  color: var(--clr-fg);
+}
+
+#contactForm textarea {
+  resize: vertical;
+  min-height: 150px;
+}
+
+/* Static-sized Send Button */
+#contactForm button {
+  align-self: center; 
+  background-color: var(--clr-primary);
+  color: var(--clr-bg);
+  border: none;
+  padding: 0.8em 1.4em;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: 180px;
+}
+
+#contactForm button:hover {
+  opacity: 0.9;
+}
+
+#contactForm button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Section Title */
+.section__title {
+  text-align: center;
+  margin-bottom: 0.5em;
+  text-transform: uppercase;
+  padding-top: 1em; 
+}
+
+
+
+
+/* Contact Section Styles */
+#contact {
+  padding-bottom: 3em;
+}
+
+/* Footer Styles */
 .footer {
   padding: 3em 0;
   margin-top: 4em;
   text-align: center;
+  margin-bottom: 3em; 
 }
 
+/* Footer Link Styling */
 .footer__link {
   font-size: 0.9rem;
   font-weight: 700;
   color: var(--clr-fg);
 }
+
+/* Card Container Styles */
+.card {
+  width: 60%;  
+  max-width: 600px; 
+  height: 200px; 
+  border-radius: 20px;
+  background: #f5f5f5;
+  position: relative;
+  padding: 1.8rem;
+  border: 2px solid #c3c6ce;
+  transition: 0.5s ease-out;
+  overflow: visible;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0 auto;  
+}
+
+/* Card Content (Image + Text) */
+.card-content {
+  display: flex;
+  width: 100%;
+  align-items: center;
+}
+
+/* Image inside the Card */
+.card-image img {
+  width: 80px;
+  height: 80px; 
+  object-fit: cover;
+  border-radius: 10px;
+  margin-right: 20px;
+}
+
+/* Card Text (Title + Details) */
+.card-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  font-family: 'Courier New', Courier, monospace;
+  text-align: left;  
+}
+
+/* Theme-aware Card Styles */
+.light .card {
+  background-color: var(--clr-bg-alt);
+  border-color: rgba(100, 100, 111, 0.2);
+}
+
+.dark .card {
+  background-color: var(--clr-bg-alt);
+  border-color: rgba(0, 0, 0, 0.16);
+}
+
+.light .card:hover {
+  border-color: var(--clr-primary);
+  box-shadow: 10px 5px 18px 0 rgba(0, 0, 0, 0.1);
+}
+
+.dark .card:hover {
+  border-color: var(--clr-primary);
+  box-shadow: 10px 5px 18px 0 rgba(255, 255, 255, 0.1);
+}
+
+.dark .text-body {
+  color: var(--clr-fg);
+}
+
+.dark .card-text {
+  color: var(--clr-fg-alt);
+}
+
+
+
+/* Theme-aware Card Styles */
+.light .card {
+  background-color: var(--clr-bg-alt);
+  border-color: rgba(100, 100, 111, 0.2);
+}
+
+.dark .card {
+  background-color: var(--clr-bg-alt);
+  border-color: rgba(0, 0, 0, 0.16);
+}
+
+/* Light Mode Hover Effects */
+.light .card:hover {
+  border-color: var(--clr-primary);
+  box-shadow: 10px 5px 18px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* Dark Mode Hover Effects */
+.dark .card:hover {
+  border-color: var(--clr-primary);
+  box-shadow: 10px 5px 18px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Button Styling for Light Mode */
+.light .card-button {
+  background-color: var(--clr-primary);
+  color: var(--clr-bg-alt);
+}
+
+/* Button Styling for Dark Mode */
+.dark .card-button {
+  background-color: var(--clr-primary);
+  color: var(--clr-bg-alt);
+}
+
+/* Button Hover Effects for Light Mode */
+.light .card:hover {
+  border-color: var(--clr-primary);
+}
+
+/* Button Hover Effects for Dark Mode */
+.dark .card:hover {
+  border-color: var(--clr-primary);
+}
+
+/* Text Styling for Dark Mode */
+.dark .text-body {
+  color: var(--clr-fg);
+}
+
+.dark .card-text {
+  color: var(--clr-fg-alt);
+}
+
+/* Card Button Styling */
+.card-button {
+  text-decoration: none;
+  text-align: center;
+  transform: translate(-50%, 125%);
+  width: 70%;
+  border-radius: 1rem;
+  border: none;
+  color: #fff;
+  font-size: 1.1rem;
+  padding: .5rem 1rem;
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  opacity: 0;
+  transition: 0.3s ease-out;
+  cursor: pointer;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+
+/* Hover Effects for the Card Button */
+.card:hover .card-button {
+  transform: translate(-50%, 50%);
+  opacity: 1;
+}
+
+
+/* Text Styling Inside the Card */
+.text-title {
+  font-size: 1.5em;
+  font-weight: bold;
+}
+
+.text-body {
+  color: rgb(134, 134, 134);
+}
+
+/* Responsive Text Sizes for Large Screens (Default) */
+@media (min-width: 1200px) {
+  .text-title {
+    font-size: 1.1em;
+  }
+  
+  .text-body {
+    font-size: 0.9em;
+  }
+}
+
+/* Responsive Text Sizes for Medium Screens */
+@media (max-width: 900px) {
+  .text-title {
+    font-size: 0.9em;
+  }
+  
+  .text-body {
+    font-size: 0.8em;
+  }
+}
+
+/* Responsive Text Sizes for Small Screens */
+@media (max-width: 600px) {
+  .text-title {
+    font-size: 0.7em;
+  }
+  
+  .text-body {
+    font-size: 0.6em;
+  }
+}
+
+
+/* ===================
+  Responsive Design
+=================== */
+
+/* Medium and Small Device Responsiveness */
+@media (max-width: 900px) {
+  .card {
+    width: 80%; 
+    height: 180px; 
+  }
+
+  .card-image img {
+    width: 70px;
+    height: 70px; 
+  }
+
+  .card-button {
+    width: 80%; 
+  }
+}
+
+@media (max-width: 600px) {
+  .card {
+    width: 90%; 
+    height: 160px;
+  }
+
+  .card-image img {
+    width: 60px; 
+    height: 60px;
+  }
+
+  .card-button {
+    width: 90%;  
+  }
+
+  .footer {
+    padding: 2em; 
+  }
+
+  .footer__link {
+    font-size: 0.8rem;
+  }
+}
+
+
+
+
 
 /* Scroll-to-Top Button */
 .scroll-top {
@@ -597,7 +1157,7 @@ main {
 
   .about {
     flex-direction: column;
-    margin-top: 1em;  /* Reduced margin to push it further up */
+    margin-top: 1em; 
   }
   
 
