@@ -1,0 +1,27 @@
+@import "tailwindcss";
+
+/* subtle metallic / neon shimmer */
+@keyframes gradient-move {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-move 6s ease infinite;
+}
+
+/* darker metallic (gunmetal → steel → obsidian) */
+.metal-gradient {
+  @apply text-transparent bg-clip-text bg-gradient-to-r from-zinc-800 via-slate-500 to-zinc-900;
+}
+
+/* neon glow (electric blue mix) */
+.neon-gradient {
+  @apply text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-indigo-500 to-cyan-400;
+}
+
+/* optional underline accent for “Hello, I’m” */
+.headline-accent {
+  background-image: linear-gradient(to right, rgba(59,130,246,0.6) 0%, rgba(236,72,153,0.6) 100%);
+}

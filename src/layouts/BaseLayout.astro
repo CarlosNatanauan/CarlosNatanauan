@@ -1,0 +1,31 @@
+---
+import "../styles/global.css";  // ✅ Load Tailwind globally
+const { title = "Carlos Benedict Natanauan — Portfolio" } = Astro.props;
+---
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>{title}</title>
+  </head>
+  <body class="bg-white text-slate-900 selection:bg-indigo-200">
+    <header class="sticky top-0 z-10 backdrop-blur bg-white/70 border-b border-slate-200">
+      <nav class="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
+        <a href="/" class="font-semibold">Carlos Natanauan</a>
+        <ul class="hidden md:flex gap-6 text-sm">
+          <li><a class="hover:text-indigo-600" href="#projects">Projects</a></li>
+          <li><a class="hover:text-indigo-600" href="#experience">Experience</a></li>
+          <li><a class="hover:text-indigo-600" href="#contact">Contact</a></li>
+        </ul>
+      </nav>
+    </header>
+    <main class="max-w-6xl mx-auto px-6">
+      <slot />
+    </main>
+    <footer class="border-t border-slate-200 mt-16">
+      <div class="max-w-6xl mx-auto px-6 py-8 text-sm text-slate-600">
+        © {new Date().getFullYear()} Carlos Benedict Natanauan
+      </div>
+    </footer>
+  </body>
+</html>

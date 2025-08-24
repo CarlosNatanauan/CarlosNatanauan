@@ -1,0 +1,20 @@
+---
+//ExperienceItem.astro
+interface Experience {
+  role: string;
+  company: string;
+  period: string;
+  bullets: string[];
+}
+
+const { item } = Astro.props as { item: Experience };
+---
+<div class="rounded-2xl border border-slate-200 p-5 bg-white">
+  <div class="flex flex-wrap items-baseline justify-between gap-2">
+    <h3 class="font-semibold">{item.role} — <span class="text-indigo-600">{item.company}</span></h3>
+    <p class="text-sm text-slate-500">{item.period}</p>
+  </div>
+  <ul class="mt-3 list-disc list-inside text-sm text-slate-700">
+    {item.bullets.map((b) => <li>{b}</li>)}
+  </ul>
+</div>
