@@ -1,7 +1,10 @@
 ---
 import "../styles/global.css";
+import BackToTop from "../components/BackToTop.astro"; // 👈 import here
+
 const { title = "Carlos Benedict Natanauan — Portfolio" } = Astro.props;
 ---
+
 <html lang="en" class="scroll-smooth">
   <head>
     <!-- Set theme deterministically before first paint -->
@@ -121,6 +124,7 @@ const { title = "Carlos Benedict Natanauan — Portfolio" } = Astro.props;
   })();
 </script>
 
+  <BackToTop threshold={200} />
 
   </body>
 </html>

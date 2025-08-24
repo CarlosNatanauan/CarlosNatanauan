@@ -1,0 +1,53 @@
+---
+// src/components/BackToTop.astro
+const { threshold = 200 } = Astro.props;
+---
+
+<button
+  id="back-to-top"
+  class="fixed bottom-6 right-6 z-20 
+         bg-slate-900 dark:bg-zinc-100 text-white dark:text-zinc-900
+         p-3 rounded-full shadow-lg hover:scale-110 transition-all duration-200
+         opacity-0 pointer-events-none"
+  aria-label="Back to top"
+  title="Back to top"
+>
+  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <path d="m18 15-6-6-6 6"/>
+  </svg>
+</button>
+
+<script define:vars={{ threshold }}>
+  (function () {
+    const btn = document.getElementById("back-to-top");
+    if (!btn) return;
+
+    const show = () => btn.classList.remove("opacity-0", "pointer-events-none");
+    const hide = () => btn.classList.add("opacity-0", "pointer-events-none");
+
+    const updateByScroll = () => {
+      if (window.scrollY > threshold) show();
+      else hide();
+    };
+    
+    updateByScroll();
+    window.addEventListener("scroll", updateByScroll, { passive: true });
+
+    const footer = document.querySelector("footer");
+    if (footer && "IntersectionObserver" in window) {
+      const io = new IntersectionObserver(
+        (entries) => {
+          const inView = entries.some((e) => e.isIntersecting);
+          if (inView) hide();
+          else updateByScroll();
+        },
+        { root: null, threshold: 0.05 }
+      );
+      io.observe(footer);
+    }
+
+    btn.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }, { passive: true });
+  })();
+</script>
