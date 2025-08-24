@@ -1,20 +1,88 @@
 ---
-//ExperienceItem.astro
 interface Experience {
   role: string;
   company: string;
-  period: string;
+  period: string;        // e.g. "Jan 2023 — Present"
   bullets: string[];
+  companyUrl?: string;
+  datetime?: string;
 }
 
 const { item } = Astro.props as { item: Experience };
+const CompanyTag = item.companyUrl ? 'a' : 'span';
+const companyAttrs = item.companyUrl ? { href: item.companyUrl, target: '_blank', rel: 'noreferrer' } : {};
+
+// detect if current job
+const isPresent = item.period.toLowerCase().includes("present");
 ---
-<div class="rounded-2xl border border-slate-200 p-5 bg-white">
-  <div class="flex flex-wrap items-baseline justify-between gap-2">
-    <h3 class="font-semibold">{item.role} — <span class="text-indigo-600">{item.company}</span></h3>
-    <p class="text-sm text-slate-500">{item.period}</p>
+
+<article
+  class="group relative rounded-2xl overflow-hidden
+         border border-slate-200 bg-white
+         dark:border-zinc-800 dark:bg-zinc-900
+         transition duration-300 hover:shadow-md hover:-translate-y-0.5"
+>
+  <!-- Decorative gradient rail -->
+  <div
+    aria-hidden="true"
+    class="absolute left-0 top-0 h-full w-1
+           bg-gradient-to-b from-indigo-500 via-sky-400 to-cyan-400
+           opacity-70 group-hover:opacity-100 transition-opacity"
+  ></div>
+
+  <div class="p-5 sm:p-6">
+    <header class="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
+      <h3 class="text-lg font-semibold text-slate-900 dark:text-zinc-100 leading-snug">
+        <span class="block sm:inline">{item.role}</span>
+        <span class="sr-only"> at </span>
+        <CompanyTag
+          class="sm:ml-2 text-indigo-600 dark:text-indigo-400 hover:underline underline-offset-4"
+          {...companyAttrs}
+        >
+          {item.company}
+        </CompanyTag>
+      </h3>
+
+      <div class="flex items-center gap-2 sm:ml-3">
+        <time
+          class="text-sm text-slate-500 dark:text-zinc-400"
+          {...(item.datetime ? { datetime: item.datetime } : {})}
+        >
+          {item.period}
+        </time>
+        {isPresent && (
+          <span
+            class="px-2 py-0.5 text-xs rounded-full font-medium
+                   bg-gradient-to-r from-indigo-500 to-sky-500
+                   text-white shadow-sm"
+          >
+            Current
+          </span>
+        )}
+      </div>
+    </header>
+
+    {item.bullets?.length > 0 && (
+      <ul class="mt-3 sm:mt-4 space-y-2 text-sm text-slate-700 dark:text-zinc-300">
+        {item.bullets.map((b) => (
+          <li class="flex gap-3">
+            <span
+              aria-hidden="true"
+              class="mt-[0.45rem] inline-block size-1.5 rounded-full
+                     bg-slate-300 dark:bg-zinc-600
+                     ring-2 ring-slate-200 dark:ring-zinc-700"
+            ></span>
+            <span class="leading-relaxed">{b}</span>
+          </li>
+        ))}
+      </ul>
+    )}
   </div>
-  <ul class="mt-3 list-disc list-inside text-sm text-slate-700">
-    {item.bullets.map((b) => <li>{b}</li>)}
-  </ul>
-</div>
+
+  <div
+    aria-hidden="true"
+    class="pointer-events-none absolute inset-0 rounded-2xl
+           ring-0 group-hover:ring-1 ring-indigo-200/60 dark:ring-indigo-500/20
+           transition-all"
+  ></div>
+</article>

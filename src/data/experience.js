@@ -1,7 +1,6 @@
-// src/data/experience.js
 export const experience = [
   {
-    role: "Mobile App Developer (Flutter)",
+    role: "Mobile App Developer (Full-time)",
     company: "Creative Outline • Remote (UK)",
     period: "Dec 2024 — Present",
     bullets: [
@@ -10,7 +9,7 @@ export const experience = [
     ],
   },
   {
-    role: "Software Developer (Intern)",
+    role: "Software Developer (Internship)",
     company: "Nucleio Information Services • Remote (Laguna, PH)",
     period: "Feb 2024 — May 2024",
     bullets: [

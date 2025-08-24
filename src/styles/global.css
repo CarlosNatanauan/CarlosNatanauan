@@ -1,4 +1,11 @@
+
+/*CarlosNatanauan/src/styles/global.css*/
+
+/* src/styles/global.css */
 @import "tailwindcss";
+
+/* Make dark: utilities respond to <html class="dark"> */
+@custom-variant dark (&:where(.dark *));
 
 /* subtle metallic / neon shimmer */
 @keyframes gradient-move {

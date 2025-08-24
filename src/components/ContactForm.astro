@@ -1,0 +1,170 @@
+---
+import SectionTitle from "./SectionTitle.astro";
+
+interface Props {
+  action?: string;   // Formspree endpoint
+  subject?: string;  // Optional email subject
+  title?: string;    // Optional heading text
+}
+
+const {
+  action = "https://formspree.io/f/mldekgro",
+  subject = "New portfolio message!",
+  title = "Contact",
+} = Astro.props as Props;
+---
+
+<!-- Section header -->
+<div class="mt-16">
+  <SectionTitle id="contact">{title}</SectionTitle>
+  <p class="mt-2 text-center text-slate-600 dark:text-zinc-400">
+    Send me a message directly — I’ll get back to you soon.
+  </p>
+</div>
+
+<!-- Card -->
+<form
+  id="contact-form"
+  action={action}
+  method="POST"
+  class="mx-auto mt-6 w-full max-w-2xl rounded-2xl border
+         border-slate-200/80 dark:border-zinc-800/80
+         bg-white/70 dark:bg-zinc-900/70 backdrop-blur
+         shadow-lg ring-1 ring-slate-200/60 dark:ring-zinc-800
+         p-6 sm:p-8"
+>
+  <!-- Two-up on md+ -->
+  <div class="grid grid-cols-1 gap-4 sm:gap-5 md:grid-cols-2">
+    <!-- Name -->
+    <div>
+      <label for="name" class="block text-sm font-medium text-slate-800 dark:text-zinc-200">
+        Your Name
+      </label>
+      <input
+        id="name" name="name" type="text" required autocomplete="name"
+        class="mt-1 w-full rounded-xl border border-slate-300 dark:border-zinc-700
+               bg-white dark:bg-zinc-900 px-3 py-3 text-base
+               text-slate-900 dark:text-zinc-100
+               placeholder:text-slate-400 dark:placeholder:text-zinc-500
+               focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        placeholder="Jane Doe"
+      />
+    </div>
+
+    <!-- Email -->
+    <div>
+      <label for="email" class="block text-sm font-medium text-slate-800 dark:text-zinc-200">
+        Your Email
+      </label>
+      <input
+        id="email" name="email" type="email" required autocomplete="email"
+        class="mt-1 w-full rounded-xl border border-slate-300 dark:border-zinc-700
+               bg-white dark:bg-zinc-900 px-3 py-3 text-base
+               text-slate-900 dark:text-zinc-100
+               placeholder:text-slate-400 dark:placeholder:text-zinc-500
+               focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        placeholder="you@email.com"
+      />
+    </div>
+  </div>
+
+  <!-- Message -->
+  <div class="mt-4 sm:mt-5">
+    <label for="message" class="block text-sm font-medium text-slate-800 dark:text-zinc-200">
+      Message
+    </label>
+    <textarea
+      id="message" name="message" rows="6" required
+      class="mt-1 w-full rounded-xl border border-slate-300 dark:border-zinc-700
+             bg-white dark:bg-zinc-900 px-3 py-3 text-base
+             text-slate-900 dark:text-zinc-100
+             placeholder:text-slate-400 dark:placeholder:text-zinc-500
+             focus:outline-none focus:ring-2 focus:ring-indigo-500"
+      placeholder="Tell me a bit about your project or question…"
+    ></textarea>
+  </div>
+
+  <!-- Optional metadata -->
+  <input type="hidden" name="_subject" value={subject} />
+  <!-- Honeypot (spam trap) -->
+  <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" class="hidden" aria-hidden="true" />
+
+  <!-- Actions -->
+  <div class="mt-6 flex items-center justify-between gap-3">
+    <p id="form-status" class="text-sm" aria-live="polite"></p>
+
+    <button
+      id="submit-btn"
+      type="submit"
+      class="inline-flex items-center justify-center gap-2 rounded-xl
+             bg-gradient-to-r from-slate-900 to-zinc-800
+             text-white px-5 py-3 text-sm font-medium
+             hover:scale-[1.02] active:scale-[0.99]
+             transition-transform
+             dark:from-zinc-100 dark:to-zinc-200 dark:text-zinc-900
+             focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+    >
+      <svg id="btn-spinner" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+           class="h-4 w-4 animate-spin hidden" fill="none" aria-hidden="true">
+        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-opacity=".25" stroke-width="4"/>
+        <path d="M22 12a10 10 0 0 1-10 10" stroke="currentColor" stroke-width="4"/>
+      </svg>
+      <span id="btn-label">Send Message</span>
+    </button>
+  </div>
+</form>
+
+<script is:inline>
+  const form = document.getElementById('contact-form');
+  const statusEl = document.getElementById('form-status');
+  const btn = document.getElementById('submit-btn');
+  const spinner = document.getElementById('btn-spinner');
+  const btnLabel = document.getElementById('btn-label');
+
+  function setStatus(msg, ok = null) {
+    statusEl.textContent = msg;
+    statusEl.className = 'text-sm';
+    if (ok === true) statusEl.classList.add('text-green-600', 'dark:text-green-400');
+    if (ok === false) statusEl.classList.add('text-red-600', 'dark:text-red-400');
+  }
+
+  function setLoading(loading) {
+    if (!btn || !spinner || !btnLabel) return;
+    btn.disabled = loading;
+    spinner.classList.toggle('hidden', !loading);
+    btnLabel.textContent = loading ? 'Sending…' : 'Send Message';
+    if (loading) {
+      btn.classList.add('opacity-80', 'pointer-events-none');
+    } else {
+      btn.classList.remove('opacity-80', 'pointer-events-none');
+    }
+  }
+
+  if (form && statusEl) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      setStatus('Sending…');
+      setLoading(true);
+
+      try {
+        const fd = new FormData(form);
+        const res = await fetch(form.action, {
+          method: 'POST',
+          body: fd,
+          headers: { 'Accept': 'application/json' }
+        });
+
+        if (res.ok) {
+          form.reset();
+          setStatus('Thanks! Your message has been sent.', true);
+        } else {
+          setStatus('Something went wrong. Please try again later.', false);
+        }
+      } catch {
+        setStatus('Network error. Please try again.', false);
+      } finally {
+        setLoading(false);
+      }
+    });
+  }
+</script>
