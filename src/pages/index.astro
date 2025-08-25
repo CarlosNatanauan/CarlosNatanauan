@@ -8,7 +8,6 @@ import { projects } from "../data/projects.js";
 import { experience } from "../data/experience.js";
 import ContactForm from "../components/ContactForm.astro";
 
-
 const NAME = "Carlos";
 const TAGLINE = "Software Developer crafting apps that don't just run, but (most of the time) actually work.";
 const EMAIL = "carlosbenedictn@gmail.com";
@@ -99,16 +98,15 @@ const LINKS = {
       pretending my to-do list isn't judging me.
     </p>
 
-<!-- CTA + Social icons -->
-<div class="mt-8 flex items-center gap-3">
-  <a 
-    href="#contact" 
-    class="rounded-xl bg-slate-900 dark:bg-zinc-100 text-white dark:text-zinc-900 
-           px-5 py-3 text-sm font-medium hover:scale-105 transition-transform"
-  >
-    Contact Me
-  </a>
-
+    <!-- CTA + Social icons -->
+    <div class="mt-8 flex items-center gap-3">
+      <a 
+        href="#contact" 
+        class="rounded-xl bg-slate-900 dark:bg-zinc-100 text-white dark:text-zinc-900 
+               px-5 py-3 text-sm font-medium hover:scale-105 transition-transform"
+      >
+        Contact Me
+      </a>
 
       <div class="ml-2 flex items-center gap-2">
         <!-- GitHub -->
@@ -140,24 +138,32 @@ const LINKS = {
   </section>
 
   <!-- Projects -->
-  <SectionTitle id="projects">Projects</SectionTitle>
-  <p class="mt-2 text-slate-600 dark:text-zinc-400">Some of my recent work.</p>
-  <div class="mt-6 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-    {projects.map((p) => <ProjectCard project={p} />)}
-  </div>
+  <section id="projects" class="scroll-mt-28 md:scroll-mt-24">
+    <SectionTitle>Projects</SectionTitle>
+    <p class="mt-2 text-slate-600 dark:text-zinc-400">Some of my recent work.</p>
+    <div class="mt-6 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {projects.map((p) => <ProjectCard project={p} />)}
+    </div>
+  </section>
 
   <!-- Experience -->
-  <SectionTitle id="experience">Experience</SectionTitle>
-  <div class="mt-6 space-y-4">
-    {experience.map((item) => <ExperienceItem item={item} />)}
-  </div>
+  <section id="experience" class="scroll-mt-28 md:scroll-mt-24">
+    <SectionTitle>Experience</SectionTitle>
+    <p class="mt-2 text-slate-600 dark:text-zinc-400">
+      A few roles and internships where I learned, built, and shipped.
+    </p>
+    <div class="mt-6 space-y-4">
+      {experience.map((item) => <ExperienceItem item={item} />)}
+    </div>
+  </section>
 
   <!-- Contact -->
-<ContactForm
-  action="https://formspree.io/f/mldekgro"
-  subject="New portfolio message!"
-  title="Contact"
-/>
-
-  
+  <section id="contact" class="scroll-mt-28 md:scroll-mt-24">
+    <SectionTitle>Contact</SectionTitle>
+    <ContactForm
+      action="https://formspree.io/f/mldekgro"
+      subject="New portfolio message!"
+      title="Contact"
+    />
+  </section>
 </BaseLayout>

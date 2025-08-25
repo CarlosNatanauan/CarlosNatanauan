@@ -12,7 +12,7 @@ export const projects = [
     name: "Listly",
     description:
       "A note-taking and task management app with real-time syncing to simplify workflow and stay on top of tasks and ideas.",
-    tech: ["Flutter", "Riverpod", "Node.js", "MongoDB Atlas"],
+    tech: ["Flutter", "Node.js", "MongoDB Atlas"],
     repo: "https://github.com/CarlosNatanauan/listly",
     image: "/listly.png", // ✅ place listly.png inside /public
   },

@@ -1,6 +1,6 @@
 ---
 import "../styles/global.css";
-import BackToTop from "../components/BackToTop.astro"; // 👈 import here
+import BackToTop from "../components/BackToTop.astro"; 
 
 const { title = "Carlos Benedict Natanauan — Portfolio" } = Astro.props;
 ---
@@ -8,18 +8,17 @@ const { title = "Carlos Benedict Natanauan — Portfolio" } = Astro.props;
 <html lang="en" class="scroll-smooth">
   <head>
     <!-- Set theme deterministically before first paint -->
-<script is:inline>
-  (function () {
-    const stored = localStorage.getItem("theme"); // 'dark' | 'light' | null
-    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    const isDark = stored ? stored === "dark" : prefersDark;
+    <script is:inline>
+      (function () {
+        const stored = localStorage.getItem("theme"); // 'dark' | 'light' | null
+        const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        const isDark = stored ? stored === "dark" : prefersDark;
 
-    const root = document.documentElement;
-    root.classList.toggle("dark", isDark);
-    root.style.colorScheme = isDark ? "dark" : "light";
-  })();
-</script>
-
+        const root = document.documentElement;
+        root.classList.toggle("dark", isDark);
+        root.style.colorScheme = isDark ? "dark" : "light";
+      })();
+    </script>
 
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
@@ -32,30 +31,78 @@ const { title = "Carlos Benedict Natanauan — Portfolio" } = Astro.props;
                dark:bg-zinc-950 dark:text-zinc-100 dark:selection:bg-indigo-900">
     <header class="sticky top-0 z-10 backdrop-blur bg-white/70 dark:bg-zinc-950/70 
                    border-b border-slate-200 dark:border-zinc-800">
-      <nav class="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
+      <nav class="relative max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
         <a href="/" class="font-semibold hover:text-indigo-600 dark:hover:text-indigo-400">Kuya Carlos</a>
-        <div class="flex items-center gap-4">
-          <ul class="hidden md:flex gap-6 text-sm">
+
+        <!-- Desktop nav -->
+        <div class="hidden md:flex items-center gap-4">
+          <ul class="flex gap-6 text-sm">
             <li><a class="hover:text-indigo-600 dark:hover:text-indigo-400" href="#projects">Projects</a></li>
             <li><a class="hover:text-indigo-600 dark:hover:text-indigo-400" href="#experience">Experience</a></li>
             <li><a class="hover:text-indigo-600 dark:hover:text-indigo-400" href="#contact">Contact</a></li>
           </ul>
 
-          <!-- Dark Mode Toggle Button -->
-<button
-  id="theme-toggle-btn"
-  type="button"
+          <!-- Dark Mode Toggle Button (desktop) -->
+          <button
+            data-theme-toggle
+            type="button"
+            class="rounded-xl border px-3 py-1 text-sm
+                   hover:bg-slate-100 dark:hover:bg-zinc-800
+                   border-slate-300 dark:border-zinc-700 transition-colors
+                   inline-flex items-center gap-2"
+            aria-label="Toggle dark mode"
+            aria-pressed="false"
+          >
+            <span class="label-dark">🌙 Dark</span>
+            <span class="label-light hidden">☀️ Light</span>
+          </button>
+        </div>
+
+        <!-- Mobile controls -->
+        <div class="md:hidden flex items-center gap-2">
+          <!-- Dark Mode Toggle Button (mobile) -->
+          <button
+            data-theme-toggle
+            type="button"
+            class="rounded-xl border px-3 py-1 text-sm
+                   hover:bg-slate-100 dark:hover:bg-zinc-800
+                   border-slate-300 dark:border-zinc-700 transition-colors
+                   inline-flex items-center gap-2"
+            aria-label="Toggle dark mode"
+            aria-pressed="false"
+          >
+            <span class="label-dark">🌙 Dark</span>
+            <span class="label-light hidden">☀️ Light</span>
+          </button>
+
+<!-- Hamburger -->
+<button 
+  id="menu-btn" 
+  type="button" 
+  aria-label="Open menu" 
+  aria-expanded="false"
+  aria-controls="mobile-menu"
   class="rounded-xl border px-3 py-1 text-sm
          hover:bg-slate-100 dark:hover:bg-zinc-800
          border-slate-300 dark:border-zinc-700 transition-colors
-         inline-flex items-center gap-2"
-  aria-label="Toggle dark mode"
-  aria-pressed="false"
+         inline-flex items-center justify-center"
 >
-  <span id="label-dark">🌙 Dark</span>
-  <span id="label-light" class="hidden">☀️ Light</span>
+  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M4 6h16v2H4zM4 11h16v2H4zM4 16h16v2H4z"/>
+  </svg>
 </button>
 
+        </div>
+
+        <!-- Mobile menu panel -->
+        <div id="mobile-menu"
+             class="md:hidden hidden absolute inset-x-0 top-14 border-b border-slate-200 dark:border-zinc-800
+                    bg-white/95 dark:bg-zinc-950/95 backdrop-blur">
+          <ul class="px-6 py-3 space-y-2 text-sm">
+            <li><a class="block py-2 hover:text-indigo-600 dark:hover:text-indigo-400" href="#projects">Projects</a></li>
+            <li><a class="block py-2 hover:text-indigo-600 dark:hover:text-indigo-400" href="#experience">Experience</a></li>
+            <li><a class="block py-2 hover:text-indigo-600 dark:hover:text-indigo-400" href="#contact">Contact</a></li>
+          </ul>
         </div>
       </nav>
     </header>
@@ -70,61 +117,107 @@ const { title = "Carlos Benedict Natanauan — Portfolio" } = Astro.props;
       </div>
     </footer>
 
-    <!-- Dark Mode Toggle Script -->
-<script is:inline>
-  (function () {
-    let controller;
+    <!-- Dark Mode Toggle Script (supports multiple buttons) -->
+    <script is:inline>
+      (function () {
+        let controller;
 
-    function setUI(isDark) {
-      const btn = document.getElementById("theme-toggle-btn");
-      if (!btn) return;
-      btn.setAttribute("aria-pressed", isDark ? "true" : "false");
-
-      // Flip the two labels manually (no Tailwind dark: dependency)
-      const on = document.getElementById("label-light"); // shows when dark is ON
-      const off = document.getElementById("label-dark"); // shows when dark is OFF
-      if (on && off) {
-        if (isDark) {
-          on.classList.remove("hidden");
-          off.classList.add("hidden");
-        } else {
-          on.classList.add("hidden");
-          off.classList.remove("hidden");
+        function setUI(isDark) {
+          const toggles = document.querySelectorAll('[data-theme-toggle]');
+          toggles.forEach((btn) => {
+            btn.setAttribute("aria-pressed", isDark ? "true" : "false");
+            const on = btn.querySelector(".label-light"); // shows when dark is ON
+            const off = btn.querySelector(".label-dark"); // shows when dark is OFF
+            if (on && off) {
+              if (isDark) {
+                on.classList.remove("hidden");
+                off.classList.add("hidden");
+              } else {
+                on.classList.add("hidden");
+                off.classList.remove("hidden");
+              }
+            }
+          });
         }
-      }
-    }
 
-    function setTheme(isDark) {
-      const root = document.documentElement;
-      root.classList.toggle("dark", isDark);
-      root.style.colorScheme = isDark ? "dark" : "light";
-      localStorage.setItem("theme", isDark ? "dark" : "light");
-      setUI(isDark);
-    }
+        function setTheme(isDark) {
+          const root = document.documentElement;
+          root.classList.toggle("dark", isDark);
+          root.style.colorScheme = isDark ? "dark" : "light";
+          localStorage.setItem("theme", isDark ? "dark" : "light");
+          setUI(isDark);
+        }
 
-    function bind() {
-      const btn = document.getElementById("theme-toggle-btn");
-      if (!btn) return;
+        function bindThemeToggles() {
+          controller?.abort();
+          controller = new AbortController();
 
-      controller?.abort();
-      controller = new AbortController();
+          // Initialize from current DOM state set by the head script
+          setUI(document.documentElement.classList.contains("dark"));
 
-      // Initialize from current DOM state set by the head script
-      setUI(document.documentElement.classList.contains("dark"));
+          document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
+            btn.addEventListener(
+              "click",
+              () => setTheme(!document.documentElement.classList.contains("dark")),
+              { signal: controller.signal, passive: true }
+            );
+          });
+        }
 
-      btn.addEventListener(
-        "click",
-        () => setTheme(!document.documentElement.classList.contains("dark")),
-        { signal: controller.signal, passive: true }
-      );
-    }
+        bindThemeToggles();
+        addEventListener("astro:page-load", bindThemeToggles); // re-bind after client-side navigations
+      })();
+    </script>
 
-    bind();
-    addEventListener("astro:page-load", bind); // re-bind after client-side navigations
-  })();
-</script>
+    <!-- Mobile Menu Script -->
+    <script is:inline>
+      (function () {
+        let ctrl;
 
-  <BackToTop threshold={200} />
+        function closeMenu() {
+          const btn = document.getElementById('menu-btn');
+          const panel = document.getElementById('mobile-menu');
+          if (!btn || !panel) return;
+          btn.setAttribute('aria-expanded', 'false');
+          panel.classList.add('hidden');
+        }
+        function toggleMenu() {
+          const btn = document.getElementById('menu-btn');
+          const panel = document.getElementById('mobile-menu');
+          if (!btn || !panel) return;
+          const open = btn.getAttribute('aria-expanded') === 'true';
+          btn.setAttribute('aria-expanded', String(!open));
+          panel.classList.toggle('hidden', open);
+        }
+        function bind() {
+          const btn = document.getElementById('menu-btn');
+          const panel = document.getElementById('mobile-menu');
+          if (!btn || !panel) return;
 
+          ctrl?.abort();
+          ctrl = new AbortController();
+
+          btn.addEventListener('click', toggleMenu, { signal: ctrl.signal });
+
+          // Close on link click
+          panel.querySelectorAll('a').forEach(a => {
+            a.addEventListener('click', closeMenu, { signal: ctrl.signal });
+          });
+
+          // Close on resize to md+
+          addEventListener('resize', () => {
+            if (matchMedia('(min-width: 768px)').matches) closeMenu();
+          }, { signal: ctrl.signal, passive: true });
+
+          // Close on page load transitions (Astro)
+          addEventListener('astro:page-load', closeMenu, { signal: ctrl.signal });
+        }
+
+        bind();
+        addEventListener('astro:page-load', bind);
+      })();
+    </script>
+
+    <BackToTop threshold={200} />
   </body>
 </html>
