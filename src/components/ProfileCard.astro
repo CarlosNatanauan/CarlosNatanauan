@@ -1,0 +1,198 @@
+---
+interface Props {
+  name: string;
+  role: string;
+  location: string;
+  avatar: string; // dark image (cropped)
+}
+
+const { name, role, location, avatar } = Astro.props as Props;
+
+const avatarLight = "/profiles/carlos_light.png";
+const avatarDarkFull = "/profiles/carlos_dark_fullsize.png";
+const avatarLightFull = "/profiles/carlos_light_fullsize.png";
+
+// Lottie hint (place these JSONs in /public/animation/)
+const hintLight = "/animation/click_light.json";
+const hintDark  = "/animation/click_dark.json";
+---
+
+<article class="mt-4 sm:mt-6 flex items-center gap-4 sm:gap-6 flex-nowrap">
+  <!-- Avatar wrapper is relative so we can position the hint -->
+  <div class="relative">
+    <!-- Avatar (clickable) -->
+    <img
+      id="profile-avatar"
+      src={avatar}
+      alt={`Portrait of ${name}`}
+      width="140"
+      height="140"
+      class="h-28 w-28 sm:h-32 sm:w-32 rounded-2xl object-cover cursor-pointer
+             ring-2 ring-indigo-400/40 dark:ring-sky-500/30
+             shadow-lg flex-shrink-0
+             transition-transform duration-300 hover:scale-[1.02]"
+      loading="eager"
+      decoding="async"
+      data-dark={avatar}
+      data-light={avatarLight}
+      data-dark-full={avatarDarkFull}
+      data-light-full={avatarLightFull}
+    />
+
+    <!-- Click hint (Lottie target). Pointer-events none so clicks go to the avatar -->
+    <div
+      id="click-hint"
+      class="pointer-events-none absolute bottom-0 right-0 translate-x-[40%] translate-y-[40%]
+             h-16 w-16 opacity-0 z-10"
+      data-light={hintLight}
+      data-dark={hintDark}
+      aria-hidden="true"
+    ></div>
+  </div>
+
+  <!-- Info -->
+  <div class="min-w-0 flex-1">
+    <h2 class="text-base sm:text-xl font-semibold text-slate-900 dark:text-zinc-100 leading-tight">
+      {name}
+    </h2>
+
+    <p class="mt-0.5 flex items-center gap-1 text-[0.75rem] sm:text-sm text-slate-600 dark:text-zinc-400">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5Z"/>
+      </svg>
+      <span class="truncate">{location}</span>
+    </p>
+
+    <p class="mt-0.5 flex items-center gap-1 text-xs sm:text-base text-slate-700 dark:text-zinc-300 leading-snug">
+  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M10 2a1 1 0 0 0-1 1v2H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-3V3a1 1 0 0 0-1-1h-4Zm1 3V4h2v1h-2Z"/>
+  </svg>
+  <span>{role}</span>
+</p>
+
+  </div>
+</article>
+
+<!-- Modal -->
+<div
+  id="profile-modal"
+  class="fixed inset-0 z-50 hidden items-center justify-center bg-black/70 backdrop-blur-sm
+         transition-opacity duration-300"
+>
+  <img
+    id="profile-modal-img"
+    src={avatarDarkFull}
+    alt="Full-size portrait"
+    class="max-h-[90vh] max-w-[90vw] rounded-2xl shadow-2xl ring-2 ring-white/10 object-contain transition-transform duration-300 scale-95"
+  />
+</div>
+
+<!-- Scripts -->
+<script is:inline>
+  const img = document.getElementById("profile-avatar");
+  const modal = document.getElementById("profile-modal");
+  const modalImg = document.getElementById("profile-modal-img");
+  const hint = document.getElementById("click-hint");
+
+  // ---- Theme-aware avatar & modal ----
+  function setAvatar() {
+    if (!img || !modalImg) return;
+    const isDark = document.documentElement.classList.contains("dark");
+    img.src = isDark ? img.dataset.dark : img.dataset.light;
+    modalImg.src = isDark ? img.dataset.darkFull : img.dataset.lightFull;
+  }
+
+  // ---- Lottie hint loader (theme-aware, stays until clicked) ----
+  let lottieInstance = null;
+
+  function hideHint(markSeen = true) {
+    if (!hint) return;
+    hint.style.opacity = "0";
+    setTimeout(() => {
+      lottieInstance?.destroy();
+      hint.innerHTML = "";
+    }, 250);
+    if (markSeen) {
+      sessionStorage.setItem("kc_click_hint_seen", "1");
+    }
+  }
+
+  function loadScriptOnce(src) {
+    if (window.lottie) return Promise.resolve(window.lottie);
+    return new Promise((resolve, reject) => {
+      const s = document.createElement("script");
+      s.src = src;
+      s.async = true;
+      s.onload = () => resolve(window.lottie);
+      s.onerror = reject;
+      document.head.appendChild(s);
+    });
+  }
+
+  async function showHintOnce() {
+    if (!hint) return;
+
+    // only show once per session; change to localStorage for persistence across tabs
+    //if (sessionStorage.getItem("kc_click_hint_seen") === "1") return;
+
+    const isDark = document.documentElement.classList.contains("dark");
+    const json = isDark ? hint.dataset.dark : hint.dataset.light;
+
+    try {
+      const lottie = await loadScriptOnce("https://unpkg.com/lottie-web@5.12.2/build/player/lottie.min.js");
+
+      // Clean any previous
+      hint.innerHTML = "";
+      lottieInstance?.destroy();
+
+      lottieInstance = lottie.loadAnimation({
+        container: hint,
+        renderer: "svg",
+        loop: true,
+        autoplay: true,
+        path: json
+      });
+
+      // gentle fade in (no auto-hide)
+      hint.style.transition = "opacity 300ms ease";
+      requestAnimationFrame(() => { hint.style.opacity = "1"; });
+    } catch {
+      // if lottie fails, just skip gracefully
+    }
+  }
+
+  // ---- Wire up events ----
+  function bind() {
+    setAvatar();
+    showHintOnce();
+
+    window.addEventListener("themechange", () => {
+      setAvatar();
+      // if hint hasn't shown yet this session, re-render with theme-appropriate JSON
+      if (!sessionStorage.getItem("kc_click_hint_seen")) showHintOnce();
+    });
+
+    window.addEventListener("astro:page-load", () => {
+      setAvatar();
+      if (!sessionStorage.getItem("kc_click_hint_seen")) showHintOnce();
+    });
+
+    // Open modal
+    img?.addEventListener("click", () => {
+      setAvatar();
+      hideHint(true); // hide Lottie when clicked
+      modal?.classList.remove("hidden");
+      requestAnimationFrame(() => modal?.classList.add("flex", "opacity-100"));
+    });
+
+    // Close modal (click or Esc)
+    const closeModal = () => {
+      modal?.classList.add("opacity-0");
+      setTimeout(() => modal?.classList.add("hidden"), 200);
+    };
+    modal?.addEventListener("click", closeModal);
+    document.addEventListener("keydown", (e) => e.key === "Escape" && closeModal());
+  }
+
+  bind();
+</script>

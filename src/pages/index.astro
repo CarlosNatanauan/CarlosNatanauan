@@ -7,6 +7,10 @@ import ExperienceItem from "../components/ExperienceItem.astro";
 import { projects } from "../data/projects.js";
 import { experience } from "../data/experience.js";
 import ContactForm from "../components/ContactForm.astro";
+import ProfileCard from "../components/ProfileCard.astro";
+import AvailabilityBadge from "../components/AvailabilityBadge.astro";
+import { profile } from "../data/profile.js";
+
 
 const NAME = "Carlos";
 const TAGLINE = "Software Developer crafting apps that don't just run, but (most of the time) actually work.";
@@ -19,24 +23,28 @@ const LINKS = {
 };
 ---
 <BaseLayout title="Kuya Carlos">
-  <!-- Hero -->
-  <section class="py-16 sm:py-24">
-    <p class="inline-block text-sm font-medium text-indigo-700 bg-indigo-50 border border-indigo-200 px-3 py-1 rounded-full dark:text-indigo-300 dark:bg-indigo-950 dark:border-indigo-800">
-      Available for remote work
-    </p>
+<!-- Hero -->
+<section class="pt-10 pb-14 sm:pt-14 sm:pb-20">
+  <div class="flex items-center gap-3">
+    <AvailabilityBadge />
+  </div>
 
-    <!-- Typing Effect Heading -->
-    <h1 class="mt-6 text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight leading-tight">
-      <span class="text-slate-800/95 dark:text-zinc-100/95">Hello, I'm</span>{" "}
-      <span
-        id="typed-name"
-        class="align-baseline metal-gradient animate-gradient drop-shadow-[0_1px_0_rgba(255,255,255,0.65)]"
-        aria-live="polite"
-      >
-        Carlos
-      </span>
-      <span id="typed-cursor" class="ml-1 inline-block w-[0.6ch] select-none">|</span>
-    </h1>
+  <ProfileCard
+    name={profile.name}
+    role={profile.role}
+    location={profile.location}
+    avatar={profile.avatar}
+  />
+
+  <!-- Typing Effect Heading -->
+  <h1 class="mt-4 text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight leading-tight">
+    <span class="text-slate-800/95 dark:text-zinc-100/95">Hello, I'm</span>{" "}
+    <span id="typed-name" class="align-baseline metal-gradient animate-gradient drop-shadow-[0_1px_0_rgba(255,255,255,0.65)]" aria-live="polite">
+      Carlos
+    </span>
+    <span id="typed-cursor" class="ml-1 inline-block w-[0.6ch] select-none">|</span>
+  </h1>
+
 
     <!-- Typing Script -->
     <script is:inline>
