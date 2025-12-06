@@ -162,14 +162,15 @@ const hintDark  = "/animation/click_dark.json";
   }
 
   // ---- Wire up events ----
+
   function bind() {
     setAvatar();
     showHintOnce();
 
     window.addEventListener("themechange", () => {
       setAvatar();
-      // if hint hasn't shown yet this session, re-render with theme-appropriate JSON
-      if (!sessionStorage.getItem("kc_click_hint_seen")) showHintOnce();
+      // Always show hint when theme changes (since avatar changed)
+      showHintOnce();
     });
 
     window.addEventListener("astro:page-load", () => {
@@ -180,11 +181,11 @@ const hintDark  = "/animation/click_dark.json";
     // Open modal
     img?.addEventListener("click", () => {
       setAvatar();
-      hideHint(true); // hide Lottie when clicked
+      hideHint(false); // hide Lottie when clicked, but don't mark as permanently seen
       modal?.classList.remove("hidden");
       requestAnimationFrame(() => modal?.classList.add("flex", "opacity-100"));
     });
-
+    
     // Close modal (click or Esc)
     const closeModal = () => {
       modal?.classList.add("opacity-0");
