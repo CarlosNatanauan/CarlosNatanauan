@@ -32,3 +32,71 @@
 .headline-accent {
   background-image: linear-gradient(to right, rgba(59,130,246,0.6) 0%, rgba(236,72,153,0.6) 100%);
 }
+
+
+
+/* Slow pulse animation for "Current" badge */
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Timeline dot pulse effect */
+@keyframes timeline-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(99, 102, 241, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
+  }
+}
+
+/* Optional: Add subtle animation to timeline dots */
+.timeline-dot {
+  animation: timeline-pulse 2s infinite;
+}
+
+/* Ensure smooth transitions */
+* {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Improve readability */
+@media (prefers-contrast: high) {
+  .bg-gradient-to-br {
+    filter: contrast(1.2);
+  }
+}
+
+#hero,
+#hero *,
+#hero::before,
+#hero::after {
+  border-left: none !important;
+}
+
+/* Remove any left borders/decorations from the hero section (first section) */
+body > main > section:first-child,
+body > main > section:first-child *,
+body > main > section:first-child::before,
+body > main > section:first-child::after {
+  border-left: none !important;
+}
+
+/* Or use a more specific selector if the above doesn't work */
+section:not(#experience):not(#projects):not(#contact),
+section:not(#experience):not(#projects):not(#contact) * {
+  border-left: none !important;
+}
+

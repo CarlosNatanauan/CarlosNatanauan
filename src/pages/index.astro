@@ -23,8 +23,11 @@ const LINKS = {
 };
 ---
 <BaseLayout title="Kuya Carlos">
+
+  
+
 <!-- Hero -->
-<section class="pt-10 pb-14 sm:pt-14 sm:pb-20">
+<section id="hero" class="pt-10 pb-14 sm:pt-14 sm:pb-20">
   <div class="flex items-center gap-3">
     <AvailabilityBadge />
   </div>
@@ -45,108 +48,172 @@ const LINKS = {
     <span id="typed-cursor" class="ml-1 inline-block w-[0.6ch] select-none">|</span>
   </h1>
 
+  <!-- Typing Script (keep your existing script) -->
+  <script is:inline>
+    const WORDS = ["Carlos", "Batman"];
+    const el = document.getElementById("typed-name");
+    const cursor = document.getElementById("typed-cursor");
 
-    <!-- Typing Script -->
-    <script is:inline>
-      const WORDS = ["Carlos", "Batman"];
-      const el = document.getElementById("typed-name");
-      const cursor = document.getElementById("typed-cursor");
+    const TYPE_MS = 90;
+    const DELETE_MS = 55;
+    const HOLD_MS = 1100;
+    const LOOP_PAUSE_MS = 400;
 
-      const TYPE_MS = 90;
-      const DELETE_MS = 55;
-      const HOLD_MS = 1100;
-      const LOOP_PAUSE_MS = 400;
+    let wi = 0, ci = 0, deleting = false;
 
-      let wi = 0, ci = 0, deleting = false;
-
-      function applyTheme(word) {
-        // toggle gradients depending on the word
-        if (word === "Carlos") {
-          el.classList.remove("metal-gradient");
-          el.classList.add("neon-gradient");
-          cursor.style.color = "rgb(56 189 248)"; // sky-400
-        } else {
-          el.classList.remove("neon-gradient");
-          el.classList.add("metal-gradient");
-          cursor.style.color = "rgb(24 24 27)"; // zinc-900
-        }
+    function applyTheme(word) {
+      if (word === "Carlos") {
+        el.classList.remove("metal-gradient");
+        el.classList.add("neon-gradient");
+        cursor.style.color = "rgb(56 189 248)";
+      } else {
+        el.classList.remove("neon-gradient");
+        el.classList.add("metal-gradient");
+        cursor.style.color = "rgb(24 24 27)";
       }
+    }
 
-      function step() {
-        const word = WORDS[wi];
-        applyTheme(word);
+    function step() {
+      const word = WORDS[wi];
+      applyTheme(word);
 
-        if (!deleting) {
-          ci++;
-          el.textContent = word.slice(0, ci);
-          if (ci === word.length) return setTimeout(() => { deleting = true; step(); }, HOLD_MS);
-        } else {
-          ci--;
-          el.textContent = word.slice(0, ci);
-          if (ci === 0) { wi = (wi + 1) % WORDS.length; deleting = false; return setTimeout(step, LOOP_PAUSE_MS); }
-        }
-        setTimeout(step, deleting ? DELETE_MS : TYPE_MS);
+      if (!deleting) {
+        ci++;
+        el.textContent = word.slice(0, ci);
+        if (ci === word.length) return setTimeout(() => { deleting = true; step(); }, HOLD_MS);
+      } else {
+        ci--;
+        el.textContent = word.slice(0, ci);
+        if (ci === 0) { wi = (wi + 1) % WORDS.length; deleting = false; return setTimeout(step, LOOP_PAUSE_MS); }
       }
+      setTimeout(step, deleting ? DELETE_MS : TYPE_MS);
+    }
 
-      function blink() { cursor.style.opacity = cursor.style.opacity === "0" ? "1" : "0"; }
-      const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      if (!prefersReduced) { setInterval(blink, 500); setTimeout(step, 300); }
-      else { cursor.style.display = "none"; el.textContent = WORDS[0]; applyTheme(WORDS[0]); }
-    </script>
+    function blink() { cursor.style.opacity = cursor.style.opacity === "0" ? "1" : "0"; }
+    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!prefersReduced) { setInterval(blink, 500); setTimeout(step, 300); }
+    else { cursor.style.display = "none"; el.textContent = WORDS[0]; applyTheme(WORDS[0]); }
+  </script>
 
-    <p class="mt-4 text-lg text-slate-600 dark:text-zinc-400">
-      A software developer who enjoys turning half-baked ideas into sleek, functional apps.
-      I studied BSIT at STI College where I wrestled with C#, .NET, and SQL.
-      Along the way I picked up Flutter, API integrations, and the fine art of debugging at 2 AM.
+  <!-- Improved Bio Section with Better Typography -->
+  <div class="mt-6 space-y-4 max-w-3xl">
+    <!-- First Paragraph with Highlighted Keywords -->
+    <p class="text-base sm:text-lg leading-relaxed text-slate-600 dark:text-zinc-400">
+      A software developer who enjoys turning 
+      <span class="font-medium text-slate-700 dark:text-zinc-300">half-baked ideas</span> 
+      into sleek, functional apps. I studied 
+      <span class="font-medium text-slate-700 dark:text-zinc-300">BSIT at STI College</span> 
+      where I wrestled with 
+      <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 text-sm font-medium">
+        C#
+      </span>
+      <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 text-sm font-medium">
+        .NET
+      </span>
+      and
+      <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 text-sm font-medium">
+        SQL
+      </span>. 
+      Along the way I picked up Flutter, API integrations, and the fine art of 
+      <span class="font-medium text-slate-700 dark:text-zinc-300">debugging at 2 AM</span>.
     </p>
-    <p class="mt-4 text-lg text-slate-600 dark:text-zinc-400">
-      These days, I focus on building user-friendly applications that make sense,
-      look good, and (with enough coffee) actually ship. When I'm not coding,
-      I'm probably debating whether to exercise, scrolling through memes, or
-      pretending my to-do list isn't judging me.
-    </p>
 
-    <!-- CTA + Social icons -->
-    <div class="mt-8 flex items-center gap-3">
+    <!-- Second Paragraph -->
+    <p class="text-base sm:text-lg leading-relaxed text-slate-600 dark:text-zinc-400">
+      These days, I focus on building 
+      <span class="font-medium text-indigo-600 dark:text-indigo-400">user-friendly applications</span> 
+      that make sense, look good, and (with enough coffee ☕) actually ship. When I'm not coding, 
+      I'm probably debating whether to exercise, scrolling through memes, or pretending my to-do list isn't judging me.
+    </p>
+  </div>
+
+  <!-- Enhanced CTA + Social Icons -->
+  <div class="mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+    <!-- Primary CTA with gradient -->
+    <a 
+      href="#contact" 
+      class="group inline-flex items-center justify-center gap-2 rounded-xl 
+             bg-gradient-to-r from-indigo-600 to-purple-600 
+             hover:from-indigo-500 hover:to-purple-500
+             dark:from-indigo-500 dark:to-purple-500
+             dark:hover:from-indigo-400 dark:hover:to-purple-400
+             text-white px-6 py-3 text-base font-medium 
+             shadow-lg hover:shadow-xl
+             transition-all duration-300 hover:scale-105 active:scale-95"
+    >
+      <span>Let's Work Together</span>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transition-transform group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M5 12h14M12 5l7 7-7 7"/>
+      </svg>
+    </a>
+
+    <!-- Social Links - Modern Card Style -->
+    <div class="flex items-center gap-3">
+      <!-- GitHub -->
       <a 
-        href="#contact" 
-        class="rounded-xl bg-slate-900 dark:bg-zinc-100 text-white dark:text-zinc-900 
-               px-5 py-3 text-sm font-medium hover:scale-105 transition-transform"
+        href={LINKS.github} 
+        target="_blank" 
+        rel="noreferrer"
+        class="group flex items-center justify-center w-11 h-11 rounded-xl 
+               border border-slate-300 dark:border-zinc-700 
+               bg-white dark:bg-zinc-900
+               hover:bg-slate-50 dark:hover:bg-zinc-800 
+               hover:border-slate-400 dark:hover:border-zinc-600
+               hover:scale-110 active:scale-95
+               transition-all duration-300 shadow-sm hover:shadow-md"
+        aria-label="GitHub"
+        title="GitHub"
       >
-        Contact Me
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-700 dark:text-zinc-300 transition-colors" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 .5a11.5 11.5 0 0 0-3.64 22.4c.58.1.8-.25.8-.56v-2c-3.26.71-3.95-1.57-3.95-1.57-.53-1.34-1.3-1.7-1.3-1.7-1.06-.72.08-.71.08-.71 1.17.08 1.79 1.2 1.79 1.2 1.04 1.8 2.72 1.28 3.38.98.1-.76.41-1.28.75-1.58-2.6-.29-5.34-1.3-5.34-5.8 0-1.28.46-2.33 1.2-3.15-.12-.3-.52-1.52.12-3.17 0 0 .98-.31 3.2 1.2a11.1 11.1 0 0 1 5.82 0c2.22-1.5 3.2-1.2 3.2-1.2.64 1.65.24 2.87.12 3.17.75.82 1.2 1.87 1.2 3.15 0 4.5-2.75 5.51-5.36 5.8.43.37.81 1.1.81 2.22v3.3c0 .31.21.67.81.56A11.5 11.5 0 0 0 12 .5z"/>
+        </svg>
       </a>
 
-      <div class="ml-2 flex items-center gap-2">
-        <!-- GitHub -->
-        <a href={LINKS.github} target="_blank" rel="noreferrer"
-           class="p-2 rounded-xl border border-slate-300 dark:border-zinc-700 hover:bg-slate-100 dark:hover:bg-zinc-800 transition"
-           aria-label="GitHub" title="GitHub">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 .5a11.5 11.5 0 0 0-3.64 22.4c.58.1.8-.25.8-.56v-2c-3.26.71-3.95-1.57-3.95-1.57-.53-1.34-1.3-1.7-1.3-1.7-1.06-.72.08-.71.08-.71 1.17.08 1.79 1.2 1.79 1.2 1.04 1.8 2.72 1.28 3.38.98.1-.76.41-1.28.75-1.58-2.6-.29-5.34-1.3-5.34-5.8 0-1.28.46-2.33 1.2-3.15-.12-.3-.52-1.52.12-3.17 0 0 .98-.31 3.2 1.2a11.1 11.1 0 0 1 5.82 0c2.22-1.5 3.2-1.2 3.2-1.2.64 1.65.24 2.87.12 3.17.75.82 1.2 1.87 1.2 3.15 0 4.5-2.75 5.51-5.36 5.8.43.37.81 1.1.81 2.22v3.3c0 .31.21.67.81.56A11.5 11.5 0 0 0 12 .5z"/>
-          </svg>
-        </a>
-        <!-- LinkedIn -->
-        <a href={LINKS.linkedin} target="_blank" rel="noreferrer"
-           class="p-2 rounded-xl border border-slate-300 dark:border-zinc-700 hover:bg-slate-100 dark:hover:bg-zinc-800 transition"
-           aria-label="LinkedIn" title="LinkedIn">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zM3 8.98h3.96V21H3zM9.5 8.98H13v1.63h.05c.49-.93 1.68-1.9 3.46-1.9 3.7 0 4.38 2.43 4.38 5.6V21h-3.96v-5.35c0-1.28-.02-2.93-1.79-2.93-1.8 0-2.07 1.4-2.07 2.84V21H9.5z"/>
-          </svg>
-        </a>
-        <!-- Email -->
-        <a href={LINKS.email}
-           class="p-2 rounded-xl border border-slate-300 dark:border-zinc-700 hover:bg-slate-100 dark:hover:bg-zinc-800 transition"
-           aria-label="Email" title="Email">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2Zm0 4-8 5L4 8V6l8 5 8-5z"/>
-          </svg>
-        </a>
-      </div>
+      <!-- LinkedIn -->
+      <a 
+        href={LINKS.linkedin} 
+        target="_blank" 
+        rel="noreferrer"
+        class="group flex items-center justify-center w-11 h-11 rounded-xl 
+               border border-slate-300 dark:border-zinc-700 
+               bg-white dark:bg-zinc-900
+               hover:bg-slate-50 dark:hover:bg-zinc-800 
+               hover:border-slate-400 dark:hover:border-zinc-600
+               hover:scale-110 active:scale-95
+               transition-all duration-300 shadow-sm hover:shadow-md"
+        aria-label="LinkedIn"
+        title="LinkedIn"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-700 dark:text-zinc-300 transition-colors" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zM3 8.98h3.96V21H3zM9.5 8.98H13v1.63h.05c.49-.93 1.68-1.9 3.46-1.9 3.7 0 4.38 2.43 4.38 5.6V21h-3.96v-5.35c0-1.28-.02-2.93-1.79-2.93-1.8 0-2.07 1.4-2.07 2.84V21H9.5z"/>
+        </svg>
+      </a>
+
+      <!-- Email -->
+      <a 
+        href={LINKS.email}
+        class="group flex items-center justify-center w-11 h-11 rounded-xl 
+               border border-slate-300 dark:border-zinc-700 
+               bg-white dark:bg-zinc-900
+               hover:bg-slate-50 dark:hover:bg-zinc-800 
+               hover:border-slate-400 dark:hover:border-zinc-600
+               hover:scale-110 active:scale-95
+               transition-all duration-300 shadow-sm hover:shadow-md"
+        aria-label="Email"
+        title="Email"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-700 dark:text-zinc-300 transition-colors" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2Zm0 4-8 5L4 8V6l8 5 8-5z"/>
+        </svg>
+      </a>
     </div>
-  </section>
+  </div>
+</section>
+
+
+
 
   <!-- Projects -->
-<!-- Projects Section - Replace your existing projects section with this -->
 <section id="projects" class="scroll-mt-28 md:scroll-mt-24 mt-20">
   <!-- Section Header with Animation -->
   <div class="text-center mb-12">
@@ -209,16 +276,53 @@ const LINKS = {
     </a>
   </div>
 </section>
-  <!-- Experience -->
-  <section id="experience" class="scroll-mt-28 md:scroll-mt-24">
-    <SectionTitle>Experience</SectionTitle>
-    <p class="mt-2 text-slate-600 dark:text-zinc-400">
-      A few roles and internships where I learned, built, and shipped.
-    </p>
-    <div class="mt-6 space-y-4">
-      {experience.map((item) => <ExperienceItem item={item} />)}
+
+
+<!-- Experience Section -->
+<section id="experience" class="scroll-mt-28 md:scroll-mt-24 mt-20">
+  <!-- Section Header with Animation -->
+  <div class="text-center mb-12 lg:mb-16">
+    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-purple-50 dark:bg-purple-950/50 border border-purple-200 dark:border-purple-900 text-purple-600 dark:text-purple-400 text-sm font-medium mb-4">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M20 7h-9M14 17H5M6 3v4M10 17v4M14 7v10"/>
+      </svg>
+      Career Journey
     </div>
-  </section>
+    
+    <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 dark:from-zinc-100 dark:via-zinc-200 dark:to-zinc-100 bg-clip-text text-transparent mb-4">
+      Experience
+    </h2>
+    
+    <p class="text-lg text-slate-600 dark:text-zinc-400 max-w-2xl mx-auto">
+      Roles and internships where I learned, built, and shipped real products
+    </p>
+  </div>
+
+  <!-- Simple stacked layout - no complex timeline on large screens -->
+  <div class="max-w-4xl mx-auto space-y-8 lg:space-y-10">
+    {experience.map((item, index) => (
+      <div class="animate-fade-in-up" style={`animation-delay: ${index * 150}ms`}>
+        <ExperienceItem item={item} />
+      </div>
+    ))}
+  </div>
+
+<!--
+  <div class="mt-16 text-center">
+    <a href="/resume.pdf" download class="inline-flex items-center gap-3 px-8 py-4 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 dark:from-indigo-500 dark:to-purple-500 dark:hover:from-indigo-400 dark:hover:to-purple-400 text-white text-base font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 active:scale-95">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+      </svg>
+      Download Resume
+    </a>
+  </div>
+-->
+
+  
+</section>
+
+
+
 
   <!-- Contact -->
   <section id="contact" class="scroll-mt-28 md:scroll-mt-24">
