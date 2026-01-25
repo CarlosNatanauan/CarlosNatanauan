@@ -91,38 +91,92 @@ const { title = "Carlos Benedict Natanauan — Portfolio" } = Astro.props;
             </li>
           </ul>
 
-          <!-- Dark Mode Toggle Button (desktop) -->
-          <button
-            data-theme-toggle
-            type="button"
-            class="rounded-xl border px-3 py-1 text-sm
-                   hover:bg-slate-100 dark:hover:bg-zinc-800
-                   border-slate-300 dark:border-zinc-700 transition-colors
-                   inline-flex items-center gap-2"
-            aria-label="Toggle dark mode"
-            aria-pressed="false"
-          >
-            <span class="label-dark">🌙 Dark</span>
-            <span class="label-light hidden">☀️ Light</span>
-          </button>
+<!-- Dark Mode Toggle Button (desktop) - Modern Switch -->
+<button
+  data-theme-toggle
+  type="button"
+  class="group relative inline-flex items-center rounded-full border
+         border-slate-200 dark:border-zinc-800
+         bg-white/70 dark:bg-zinc-950/60 backdrop-blur
+         p-1.5
+         shadow-sm hover:shadow-md
+         transition-all duration-300
+         focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/60
+         focus-visible:ring-offset-2 focus-visible:ring-offset-white
+         dark:focus-visible:ring-offset-zinc-950"
+  aria-label="Toggle dark mode"
+  aria-pressed="false"
+  title="Toggle dark / light"
+>
+  <!-- Track -->
+  <span
+    class="relative inline-flex h-7 w-[64px] items-center rounded-full
+           bg-slate-100 dark:bg-zinc-800
+           ring-1 ring-inset ring-slate-200/80 dark:ring-zinc-700
+           transition-colors duration-300"
+    aria-hidden="true"
+  >
+    <!-- Thumb -->
+    <span
+      class="absolute left-1 top-1 h-5 w-5 rounded-full
+             bg-white dark:bg-zinc-950
+             shadow-sm ring-1 ring-black/5 dark:ring-white/10
+             transition-transform duration-300
+             group-aria-pressed:translate-x-[32px]"
+    ></span>
+
+    <!-- Icons -->
+    <span class="absolute left-2 text-[11px] opacity-70">🌙</span>
+    <span class="absolute right-2 text-[11px] opacity-70">☀️</span>
+  </span>
+</button>
+
+
         </div>
 
         <!-- Mobile controls -->
         <div class="md:hidden flex items-center gap-2">
-          <!-- Dark Mode Toggle Button (mobile) -->
-          <button
-            data-theme-toggle
-            type="button"
-            class="rounded-xl border px-3 py-1 text-sm
-                   hover:bg-slate-100 dark:hover:bg-zinc-800
-                   border-slate-300 dark:border-zinc-700 transition-colors
-                   inline-flex items-center gap-2"
-            aria-label="Toggle dark mode"
-            aria-pressed="false"
-          >
-            <span class="label-dark">🌙 Dark</span>
-            <span class="label-light hidden">☀️ Light</span>
-          </button>
+<!-- Dark Mode Toggle Button (mobile) - Modern Switch -->
+<button
+  data-theme-toggle
+  type="button"
+  class="group relative inline-flex items-center rounded-full border
+         border-slate-200 dark:border-zinc-800
+         bg-white/70 dark:bg-zinc-950/60 backdrop-blur
+         p-1.5
+         shadow-sm hover:shadow-md
+         transition-all duration-300
+         focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/60
+         focus-visible:ring-offset-2 focus-visible:ring-offset-white
+         dark:focus-visible:ring-offset-zinc-950"
+  aria-label="Toggle dark mode"
+  aria-pressed="false"
+  title="Toggle dark / light"
+>
+  <!-- Track -->
+  <span
+    class="relative inline-flex h-7 w-[64px] items-center rounded-full
+           bg-slate-100 dark:bg-zinc-800
+           ring-1 ring-inset ring-slate-200/80 dark:ring-zinc-700
+           transition-colors duration-300"
+    aria-hidden="true"
+  >
+    <!-- Thumb -->
+    <span
+      class="absolute left-1 top-1 h-5 w-5 rounded-full
+             bg-white dark:bg-zinc-950
+             shadow-sm ring-1 ring-black/5 dark:ring-white/10
+             transition-transform duration-300
+             group-aria-pressed:translate-x-[32px]"
+    ></span>
+
+    <!-- Icons -->
+    <span class="absolute left-2 text-[11px] opacity-70">🌙</span>
+    <span class="absolute right-2 text-[11px] opacity-70">☀️</span>
+  </span>
+</button>
+
+
 
           <!-- Hamburger -->
           <button
