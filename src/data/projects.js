@@ -1,6 +1,15 @@
 // src/data/projects.js
 export const projects = [
   {
+    name: "SpaceNest — Smart Rental Management",
+    description:
+      "A fullstack mobile app for landlords to manage spaces, rooms, and tenants — and for tenants to handle leases, rent, and maintenance requests.",
+    tech: ["Flutter", "NestJS", "PostgreSQL", "Prisma", "Riverpod"],
+    repo: "https://github.com/CarlosNatanauan/apartment_app",
+    image: "/spacenest.png",
+  },
+
+  {
     name: "Caflow — Offline Café Chat",
     description:
       "An offline, café-only chat app that lets people in the same café talk via Nearby Connections and Wi-Fi Direct — no internet, no accounts, just anonymous café nicknames.",
