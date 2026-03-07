@@ -11,6 +11,10 @@ const { name, role, location, avatar } = Astro.props as Props;
 const avatarLight = "/profiles/carlos_light.png";
 const avatarDarkFull = "/profiles/carlos_dark_fullsize.png";
 const avatarLightFull = "/profiles/carlos_light_fullsize.png";
+const avatarDarkShy = "/profiles/carlos_dark_shy.png";
+const avatarLightShy = "/profiles/carlos_light_shy.png";
+const avatarDarkFullShy = "/profiles/carlos_dark_fullsize_shy.png";
+const avatarLightFullShy = "/profiles/carlos_light_fullsize_shy.png";
 
 // Lottie hint (place these JSONs in /public/animation/)
 const hintLight = "/animation/click_light.json";
@@ -20,24 +24,50 @@ const hintDark  = "/animation/click_dark.json";
 <article class="mt-4 sm:mt-6 flex items-center gap-4 sm:gap-6 flex-nowrap">
   <!-- Avatar wrapper is relative so we can position the hint -->
   <div class="relative">
-    <!-- Avatar (clickable) -->
-    <img
+    <!-- Avatar stack (two layers for smooth crossfade) -->
+    <div
       id="profile-avatar"
-      src={avatar}
-      alt={`Portrait of ${name}`}
-      width="140"
-      height="140"
-      class="h-28 w-28 sm:h-32 sm:w-32 rounded-2xl object-cover cursor-pointer
+      role="img"
+      aria-label={`Portrait of ${name}`}
+      class="relative h-28 w-28 sm:h-32 sm:w-32 rounded-2xl overflow-hidden cursor-pointer
              ring-2 ring-indigo-400/40 dark:ring-sky-500/30
              shadow-lg flex-shrink-0
              transition-transform duration-300 hover:scale-[1.02]"
-      loading="eager"
-      decoding="async"
       data-dark={avatar}
       data-light={avatarLight}
       data-dark-full={avatarDarkFull}
       data-light-full={avatarLightFull}
-    />
+      data-dark-shy={avatarDarkShy}
+      data-light-shy={avatarLightShy}
+      data-dark-full-shy={avatarDarkFullShy}
+      data-light-full-shy={avatarLightFullShy}
+    >
+      <!-- Layer A (starts active) -->
+      <img
+        id="profile-layer-a"
+        src={avatar}
+        alt={`Portrait of ${name}`}
+        width="140"
+        height="140"
+        class="absolute inset-0 w-full h-full object-cover"
+        style="transition: opacity 500ms ease;"
+        loading="eager"
+        decoding="async"
+      />
+      <!-- Layer B (starts hidden) -->
+      <img
+        id="profile-layer-b"
+        src={avatar}
+        alt=""
+        aria-hidden="true"
+        width="140"
+        height="140"
+        class="absolute inset-0 w-full h-full object-cover"
+        style="transition: opacity 500ms ease; opacity: 0;"
+        loading="eager"
+        decoding="async"
+      />
+    </div>
 
     <!-- Click hint (Lottie target). Pointer-events none so clicks go to the avatar -->
     <div
@@ -89,17 +119,32 @@ const hintDark  = "/animation/click_dark.json";
 
 <!-- Scripts -->
 <script is:inline>
-  const img = document.getElementById("profile-avatar");
+  const wrap = document.getElementById("profile-avatar");
+  const layerA = document.getElementById("profile-layer-a");
+  const layerB = document.getElementById("profile-layer-b");
   const modal = document.getElementById("profile-modal");
   const modalImg = document.getElementById("profile-modal-img");
   const hint = document.getElementById("click-hint");
 
+  // ---- Two-layer crossfade ----
+  let activeLayer = 'a'; // 'a' or 'b'
+
+  function crossfadeTo(src) {
+    if (!layerA || !layerB) return;
+    const incoming = activeLayer === 'a' ? layerB : layerA;
+    const outgoing = activeLayer === 'a' ? layerA : layerB;
+    incoming.src = src;
+    incoming.style.opacity = '1';
+    outgoing.style.opacity = '0';
+    activeLayer = activeLayer === 'a' ? 'b' : 'a';
+  }
+
   // ---- Theme-aware avatar & modal ----
   function setAvatar() {
-    if (!img || !modalImg) return;
+    if (!wrap || !modalImg) return;
     const isDark = document.documentElement.classList.contains("dark");
-    img.src = isDark ? img.dataset.dark : img.dataset.light;
-    modalImg.src = isDark ? img.dataset.darkFull : img.dataset.lightFull;
+    crossfadeTo(isDark ? wrap.dataset.dark : wrap.dataset.light);
+    modalImg.src = isDark ? wrap.dataset.darkFull : wrap.dataset.lightFull;
   }
 
   // ---- Lottie hint loader (theme-aware, stays until clicked) ----
@@ -164,10 +209,59 @@ const hintDark  = "/animation/click_dark.json";
   // ---- Wire up events ----
 
   function preloadImages() {
-    if (!img) return;
-    [img.dataset.dark, img.dataset.light, img.dataset.darkFull, img.dataset.lightFull]
+    if (!wrap) return;
+    [
+      wrap.dataset.dark, wrap.dataset.light,
+      wrap.dataset.darkFull, wrap.dataset.lightFull,
+      wrap.dataset.darkShy, wrap.dataset.lightShy,
+      wrap.dataset.darkFullShy, wrap.dataset.lightFullShy,
+    ]
       .filter(Boolean)
       .forEach(src => { new Image().src = src; });
+  }
+
+  function getShy() {
+    const isDark = document.documentElement.classList.contains("dark");
+    return isDark ? wrap.dataset.darkShy : wrap.dataset.lightShy;
+  }
+
+  function getShyFull() {
+    const isDark = document.documentElement.classList.contains("dark");
+    return isDark ? wrap.dataset.darkFullShy : wrap.dataset.lightFullShy;
+  }
+
+  function getNormalFull() {
+    const isDark = document.documentElement.classList.contains("dark");
+    return isDark ? wrap.dataset.darkFull : wrap.dataset.lightFull;
+  }
+
+  // ---- Mobile auto-cycle (touch devices only) ----
+  const isTouchDevice = window.matchMedia('(pointer: coarse)').matches;
+  let cycleHandle = null;
+
+  function rand(min, max) {
+    return Math.floor(min + Math.random() * (max - min));
+  }
+
+  function stopCycle() {
+    clearTimeout(cycleHandle);
+    cycleHandle = null;
+  }
+
+  function scheduleCycle() {
+    if (!isTouchDevice || !wrap) return;
+    // Hold normal image for 3–5s, then briefly show shy
+    cycleHandle = setTimeout(() => {
+      if (document.hidden) { scheduleCycle(); return; }
+      crossfadeTo(getShy());
+      // Hold shy for 1.8–2.5s, then fade back to normal
+      cycleHandle = setTimeout(() => {
+        if (document.hidden) { setAvatar(); scheduleCycle(); return; }
+        const isDark = document.documentElement.classList.contains("dark");
+        crossfadeTo(isDark ? wrap.dataset.dark : wrap.dataset.light);
+        scheduleCycle();
+      }, rand(1800, 2500));
+    }, rand(3000, 5000));
   }
 
   function bind() {
@@ -176,9 +270,10 @@ const hintDark  = "/animation/click_dark.json";
     showHintOnce();
 
     window.addEventListener("themechange", () => {
+      stopCycle();
       setAvatar();
-      // Always show hint when theme changes (since avatar changed)
       showHintOnce();
+      if (isTouchDevice) scheduleCycle();
     });
 
     window.addEventListener("astro:page-load", () => {
@@ -186,20 +281,58 @@ const hintDark  = "/animation/click_dark.json";
       if (!sessionStorage.getItem("kc_click_hint_seen")) showHintOnce();
     });
 
+    // Pause cycle when tab is hidden, resume when visible
+    document.addEventListener("visibilitychange", () => {
+      if (!isTouchDevice) return;
+      if (document.hidden) {
+        stopCycle();
+      } else {
+        setAvatar();
+        scheduleCycle();
+      }
+    });
+
+    if (isTouchDevice) {
+      // Mobile: start ambient crossfade cycle
+      scheduleCycle();
+    } else {
+      // Desktop only: hover → shy
+      wrap?.addEventListener("mouseenter", () => crossfadeTo(getShy()));
+      wrap?.addEventListener("mouseleave", () => setAvatar());
+    }
+
     // Open modal
-    img?.addEventListener("click", () => {
+    wrap?.addEventListener("click", () => {
+      stopCycle();
       setAvatar();
-      hideHint(false); // hide Lottie when clicked, but don't mark as permanently seen
+      hideHint(false);
       modal?.classList.remove("hidden");
       requestAnimationFrame(() => modal?.classList.add("flex", "opacity-100"));
     });
-    
-    // Close modal (click or Esc)
+
+    // Modal image hover → shy fullsize (desktop only)
+    if (!isTouchDevice) {
+      modalImg?.addEventListener("mouseenter", () => {
+        if (!modalImg) return;
+        modalImg.src = getShyFull();
+      });
+      modalImg?.addEventListener("mouseleave", () => {
+        if (!modalImg) return;
+        modalImg.src = getNormalFull();
+      });
+    }
+
+    // Close modal (click backdrop or Esc — but not the image itself)
     const closeModal = () => {
       modal?.classList.add("opacity-0");
-      setTimeout(() => modal?.classList.add("hidden"), 200);
+      setTimeout(() => {
+        modal?.classList.add("hidden");
+        if (isTouchDevice) scheduleCycle();
+      }, 200);
     };
-    modal?.addEventListener("click", closeModal);
+    modal?.addEventListener("click", (e) => {
+      if (e.target === modal) closeModal();
+    });
     document.addEventListener("keydown", (e) => e.key === "Escape" && closeModal());
   }
 
