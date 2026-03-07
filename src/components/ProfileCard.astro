@@ -163,7 +163,15 @@ const hintDark  = "/animation/click_dark.json";
 
   // ---- Wire up events ----
 
+  function preloadImages() {
+    if (!img) return;
+    [img.dataset.dark, img.dataset.light, img.dataset.darkFull, img.dataset.lightFull]
+      .filter(Boolean)
+      .forEach(src => { new Image().src = src; });
+  }
+
   function bind() {
+    preloadImages();
     setAvatar();
     showHintOnce();
 
