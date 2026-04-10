@@ -9,6 +9,7 @@ interface Project {
   demo?: string;
   tryIt?: string;
   image?: string;
+  imageMobile?: string;
   featured?: boolean;
 }
 
@@ -41,11 +42,25 @@ const f = project.featured;
     {project.image && (
       <div class={`relative overflow-hidden bg-slate-100 dark:bg-zinc-800 flex-shrink-0
                    ${f ? 'h-64 md:h-auto md:w-2/5' : 'h-52'}`}>
+        {/* Mobile image — shown below md, only when imageMobile is set on featured */}
+        {f && project.imageMobile && (
+          <img
+            src={project.imageMobile}
+            alt={project.name}
+            class="w-full h-full object-cover transition-transform duration-700
+                   group-hover:scale-110 group-hover:rotate-1
+                   md:hidden"
+            loading="lazy"
+            decoding="async"
+          />
+        )}
+        {/* Desktop image — always shown, hidden on mobile when imageMobile exists */}
         <img
           src={project.image}
           alt={project.name}
-          class="w-full h-full object-cover transition-transform duration-700
-                 group-hover:scale-110 group-hover:rotate-1"
+          class={`w-full h-full object-cover transition-transform duration-700
+                 group-hover:scale-110 group-hover:rotate-1
+                 ${f && project.imageMobile ? 'hidden md:block' : ''}`}
           loading="lazy"
           decoding="async"
         />
