@@ -235,8 +235,8 @@ const LINKS = {
   <!-- Projects Grid - Responsive with better layout -->
   <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 auto-rows-fr">
     {projects.map((p, index) => (
-      <div 
-        class="animate-fade-in-up"
+      <div
+        class={`animate-fade-in-up h-full${p.featured ? ' md:col-span-2 xl:col-span-3' : ''}`}
         style={`animation-delay: ${index * 100}ms`}
       >
         <ProjectCard project={p} />
