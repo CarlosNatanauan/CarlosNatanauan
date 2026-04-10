@@ -9,6 +9,7 @@ export const projects = [
     demo: "https://youtu.be/otQp8XxPmQw",
     tryIt: "https://drive.google.com/file/d/1eA4rUY1DHmFvIH22t0FAxvnfXB1ILTmW/view?usp=sharing",
     image: "/keepsake.png",
+    imageMobile: "/keepsake_thumbnail.png",
     featured: true,
   },
 
