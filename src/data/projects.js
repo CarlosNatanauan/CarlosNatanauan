@@ -27,7 +27,7 @@ export const projects = [
     name: "Caflow — Offline Café Chat",
     description:
       "An offline, café-only chat app that lets people in the same café talk via Nearby Connections and Wi-Fi Direct — no internet, no accounts, just anonymous café nicknames.",
-    tech: ["Flutter", "Wi-Fi Direct"],
+    tech: ["Flutter", "Nearby Connections API", "Wi-Fi Direct", "Material 3"],
     repo: "https://github.com/CarlosNatanauan/offline_chat_app",
     demo: "https://youtu.be/CRS-6HNhUDg",
     tryIt: "https://drive.google.com/file/d/1Dig_7LhAJxd6_uSuGbrXzR8okkNiMoeK/view",
