@@ -4,9 +4,10 @@ interface Props {
   role: string;
   location: string;
   avatar: string; // dark image (cropped)
+  centered?: boolean; // avatar-only centered mode for hero
 }
 
-const { name, role, location, avatar } = Astro.props as Props;
+const { name, role, location, avatar, centered = false } = Astro.props as Props;
 
 const avatarLight = "/profiles/carlos_light.png";
 const avatarDarkFull = "/profiles/carlos_dark_fullsize.png";
@@ -21,18 +22,21 @@ const hintLight = "/animation/click_light.json";
 const hintDark  = "/animation/click_dark.json";
 ---
 
-<article class="mt-4 sm:mt-6 flex items-center gap-4 sm:gap-6 flex-nowrap">
+<article class={centered ? "mt-6 flex flex-col items-center" : "mt-4 sm:mt-6 flex items-center gap-4 sm:gap-6 flex-nowrap"}>
   <!-- Avatar wrapper is relative so we can position the hint -->
   <div class="relative">
+    <!-- Glass gradient border wrap — always present, styled only in centered mode -->
+    <div class={centered
+      ? "p-[3px] rounded-2xl bg-gradient-to-br from-white/40 via-indigo-400/50 to-purple-500/50 dark:from-white/20 dark:via-indigo-500/40 dark:to-purple-500/40 shadow-[0_0_32px_rgba(99,102,241,0.35)] dark:shadow-[0_0_48px_rgba(99,102,241,0.5)]"
+      : ""}>
     <!-- Avatar stack (two layers for smooth crossfade) -->
     <div
       id="profile-avatar"
       role="img"
       aria-label={`Portrait of ${name}`}
-      class="relative h-28 w-28 sm:h-32 sm:w-32 rounded-2xl overflow-hidden cursor-pointer
-             ring-2 ring-indigo-400/40 dark:ring-sky-500/30
-             shadow-lg flex-shrink-0
-             transition-transform duration-300 hover:scale-[1.02]"
+      class={centered
+        ? "relative h-36 w-36 sm:h-40 sm:w-40 rounded-2xl overflow-hidden cursor-pointer shadow-lg flex-shrink-0 transition-transform duration-300 hover:scale-[1.02]"
+        : "relative h-28 w-28 sm:h-32 sm:w-32 rounded-2xl overflow-hidden cursor-pointer ring-2 ring-indigo-400/40 dark:ring-sky-500/30 shadow-lg flex-shrink-0 transition-transform duration-300 hover:scale-[1.02]"}
       data-dark={avatar}
       data-light={avatarLight}
       data-dark-full={avatarDarkFull}
@@ -68,6 +72,7 @@ const hintDark  = "/animation/click_dark.json";
         decoding="async"
       />
     </div>
+    </div><!-- /glass gradient border wrap -->
 
     <!-- Click hint (Lottie target). Pointer-events none so clicks go to the avatar -->
     <div
@@ -80,8 +85,8 @@ const hintDark  = "/animation/click_dark.json";
     ></div>
   </div>
 
-  <!-- Info -->
-  <div class="min-w-0 flex-1">
+  <!-- Info (hidden in centered/hero mode) -->
+  {!centered && <div class="min-w-0 flex-1">
     <h2 class="text-base sm:text-xl font-semibold text-slate-900 dark:text-zinc-100 leading-tight">
       {name}
     </h2>
@@ -100,31 +105,71 @@ const hintDark  = "/animation/click_dark.json";
   <span>{role}</span>
 </p>
 
-  </div>
+  </div>}
 </article>
 
-<!-- Modal -->
-<div
-  id="profile-modal"
-  class="fixed inset-0 z-50 hidden items-center justify-center bg-black/70 backdrop-blur-sm
-         transition-opacity duration-300"
->
-  <img
-    id="profile-modal-img"
-    src={avatarDarkFull}
-    alt="Full-size portrait"
-    class="max-h-[90vh] max-w-[90vw] rounded-2xl shadow-2xl ring-2 ring-white/10 object-contain transition-transform duration-300 scale-95"
-  />
-</div>
+<!-- Modal is created and appended to body via JS below -->
 
 <!-- Scripts -->
 <script is:inline>
   const wrap = document.getElementById("profile-avatar");
   const layerA = document.getElementById("profile-layer-a");
   const layerB = document.getElementById("profile-layer-b");
-  const modal = document.getElementById("profile-modal");
-  const modalImg = document.getElementById("profile-modal-img");
   const hint = document.getElementById("click-hint");
+
+  // Hoisted so closeBtn listener can call it before bind() runs
+  var closeModal = function() {};
+
+  // ---- Build modal overlay and append to <body> ----
+  var overlay = document.createElement("div");
+  overlay.style.cssText = [
+    "position:fixed", "top:0", "left:0", "width:100%", "height:100%",
+    "z-index:99999", "background:rgba(0,0,0,0.8)", "backdrop-filter:blur(10px)",
+    "-webkit-backdrop-filter:blur(10px)", "display:none",
+    "align-items:center", "justify-content:center",
+    "opacity:0", "transition:opacity 0.3s ease", "cursor:pointer"
+  ].join(";");
+
+  var modalImg = document.createElement("img");
+  modalImg.alt = "Full-size portrait";
+  modalImg.style.cssText = [
+    "max-height:90vh", "max-width:90vw", "border-radius:1rem",
+    "object-fit:contain", "box-shadow:0 25px 60px rgba(0,0,0,0.5)",
+    "cursor:default", "transition:transform 0.3s ease", "transform:scale(0.95)"
+  ].join(";");
+
+  // Clicks on the image must NOT close the modal
+  modalImg.addEventListener("click", function(e) { e.stopPropagation(); });
+
+  // Close button — top-right corner
+  var closeBtn = document.createElement("button");
+  closeBtn.setAttribute("aria-label", "Close");
+  closeBtn.style.cssText = [
+    "position:absolute", "top:16px", "right:16px",
+    "width:40px", "height:40px", "border-radius:50%",
+    "background:rgba(255,255,255,0.15)", "backdrop-filter:blur(6px)",
+    "-webkit-backdrop-filter:blur(6px)",
+    "border:1px solid rgba(255,255,255,0.25)",
+    "color:#fff", "font-size:18px", "line-height:1",
+    "display:flex", "align-items:center", "justify-content:center",
+    "cursor:pointer", "transition:background 0.2s ease",
+    "z-index:1"
+  ].join(";");
+  closeBtn.innerHTML = "&#x2715;"; // ✕
+  closeBtn.addEventListener("mouseenter", function() {
+    closeBtn.style.background = "rgba(255,255,255,0.28)";
+  });
+  closeBtn.addEventListener("mouseleave", function() {
+    closeBtn.style.background = "rgba(255,255,255,0.15)";
+  });
+  closeBtn.addEventListener("click", function(e) {
+    e.stopPropagation();
+    closeModal();
+  });
+
+  overlay.appendChild(modalImg);
+  overlay.appendChild(closeBtn);
+  document.body.appendChild(overlay);
 
   // ---- Two-layer crossfade ----
   let activeLayer = 'a'; // 'a' or 'b'
@@ -139,12 +184,11 @@ const hintDark  = "/animation/click_dark.json";
     activeLayer = activeLayer === 'a' ? 'b' : 'a';
   }
 
-  // ---- Theme-aware avatar & modal ----
+  // ---- Theme-aware avatar ----
   function setAvatar() {
-    if (!wrap || !modalImg) return;
+    if (!wrap) return;
     const isDark = document.documentElement.classList.contains("dark");
     crossfadeTo(isDark ? wrap.dataset.dark : wrap.dataset.light);
-    modalImg.src = isDark ? wrap.dataset.darkFull : wrap.dataset.lightFull;
   }
 
   // ---- Lottie hint loader (theme-aware, stays until clicked) ----
@@ -301,39 +345,52 @@ const hintDark  = "/animation/click_dark.json";
       wrap?.addEventListener("mouseleave", () => setAvatar());
     }
 
-    // Open modal
-    wrap?.addEventListener("click", () => {
+    // ---- Modal open / close ----
+    function openModal() {
+      var isDark = document.documentElement.classList.contains("dark");
+      modalImg.src = isDark ? wrap.dataset.darkFull : wrap.dataset.lightFull;
+      modalImg.style.transform = "scale(0.95)";
+      overlay.style.display = "flex";
+      // Double rAF ensures display:flex is painted before opacity transitions
+      requestAnimationFrame(function() {
+        requestAnimationFrame(function() {
+          overlay.style.opacity = "1";
+          modalImg.style.transform = "scale(1)";
+        });
+      });
+    }
+
+    closeModal = function() {
+      overlay.style.opacity = "0";
+      modalImg.style.transform = "scale(0.95)";
+      setTimeout(function() { overlay.style.display = "none"; }, 300);
+      if (isTouchDevice) scheduleCycle();
+    };
+
+    // Open on avatar click
+    wrap?.addEventListener("click", function() {
       stopCycle();
-      setAvatar();
       hideHint(false);
-      modal?.classList.remove("hidden");
-      requestAnimationFrame(() => modal?.classList.add("flex", "opacity-100"));
+      openModal();
     });
 
     // Modal image hover → shy fullsize (desktop only)
     if (!isTouchDevice) {
-      modalImg?.addEventListener("mouseenter", () => {
-        if (!modalImg) return;
-        modalImg.src = getShyFull();
+      modalImg.addEventListener("mouseenter", function() {
+        var isDark = document.documentElement.classList.contains("dark");
+        modalImg.src = isDark ? wrap.dataset.darkFullShy : wrap.dataset.lightFullShy;
       });
-      modalImg?.addEventListener("mouseleave", () => {
-        if (!modalImg) return;
-        modalImg.src = getNormalFull();
+      modalImg.addEventListener("mouseleave", function() {
+        var isDark = document.documentElement.classList.contains("dark");
+        modalImg.src = isDark ? wrap.dataset.darkFull : wrap.dataset.lightFull;
       });
     }
 
-    // Close modal (click backdrop or Esc — but not the image itself)
-    const closeModal = () => {
-      modal?.classList.add("opacity-0");
-      setTimeout(() => {
-        modal?.classList.add("hidden");
-        if (isTouchDevice) scheduleCycle();
-      }, 200);
-    };
-    modal?.addEventListener("click", (e) => {
-      if (e.target === modal) closeModal();
-    });
-    document.addEventListener("keydown", (e) => e.key === "Escape" && closeModal());
+    // Close when clicking the backdrop (overlay itself, not the image — image stops propagation)
+    overlay.addEventListener("click", closeModal);
+
+    // Close on Esc
+    document.addEventListener("keydown", function(e) { if (e.key === "Escape") closeModal(); });
   }
 
   bind();

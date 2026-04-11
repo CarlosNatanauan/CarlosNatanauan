@@ -25,26 +25,36 @@ const LINKS = {
 <BaseLayout title="Kuya Carlos">
 
 <!-- Hero -->
-<section class="pt-10 pb-14 sm:pt-14 sm:pb-20">
-  <div class="flex items-center gap-3">
+<section class="min-h-[calc(100vh-3.5rem)] flex flex-col items-center justify-center text-center py-16">
+  <div class="max-w-2xl w-full mx-auto flex flex-col items-center">
+
+  <div class="hero-enter-down" style="animation-delay: 0ms">
     <AvailabilityBadge />
   </div>
 
-  <ProfileCard
-    name={profile.name}
-    role={profile.role}
-    location={profile.location}
-    avatar={profile.avatar}
-  />
+  <div class="hero-enter-down" style="animation-delay: 100ms">
+    <ProfileCard
+      name={profile.name}
+      role={profile.role}
+      location={profile.location}
+      avatar={profile.avatar}
+      centered={true}
+    />
+  </div>
 
   <!-- Typing Effect Heading -->
-  <h1 class="mt-4 text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight leading-tight">
+  <h1 class="hero-enter-in mt-6 text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight leading-tight" style="animation-delay: 250ms">
     <span class="text-slate-800/95 dark:text-zinc-100/95">Hello, I'm</span>{" "}
     <span id="typed-name" class="align-baseline metal-gradient animate-gradient drop-shadow-[0_1px_0_rgba(255,255,255,0.65)]" aria-live="polite">
       Carlos
     </span>
     <span id="typed-cursor" class="ml-1 inline-block w-[0.6ch] select-none">|</span>
   </h1>
+
+  <!-- Subheading -->
+  <p class="hero-enter-up mt-3 text-base sm:text-lg text-slate-500 dark:text-zinc-400 tracking-wide" style="animation-delay: 350ms">
+    Mobile developer by day. Someone else by night.
+  </p>
 
   <!-- Typing Script (keep your existing script) -->
   <script is:inline>
@@ -93,151 +103,126 @@ const LINKS = {
     else { cursor.style.display = "none"; el.textContent = WORDS[0]; applyTheme(WORDS[0]); }
   </script>
 
-  <!-- Bio Section with subtle highlights -->
-  <div class="mt-6 space-y-3 max-w-2xl">
-    <p class="text-base sm:text-lg leading-relaxed text-slate-600 dark:text-zinc-400">
-      I'm a software developer with a BSIT degree from
-      <span class="font-medium text-slate-700 dark:text-zinc-300">STI College</span>,
-      where I built my foundation in
-      <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 text-sm font-medium">C#</span>
-      <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 text-sm font-medium">.NET</span>
-      and
-      <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 text-sm font-medium">SQL</span>.
-      Since then, I've specialized in
-      <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 text-sm font-medium">Flutter</span>
-      development and backend API integrations, building mobile apps that hold up in production —
-      <span class="font-medium text-slate-700 dark:text-zinc-300">not just in demos</span>.
-      I've worked on and maintain production mobile apps currently live on the
-      <span class="font-medium text-slate-700 dark:text-zinc-300">App Store and Google Play</span>.
-    </p>
+  <!-- CTA + Socials -->
+  <div class="hero-enter-up mt-8 flex flex-col sm:flex-row items-center gap-3" style="animation-delay: 450ms">
 
-    <p class="text-base sm:text-lg leading-relaxed text-slate-600 dark:text-zinc-400">
-      I care about
-      <span class="font-medium text-indigo-600 dark:text-indigo-400">clean architecture</span>,
-      <span class="font-medium text-indigo-600 dark:text-indigo-400">thoughtful UX</span>,
-      and writing code that still makes sense a month later. When I'm not building, I'm usually picking up something new,
-      chipping away at a side project, going for a run, or convincing myself that one more coffee is a productivity strategy.
-    </p>
-  </div>
-
-  <!-- Compact CTA + Social Icons -->
-  <div class="mt-7 flex flex-wrap items-center gap-3">
-    <!-- Smaller Primary CTA -->
-    <a 
-      href="#contact" 
-      class="group inline-flex items-center justify-center gap-2 rounded-lg 
-             bg-gradient-to-r from-indigo-600 to-purple-600 
+    <!-- Let's Talk — gradient pill -->
+    <a
+      href="#contact"
+      class="group inline-flex items-center gap-2 px-6 py-2.5 rounded-xl
+             bg-gradient-to-r from-indigo-600 to-purple-600
              hover:from-indigo-500 hover:to-purple-500
-             dark:from-indigo-500 dark:to-purple-500
-             dark:hover:from-indigo-400 dark:hover:to-purple-400
-             text-white px-5 py-2.5 text-sm font-medium 
-             shadow-md hover:shadow-lg
-             transition-all duration-300 hover:scale-105 active:scale-95"
+             text-white text-sm font-semibold
+             shadow-lg shadow-indigo-500/25
+             hover:shadow-indigo-500/40 hover:scale-105 active:scale-95
+             transition-all duration-300"
     >
-      <span>Let's Talk</span>
+      Let's Talk
       <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M5 12h14M12 5l7 7-7 7"/>
       </svg>
     </a>
 
-    <!-- Compact Social Links -->
+    <!-- See Projects — glass pill -->
+    <a
+      href="#projects"
+      class="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl
+             bg-slate-100/80 hover:bg-slate-200/80
+             dark:bg-white/10 dark:hover:bg-white/15
+             backdrop-blur-sm
+             border border-slate-300/60 dark:border-white/20
+             text-slate-700 dark:text-zinc-200 text-sm font-semibold
+             hover:scale-105 active:scale-95
+             transition-all duration-300"
+    >
+      See Projects
+    </a>
+
+    <!-- Divider -->
+    <span class="hidden sm:block w-px h-7 bg-slate-300 dark:bg-zinc-700"></span>
+
+    <!-- Social icons — glass -->
     <div class="flex items-center gap-2">
-      <!-- GitHub -->
-      <a 
-        href={LINKS.github} 
-        target="_blank" 
-        rel="noreferrer"
-        class="group flex items-center justify-center w-10 h-10 rounded-lg 
-               border border-slate-300 dark:border-zinc-700 
-               bg-white dark:bg-zinc-900
-               hover:bg-slate-50 dark:hover:bg-zinc-800 
-               hover:border-slate-400 dark:hover:border-zinc-600
-               hover:scale-110 active:scale-95
-               transition-all duration-200 shadow-sm hover:shadow"
-        aria-label="GitHub"
-        title="GitHub"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5 text-slate-700 dark:text-zinc-300" viewBox="0 0 24 24" fill="currentColor">
+      <a href={LINKS.github} target="_blank" rel="noreferrer"
+         class="flex items-center justify-center w-10 h-10 rounded-xl
+                bg-slate-100/80 hover:bg-slate-200/80
+                dark:bg-white/10 dark:hover:bg-white/15
+                backdrop-blur-sm border border-slate-300/60 dark:border-white/20
+                text-slate-600 dark:text-zinc-300
+                hover:scale-110 active:scale-95 transition-all duration-200"
+         aria-label="GitHub" title="GitHub">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
           <path d="M12 .5a11.5 11.5 0 0 0-3.64 22.4c.58.1.8-.25.8-.56v-2c-3.26.71-3.95-1.57-3.95-1.57-.53-1.34-1.3-1.7-1.3-1.7-1.06-.72.08-.71.08-.71 1.17.08 1.79 1.2 1.79 1.2 1.04 1.8 2.72 1.28 3.38.98.1-.76.41-1.28.75-1.58-2.6-.29-5.34-1.3-5.34-5.8 0-1.28.46-2.33 1.2-3.15-.12-.3-.52-1.52.12-3.17 0 0 .98-.31 3.2 1.2a11.1 11.1 0 0 1 5.82 0c2.22-1.5 3.2-1.2 3.2-1.2.64 1.65.24 2.87.12 3.17.75.82 1.2 1.87 1.2 3.15 0 4.5-2.75 5.51-5.36 5.8.43.37.81 1.1.81 2.22v3.3c0 .31.21.67.81.56A11.5 11.5 0 0 0 12 .5z"/>
         </svg>
       </a>
-
-      <!-- LinkedIn -->
-      <a 
-        href={LINKS.linkedin} 
-        target="_blank" 
-        rel="noreferrer"
-        class="group flex items-center justify-center w-10 h-10 rounded-lg 
-               border border-slate-300 dark:border-zinc-700 
-               bg-white dark:bg-zinc-900
-               hover:bg-slate-50 dark:hover:bg-zinc-800 
-               hover:border-slate-400 dark:hover:border-zinc-600
-               hover:scale-110 active:scale-95
-               transition-all duration-200 shadow-sm hover:shadow"
-        aria-label="LinkedIn"
-        title="LinkedIn"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5 text-slate-700 dark:text-zinc-300" viewBox="0 0 24 24" fill="currentColor">
+      <a href={LINKS.linkedin} target="_blank" rel="noreferrer"
+         class="flex items-center justify-center w-10 h-10 rounded-xl
+                bg-slate-100/80 hover:bg-slate-200/80
+                dark:bg-white/10 dark:hover:bg-white/15
+                backdrop-blur-sm border border-slate-300/60 dark:border-white/20
+                text-slate-600 dark:text-zinc-300
+                hover:scale-110 active:scale-95 transition-all duration-200"
+         aria-label="LinkedIn" title="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
           <path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zM3 8.98h3.96V21H3zM9.5 8.98H13v1.63h.05c.49-.93 1.68-1.9 3.46-1.9 3.7 0 4.38 2.43 4.38 5.6V21h-3.96v-5.35c0-1.28-.02-2.93-1.79-2.93-1.8 0-2.07 1.4-2.07 2.84V21H9.5z"/>
         </svg>
       </a>
-
-      <!-- Email -->
-      <a 
-        href={LINKS.email}
-        class="group flex items-center justify-center w-10 h-10 rounded-lg 
-               border border-slate-300 dark:border-zinc-700 
-               bg-white dark:bg-zinc-900
-               hover:bg-slate-50 dark:hover:bg-zinc-800 
-               hover:border-slate-400 dark:hover:border-zinc-600
-               hover:scale-110 active:scale-95
-               transition-all duration-200 shadow-sm hover:shadow"
-        aria-label="Email"
-        title="Email"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5 text-slate-700 dark:text-zinc-300" viewBox="0 0 24 24" fill="currentColor">
+      <a href={LINKS.email}
+         class="flex items-center justify-center w-10 h-10 rounded-xl
+                bg-slate-100/80 hover:bg-slate-200/80
+                dark:bg-white/10 dark:hover:bg-white/15
+                backdrop-blur-sm border border-slate-300/60 dark:border-white/20
+                text-slate-600 dark:text-zinc-300
+                hover:scale-110 active:scale-95 transition-all duration-200"
+         aria-label="Email" title="Email">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
           <path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2Zm0 4-8 5L4 8V6l8 5 8-5z"/>
         </svg>
       </a>
     </div>
   </div>
+
+  </div><!-- end max-w-2xl wrapper -->
 </section>
 
 
 
   <!-- Projects -->
-<section id="projects" class="scroll-mt-28 md:scroll-mt-24 mt-20">
+<section id="projects" class="scroll-mt-28 md:scroll-mt-24 mt-32 lg:mt-40">
   <!-- Section Header with Animation -->
-  <div class="text-center mb-12">
-    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full 
-                bg-indigo-50 dark:bg-indigo-950/50 
+  <div class="text-center mb-14 lg:mb-20">
+    <div class="reveal-title inline-flex items-center gap-2 px-4 py-1.5 rounded-full
+                bg-indigo-50 dark:bg-indigo-950/50
                 border border-indigo-200 dark:border-indigo-900
-                text-indigo-600 dark:text-indigo-400 text-sm font-medium mb-4">
+                text-indigo-600 dark:text-indigo-400 text-sm font-medium mb-4"
+         style="transition-delay: 0ms">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <rect x="2" y="3" width="20" height="14" rx="2"/>
         <path d="M8 21h8M12 17v4"/>
       </svg>
       Featured Work
     </div>
-    
-    <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight
+
+    <h2 class="reveal-title text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight
                bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900
                dark:from-zinc-100 dark:via-zinc-200 dark:to-zinc-100
-               bg-clip-text text-transparent mb-4">
+               bg-clip-text text-transparent mb-4"
+        style="transition-delay: 100ms">
       Projects
     </h2>
-    
-    <p class="text-lg text-slate-600 dark:text-zinc-400 max-w-2xl mx-auto">
+
+    <p class="reveal-title text-lg text-slate-600 dark:text-zinc-400 max-w-2xl mx-auto"
+       style="transition-delay: 180ms">
       A collection of projects I've built — from full-stack applications to mobile experiences
     </p>
   </div>
 
   <!-- Projects Grid - Responsive with better layout -->
-  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 auto-rows-fr">
+  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
     {projects.map((p, index) => (
-      <div 
-        class="animate-fade-in-up"
-        style={`animation-delay: ${index * 100}ms`}
+      <div
+        class={`reveal${p.featured ? ' md:col-span-2 xl:col-span-3' : ''}`}
+        style={`transition-delay: ${index * 100}ms`}
       >
         <ProjectCard project={p} />
       </div>
@@ -245,7 +230,7 @@ const LINKS = {
   </div>
 
   <!-- Optional: View More Button -->
-  <div class="mt-12 text-center">
+  <div class="reveal mt-12 text-center" style="transition-delay: 200ms">
     <a
       href="https://github.com/CarlosNatanauan"
       target="_blank"
@@ -271,21 +256,24 @@ const LINKS = {
 
 
 <!-- Experience Section -->
-<section id="experience" class="scroll-mt-28 md:scroll-mt-24 mt-20">
+<section id="experience" class="scroll-mt-28 md:scroll-mt-24 mt-32 lg:mt-40">
   <!-- Section Header with Animation -->
-  <div class="text-center mb-12 lg:mb-16">
-    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-purple-50 dark:bg-purple-950/50 border border-purple-200 dark:border-purple-900 text-purple-600 dark:text-purple-400 text-sm font-medium mb-4">
+  <div class="text-center mb-14 lg:mb-20">
+    <div class="reveal-title inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-purple-50 dark:bg-purple-950/50 border border-purple-200 dark:border-purple-900 text-purple-600 dark:text-purple-400 text-sm font-medium mb-4"
+         style="transition-delay: 0ms">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M20 7h-9M14 17H5M6 3v4M10 17v4M14 7v10"/>
       </svg>
       Career Journey
     </div>
-    
-    <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 dark:from-zinc-100 dark:via-zinc-200 dark:to-zinc-100 bg-clip-text text-transparent mb-4">
+
+    <h2 class="reveal-title text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 dark:from-zinc-100 dark:via-zinc-200 dark:to-zinc-100 bg-clip-text text-transparent mb-4"
+        style="transition-delay: 100ms">
       Experience
     </h2>
-    
-    <p class="text-lg text-slate-600 dark:text-zinc-400 max-w-2xl mx-auto">
+
+    <p class="reveal-title text-lg text-slate-600 dark:text-zinc-400 max-w-2xl mx-auto"
+       style="transition-delay: 180ms">
       Roles and internships where I learned, built, and shipped real products
     </p>
   </div>
@@ -293,7 +281,7 @@ const LINKS = {
   <!-- Simple stacked layout - no complex timeline on large screens -->
   <div class="max-w-4xl mx-auto space-y-8 lg:space-y-10">
     {experience.map((item, index) => (
-      <div class="animate-fade-in-up" style={`animation-delay: ${index * 150}ms`}>
+      <div class="reveal-left" style={`transition-delay: ${index * 120}ms`}>
         <ExperienceItem item={item} />
       </div>
     ))}
@@ -317,12 +305,41 @@ const LINKS = {
 
 
   <!-- Contact -->
-  <section id="contact" class="scroll-mt-28 md:scroll-mt-24">
-    <SectionTitle>Contact</SectionTitle>
-    <ContactForm
-      action="https://formspree.io/f/mldekgro"
-      subject="New portfolio message!"
-      title="Contact"
-    />
+  <section id="contact" class="scroll-mt-28 md:scroll-mt-24 mt-32 lg:mt-40 pb-20">
+    <div class="reveal-title" style="transition-delay: 0ms">
+      <SectionTitle>Contact</SectionTitle>
+    </div>
+    <div class="reveal-scale" style="transition-delay: 120ms">
+      <ContactForm
+        action="https://formspree.io/f/mldekgro"
+        subject="New portfolio message!"
+        title="Contact"
+      />
+    </div>
   </section>
+
+<!-- Scroll reveal: IntersectionObserver -->
+<script is:inline>
+  (function () {
+    var prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReduced) return;
+
+    var targets = document.querySelectorAll('.reveal, .reveal-left, .reveal-scale, .reveal-title');
+    if (!targets.length) return;
+
+    var observer = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12, rootMargin: '0px 0px -48px 0px' }
+    );
+
+    targets.forEach(function (el) { observer.observe(el); });
+  })();
+</script>
 </BaseLayout>
