@@ -5,11 +5,10 @@ I’m a **Software Developer** who loves creating solutions and learning new thi
 I might not know everything, but I’m **pretty good at making the internet work for me**!
 
 
-## 🌐 Socials:
-<a href="https://linkedin.com/in/carlosnatanauan/" target="blank"><img align="center" src="https://raw.githubusercontent.com/rahuldkjain/github-profile-readme-generator/master/src/images/icons/Social/linked-in-alt.svg" alt="carlosnatanauan/" height="30" width="40" /></a>
-<a href="https://fb.com/carlosbenedict.natanauan/" target="blank"><img align="center" src="https://raw.githubusercontent.com/rahuldkjain/github-profile-readme-generator/master/src/images/icons/Social/facebook.svg" alt="carlosbenedict.natanauan/" height="30" width="40" /></a>
-<a href="https://instagram.com/kuys.carlyy/" target="blank"><img align="center" src="https://raw.githubusercontent.com/rahuldkjain/github-profile-readme-generator/master/src/images/icons/Social/instagram.svg" alt="kuys.carlyy/" height="30" width="40" /></a>
-</p>
+## Contact Me
+<p><a href="https://www.linkedin.com/in/carlosnatanauan/" target="_blank"><img src="https://img.shields.io/badge/LinkedIn-%230077B5.svg?&style=flat-square&logo=linkedin&logoColor=white" alt="LinkedIn"></a> <a href="https://kuyacarlos.is-a.dev/" target="_blank"><img src="https://img.shields.io/badge/Website-%23FF7139.svg?&style=flat-square&logo=Firefox&logoColor=white" alt="Website"></a> <a href="https://www.instagram.com/kuys.carlyy/" target="_blank"><img src="https://img.shields.io/badge/Instagram-%23E4405F.svg?&style=flat-square&logo=instagram&logoColor=white" alt="Instagram"></a> </p>
+
+
 
 
 ## 💻 Techs and Tools I used:
