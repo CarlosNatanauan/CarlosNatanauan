@@ -7,8 +7,10 @@ export const experience = [
     period: "Dec 2024 — Present",
     datetime: "2024-12", // ISO format for semantic HTML
     bullets: [
-      "Turn Figma designs into polished Flutter UI/UX with pixel-perfect precision and smooth animations",
-      "Integrate and test backend APIs in Flutter applications, ensuring robust error handling and optimal performance",
+      "Shipped 3 production apps to the App Store and Play Store — a social cinema platform, a field operations tool, and a B2B e-commerce app",
+      "Integrated Stripe, Apple Pay, and Google Pay into Flutter — including interactive seat selection UI and multi-step booking flows",
+      "Architected dual-role auth systems with JWT persistence, intelligent error classification, and session timeout handling",
+      "Implemented offline-first persistence across multiple production apps using Hive — including per-keystroke draft saving, extensive type adapters, and dual-layer caching with TTL policies",
     ],
   },
   {
