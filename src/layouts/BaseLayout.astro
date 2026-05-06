@@ -7,6 +7,15 @@ const { title = "Carlos Benedict Natanauan — Portfolio" } = Astro.props;
 
 <html lang="en" class="scroll-smooth">
 <head>
+  <!-- Google tag (gtag.js) -->
+  <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-ZQW8V8K7VS"></script>
+  <script is:inline>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-ZQW8V8K7VS');
+  </script>
+
   <!-- Set theme deterministically before first paint -->
   <script is:inline>
     (function () {
