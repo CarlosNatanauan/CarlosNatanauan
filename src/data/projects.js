@@ -1,6 +1,24 @@
 // src/data/projects.js
 export const projects = [
   {
+    name: "ResiboVault",
+    tagline: "Bayad ka na ba? Show proof in seconds.",
+    about:
+      'Born from one too many "Bayad ka na ba?" moments. Screenshot a GCash, Maya, or bank receipt — Gemini 2.5 Flash reads the amount, ref, and recipient for you. Search anytime by name or amount. Need to prove a payment? One tap generates a shareable link that expires in 7 days — they see the receipt, not your whole vault.',
+    tech: ["Flutter", "Riverpod", "Drift/SQLite", "go_router", "Gemini 2.5 Flash", "Supabase", "Edge Functions", "Astro", "Tailwind", "Vercel"],
+    techGroups: [
+      { label: "Mobile",       items: ["Flutter", "Riverpod", "Drift/SQLite", "go_router"] },
+      { label: "AI & Backend", items: ["Gemini 2.5 Flash", "Supabase", "Edge Functions"] },
+      { label: "Web",          items: ["Astro", "Tailwind", "Vercel"] },
+    ],
+    demo:        "https://youtube.com/shorts/69dEFXfPr7o",
+    live:        "https://resibovault-web.vercel.app/",
+    image:       "/animation/resibo_vault_small.png",
+    imageMobile: "/resibo_vault_big.png",
+    featured: true,
+  },
+
+  {
     name: "Keepsake — Memory Archive",
     description:
       "An offline-first Flutter app for archiving the objects that shaped you. Take a photo, write why it matters, record your voice while it's still fresh. Organize by collections and tags, swipe through photo galleries, and restore everything silently on a new device — all backed by your own Google Drive. No backend, no subscriptions, no strangers holding your memories.",
@@ -9,8 +27,6 @@ export const projects = [
     demo: "https://youtu.be/otQp8XxPmQw",
     tryIt: "https://drive.google.com/file/d/1eA4rUY1DHmFvIH22t0FAxvnfXB1ILTmW/view?usp=sharing",
     image: "/keepsake.png",
-    imageMobile: "/keepsake_thumbnail.png",
-    featured: true,
   },
 
   {
