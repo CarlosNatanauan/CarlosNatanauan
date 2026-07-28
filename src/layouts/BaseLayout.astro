@@ -1,6 +1,7 @@
 ---
 import "../styles/global.css";
 import { profile } from "../data/profile.js";
+import ScrollTop from "../components/ScrollTop.astro";
 
 interface Props {
   title?: string;
@@ -12,6 +13,21 @@ const {
 } = Astro.props as Props;
 
 const year = new Date().getFullYear();
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const ogImageURL = new URL(profile.avatar, Astro.site);
+
+const personSchema = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: profile.name,
+  alternateName: profile.fullName,
+  jobTitle: profile.headline,
+  description,
+  image: ogImageURL.toString(),
+  url: canonicalURL.toString(),
+  sameAs: Object.values(profile.links).filter((link) => link.startsWith("http")),
+};
 ---
 
 <html lang="en" class="scroll-smooth">
@@ -44,6 +60,7 @@ const year = new Date().getFullYear();
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalURL} />
     <meta
       name="theme-color"
       content="#fbfbfc"
@@ -54,6 +71,25 @@ const year = new Date().getFullYear();
       content="#26262b"
       media="(prefers-color-scheme: dark)"
     />
+
+    <!-- Open Graph / social + search preview -->
+    <meta property="og:type" content="profile" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:image" content={ogImageURL} />
+    <meta property="profile:first_name" content="Carlos" />
+    <meta property="profile:last_name" content="Natanauan" />
+
+    <!-- Twitter card -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageURL} />
+
+    <!-- Structured data: ties this portrait to "Carlos Natanauan" /
+         "Carlos Benedict Natanauan" as one entity for Google -->
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(personSchema)} />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
@@ -201,6 +237,8 @@ const year = new Date().getFullYear();
     >
       © {year} {profile.fullName}
     </footer>
+
+    <ScrollTop />
 
     <script is:inline>
       (function () {

@@ -47,8 +47,7 @@ export const projects = [
     ],
     live: "https://resibovault-web.vercel.app/",
     demo: "https://youtube.com/shorts/69dEFXfPr7o",
-    image: "/animation/resibo_vault_small.png",
-    imageMobile: "/resibo_vault_big.png",
+    image: "/resibo_vault_big.png",
   },
 
   {
@@ -59,8 +58,7 @@ export const projects = [
     repo: "https://github.com/CarlosNatanauan/keepsake_app",
     demo: "https://youtu.be/otQp8XxPmQw",
     tryIt: "https://drive.google.com/file/d/1eA4rUY1DHmFvIH22t0FAxvnfXB1ILTmW/view?usp=sharing",
-    image: "/keepsake.png",
-    imageMobile: "/keepsake_thumbnail.png",
+    image: "/keepsake_thumbnail.png",
   },
 
   {

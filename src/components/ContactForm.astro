@@ -21,14 +21,14 @@ const emailAddress = (profile.links.email || "")
   id="contact-form"
   action={action}
   method="POST"
-  class="w-full rounded-[20px] border border-line bg-card p-6 sm:p-8"
+  class="w-full rounded-2xl border border-line bg-card p-4 sm:p-5"
 >
   <!-- Name and email share a row on desktop; message spans both -->
-  <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+  <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
     <div>
       <label
         for="name"
-        class="mb-2 block text-[13px] font-semibold text-muted">Your Name</label
+        class="mb-1 block text-[12px] font-semibold text-muted">Your Name</label
       >
       <input
         id="name"
@@ -37,14 +37,14 @@ const emailAddress = (profile.links.email || "")
         required
         autocomplete="name"
         placeholder="Jane Doe"
-        class="field"
+        class="field field-sm"
       />
     </div>
 
     <div>
       <label
         for="email"
-        class="mb-2 block text-[13px] font-semibold text-muted">Your Email</label
+        class="mb-1 block text-[12px] font-semibold text-muted">Your Email</label
       >
       <input
         id="email"
@@ -53,22 +53,22 @@ const emailAddress = (profile.links.email || "")
         required
         autocomplete="email"
         placeholder="you@email.com"
-        class="field"
+        class="field field-sm"
       />
     </div>
 
     <div class="sm:col-span-2">
       <label
         for="message"
-        class="mb-2 block text-[13px] font-semibold text-muted">Message</label
+        class="mb-1 block text-[12px] font-semibold text-muted">Message</label
       >
       <textarea
         id="message"
         name="message"
-        rows="5"
+        rows="3"
         required
         placeholder="Tell me about your project or just say hi!"
-        class="field resize-y"></textarea>
+        class="field field-sm resize-y"></textarea>
     </div>
   </div>
 
@@ -84,30 +84,30 @@ const emailAddress = (profile.links.email || "")
 
   <!-- Actions: button left, live status beside it, direct email as a fallback -->
   <div
-    class="mt-6 flex flex-col gap-4 border-t border-line pt-5 sm:flex-row sm:items-center sm:justify-between"
+    class="mt-4 flex flex-col gap-3 border-t border-line pt-4 sm:flex-row sm:items-center sm:justify-between"
   >
-    <div class="flex flex-wrap items-center gap-4">
+    <div class="flex flex-wrap items-center gap-3">
       <button
         id="submit-btn"
         type="submit"
-        class="group inline-flex items-center gap-2 rounded-[10px] border-none bg-fg px-7 py-3.5 text-[14.5px] font-bold text-bg transition-transform hover:scale-[1.03] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
+        class="group inline-flex items-center gap-1.5 rounded-lg border-none bg-fg px-5 py-2.5 text-[13.5px] font-bold text-bg transition-transform hover:scale-[1.03] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
       >
         <span id="btn-label">Send Message</span>
         <span class="inline-block transition-transform group-hover:translate-x-1"
           >→</span
         >
       </button>
-      <p id="form-status" class="m-0 text-[13.5px]" aria-live="polite"></p>
+      <p id="form-status" class="m-0 text-[13px]" aria-live="polite"></p>
     </div>
 
     {
       emailAddress && (
         <a
           href={profile.links.email}
-          class="inline-flex items-center gap-2 text-[13.5px] text-muted hover:text-accent-hover"
+          class="inline-flex items-center gap-1.5 text-[13px] text-muted hover:text-accent-hover"
         >
           <svg
-            class="size-4 shrink-0"
+            class="size-3.5 shrink-0"
             viewBox="0 0 24 24"
             fill="currentColor"
             aria-hidden="true"

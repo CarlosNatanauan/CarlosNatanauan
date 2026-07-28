@@ -61,8 +61,13 @@ const mediaProps = imageHref
 ---
 
 <section
-  class="mb-8 w-full overflow-hidden rounded-[20px] border border-line bg-card"
+  class="card-featured relative mb-14 w-full overflow-hidden rounded-[20px] border bg-card"
 >
+  <!-- Beam travelling the border. Purely decorative and non-interactive; the
+       mask below confines it to the 1px border ring. -->
+  <div class="beam-track" aria-hidden="true">
+    <div class="beam"></div>
+  </div>
   <div class="grid grid-cols-1 gap-0 sm:grid-cols-[340px_1fr] sm:items-center">
   <!-- No backdrop: the clip sits directly on the card so it blends in both
        themes. Framed and vertically centred rather than full-bleed. -->
@@ -142,11 +147,15 @@ const mediaProps = imageHref
               href={project.live}
               target="_blank"
               rel="noopener noreferrer"
-              class="btn-solid btn-sm group inline-flex w-fit items-center gap-2 transition-transform hover:scale-[1.03]"
+              class="btn-hover w-fit"
             >
-              <span>Visit Live Site</span>
-              <span class="inline-block transition-transform group-hover:translate-x-1">
-                →
+              <span class="btn-hover-idle">
+                <span class="btn-hover-dot" aria-hidden="true"></span>
+                <span class="btn-hover-idle-text">Visit Live Site</span>
+              </span>
+              <span class="btn-hover-reveal" aria-hidden="true">
+                <span>Visit Live Site</span>
+                <span>→</span>
               </span>
             </a>
           )}
@@ -176,6 +185,113 @@ const mediaProps = imageHref
     </div>
   </div>
 </section>
+
+<style>
+  /* The eyebrow already claims this card is featured; tinting the frame
+     toward the accent makes the container agree with the label instead of
+     contradicting it. Same color-mix technique as .tag-tech:hover. */
+  .card-featured {
+    border-color: color-mix(in oklch, var(--tk-accent) 32%, var(--tk-line));
+  }
+
+  /* The two themes mix against very different bases — --tk-line is
+     black/0.09 in light and white/0.1 in dark — so the same percentage does
+     not read the same. Dark needs more accent to register. */
+  :global(:root.dark) .card-featured {
+    border-color: color-mix(in oklch, var(--tk-accent) 45%, var(--tk-line));
+  }
+
+  /* ── border beam ──────────────────────────────────────────────
+     A gradient square is walked around a rounded-rect motion path while a
+     mask confines it to the border ring, so only the sliver crossing the
+     border is ever visible — reading as a beam of light tracing the edge.
+
+     Driven by `rotate` on a conic gradient rather than walking a square
+     along offset-path. offset-distance is not a compositor-accelerated
+     property, so it animates on the main thread — and this card contains an
+     autoplaying looping video, whose frame decoding competes for exactly
+     that thread and makes the beam hitch. `rotate` is composited: the
+     gradient is painted once into a layer that the GPU then spins, so it
+     stays smooth no matter how busy the main thread gets.
+
+     Gated on @supports for the mask; without it the card simply keeps its
+     static accent border. */
+  .beam-track {
+    display: none;
+  }
+
+  @supports (mask-composite: intersect) {
+    .beam-track {
+      display: block;
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      border-radius: inherit;
+      /* Transparent border of the same width as the card's: the ring this
+         carves out is exactly the band the beam is allowed to paint in. */
+      border: 1px solid transparent;
+
+      /* Two mask layers intersected: the first is fully transparent and
+         clipped to the padding box, the second fully opaque and clipped to
+         the border box. What survives is border-box minus padding-box. */
+      mask-image: linear-gradient(transparent, transparent),
+        linear-gradient(#000, #000);
+      mask-clip: padding-box, border-box;
+      mask-composite: intersect;
+    }
+
+    .beam {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      /* Square, and wide enough that its inscribed circle still covers the
+         card's corners at every angle — otherwise the sweep would visibly
+         detach from the border on the diagonals. */
+      width: 150%;
+      aspect-ratio: 1;
+      /* Separate `translate` so the centring is not clobbered by the
+         `rotate` the animation drives — both are independent properties,
+         and both are composited. */
+      translate: -50% -50%;
+
+      /* A long faint tail ramping into a solid head, so it reads as a beam
+         with a trail rather than a rotating hard edge.
+
+         Every stop is the accent at a different alpha — nothing is mixed
+         toward white. Mixing with white desaturates as it lightens, which
+         pulled the brightest part of the beam out of blue and read as an
+         extra colour next to the accent already used on text. One hue,
+         four opacities. */
+      background: conic-gradient(
+        from 0deg,
+        transparent 0deg 250deg,
+        color-mix(in oklch, var(--tk-accent) 22%, transparent) 320deg,
+        color-mix(in oklch, var(--tk-accent) 62%, transparent) 348deg,
+        var(--tk-accent) 358deg,
+        transparent 360deg
+      );
+      animation: card-beam 8s linear infinite;
+      /* Promote up front rather than mid-animation */
+      will-change: rotate;
+    }
+
+    @keyframes card-beam {
+      to {
+        rotate: 360deg;
+      }
+    }
+
+    /* A perpetual loop is exactly what reduced motion is asking about.
+       Removed outright — freezing it would leave a bright blob parked on
+       one corner with no way to read it as intentional. */
+    @media (prefers-reduced-motion: reduce) {
+      .beam-track {
+        display: none;
+      }
+    }
+  }
+</style>
 
 <script is:inline>
   // Don't loop an autoplaying clip at people who asked for less motion

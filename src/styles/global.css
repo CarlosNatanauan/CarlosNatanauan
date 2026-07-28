@@ -207,6 +207,78 @@ html[data-theme-vt="active"] body {
     font-size: 14px;
     border-radius: 8px;
   }
+
+  /* Interactive hover button (mimics Magic UI's "Interactive Hover Button"
+     in plain CSS): a dot expands to fill the button while the idle label
+     slides out and the reveal label + arrow slide in from the other side. */
+  .btn-hover {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border: 1px solid var(--tk-line);
+    border-radius: 8px;
+    padding: 11px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--tk-fg);
+    background: var(--tk-card);
+  }
+  .btn-hover-idle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn-hover-dot {
+    height: 8px;
+    width: 8px;
+    border-radius: 999px;
+    background: var(--tk-fg);
+    transition: transform 0.3s ease;
+  }
+  .btn-hover-idle-text {
+    display: inline-block;
+    transition:
+      transform 0.3s ease,
+      opacity 0.3s ease;
+  }
+  .btn-hover-reveal {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: var(--tk-bg);
+    opacity: 0;
+    transform: translateX(14px);
+    transition:
+      transform 0.3s ease,
+      opacity 0.3s ease;
+  }
+  .btn-hover:hover .btn-hover-dot {
+    /* Dot sits near the left edge, so it must grow far enough to reach the
+       button's far corners, not just its far edge — a modest scale leaves
+       the top-right/bottom-right corners uncovered on wider buttons. */
+    transform: scale(80);
+  }
+  .btn-hover:hover .btn-hover-idle-text {
+    transform: translateX(14px);
+    opacity: 0;
+  }
+  .btn-hover:hover .btn-hover-reveal {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .btn-hover-dot,
+    .btn-hover-idle-text,
+    .btn-hover-reveal {
+      transition: none;
+    }
+  }
 }
 
 /* Form fields */
@@ -228,6 +300,11 @@ html[data-theme-vt="active"] body {
 }
 .field::placeholder {
   color: var(--tk-faint);
+}
+.field-sm {
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-size: 13.5px;
 }
 
 /* ── Tech stack: scrolling compact view ⇄ labelled grouped view ──
