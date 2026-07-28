@@ -7,7 +7,7 @@ interface Props {
   description?: string;
 }
 const {
-  title = "Carlos Benedict Natanauan — Portfolio",
+  title = "Carlos Natanauan — Portfolio",
   description = "Software developer focused on mobile app development with Flutter, branching into web with Astro.",
 } = Astro.props as Props;
 
@@ -66,28 +66,11 @@ const year = new Date().getFullYear();
       rel="stylesheet"
     />
 
-    <!-- Favicon follows the active theme -->
-    <link
-      id="favicon"
-      rel="icon"
-      type="image/png"
-      href="/profiles/carlos_dark.png"
-    />
-    <script is:inline>
-      (function () {
-        function setFavicon() {
-          const el = document.getElementById("favicon");
-          if (!el) return;
-          const isDark = document.documentElement.classList.contains("dark");
-          el.href = isDark
-            ? "/profiles/carlos_dark.png"
-            : "/profiles/carlos_light.png";
-        }
-        setFavicon();
-        window.addEventListener("themechange", setFavicon);
-        window.addEventListener("astro:page-load", setFavicon);
-      })();
-    </script>
+    <!-- Same portrait as the hero. One image for both themes, so there is no
+         theme-swap script here any more. Cropped to the face and downscaled
+         to 128px: the browser fetches the whole file to draw a 16px tab
+         icon, so pointing this at the full 753KB portrait would be wasteful. -->
+    <link id="favicon" rel="icon" type="image/png" href="/favicon.png" />
 
     <title>{title}</title>
 
