@@ -17,10 +17,8 @@ export const projects = [
     mediaPoster: "/kkevents_website_showcase.jpg",
     // TODO: add a K & K's Events screenshot to /public and point `image` at it
     image: "",
+    // Live site only — no repo link for this one.
     live: "https://www.kandkevents.online",
-    // TODO: add the frontend repo URL (this points at the backend repo for now)
-    repo: "https://github.com/CarlosNatanauan/k_and_k_events_backend",
-    repoLabel: "Backend Repo",
     featured: true,
   },
 
