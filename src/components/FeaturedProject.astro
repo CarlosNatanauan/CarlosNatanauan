@@ -61,7 +61,8 @@ const mediaProps = imageHref
 ---
 
 <section
-  class="card-featured relative mb-14 w-full overflow-hidden rounded-[20px] border bg-card"
+  data-beam-card
+  class="card-featured relative mb-14 w-full overflow-hidden rounded-[20px] border border-line bg-card"
 >
   <!-- Beam travelling the border. Purely decorative and non-interactive; the
        mask below confines it to the 1px border ring. -->
@@ -187,19 +188,11 @@ const mediaProps = imageHref
 </section>
 
 <style>
-  /* The eyebrow already claims this card is featured; tinting the frame
-     toward the accent makes the container agree with the label instead of
-     contradicting it. Same color-mix technique as .tag-tech:hover. */
-  .card-featured {
-    border-color: color-mix(in oklch, var(--tk-accent) 32%, var(--tk-line));
-  }
-
-  /* The two themes mix against very different bases — --tk-line is
-     black/0.09 in light and white/0.1 in dark — so the same percentage does
-     not read the same. Dark needs more accent to register. */
-  :global(:root.dark) .card-featured {
-    border-color: color-mix(in oklch, var(--tk-accent) 45%, var(--tk-line));
-  }
+  /* The static border stays neutral (--tk-line is black at 9% in light,
+     white at 10% in dark) so the beam is the only accent-coloured thing on
+     the card. It earns its keep as structure, not decoration: bg-card and
+     bg-bg are nearly identical in light mode (1.0 vs 0.985 lightness), so
+     with no border at all the card would lose its shape entirely there. */
 
   /* ── border beam ──────────────────────────────────────────────
      A gradient square is walked around a rounded-rect motion path while a
@@ -271,7 +264,10 @@ const mediaProps = imageHref
         var(--tk-accent) 358deg,
         transparent 360deg
       );
-      animation: card-beam 8s linear infinite;
+      /* --beam-ease is computed from the card's real aspect ratio at runtime
+         (see below) and remaps time onto perimeter distance. Falls back to
+         plain linear — visibly uneven, but never broken. */
+      animation: card-beam 5s var(--beam-ease, linear) infinite;
       /* Promote up front rather than mid-animation */
       will-change: rotate;
     }
@@ -294,6 +290,101 @@ const mediaProps = imageHref
 </style>
 
 <script is:inline>
+  // Even out the border beam.
+  //
+  // A conic gradient sweeps by ANGLE, but it is tracing a RECTANGLE. The ray
+  // from the centre meets the edge at y = a·tan(theta), so the contact point
+  // travels at a·sec²(theta) — slowest at the middle of each edge, fastest
+  // into the corners. On a wide card that is a large swing, and it reads as
+  // the beam speeding up and slowing down.
+  //
+  // The fix is a timing function that maps elapsed time to perimeter
+  // distance rather than to angle. Measured rather than hard-coded because
+  // the card's aspect ratio changes with the viewport (and flips entirely
+  // when the layout stacks on mobile). Runs on load and on resize only — the
+  // animation itself stays pure CSS and stays on the compositor.
+  (function () {
+    const cards = document.querySelectorAll("[data-beam-card]");
+    if (!cards.length) return;
+
+    // Guard: if linear() is unsupported, leave the var unset so the CSS
+    // fallback (plain `linear`) applies. Injecting an invalid timing
+    // function would invalidate the whole animation shorthand and stop the
+    // beam outright.
+    if (
+      !window.CSS ||
+      !CSS.supports ||
+      !CSS.supports("animation-timing-function", "linear(0, 1)")
+    )
+      return;
+
+    const SAMPLES = 720; // around the perimeter
+    const STOPS = 48; // control points emitted
+
+    function easeFor(w, h) {
+      if (!w || !h) return null;
+      const a = w / 2;
+      const b = h / 2;
+
+      // Walk the perimeter at fine angular steps, accumulating arc length.
+      const theta = new Array(SAMPLES + 1);
+      const cum = new Array(SAMPLES + 1);
+      let prevX = 0;
+      let prevY = 0;
+      let total = 0;
+
+      for (let i = 0; i <= SAMPLES; i++) {
+        const t = (i / SAMPLES) * Math.PI * 2;
+        // 0deg points up and angle increases clockwise, matching both
+        // conic-gradient(from 0deg) and a positive `rotate`.
+        const dx = Math.sin(t);
+        const dy = -Math.cos(t);
+        const sx = Math.abs(dx) < 1e-9 ? Infinity : a / Math.abs(dx);
+        const sy = Math.abs(dy) < 1e-9 ? Infinity : b / Math.abs(dy);
+        const k = Math.min(sx, sy);
+        const x = dx * k;
+        const y = dy * k;
+        if (i > 0) total += Math.hypot(x - prevX, y - prevY);
+        theta[i] = t;
+        cum[i] = total;
+        prevX = x;
+        prevY = y;
+      }
+      if (!total) return null;
+
+      // Invert: for each evenly spaced slice of perimeter, find the angle
+      // that reaches it. That angle (normalised) is the easing's output.
+      const pts = [];
+      let cursor = 0;
+      for (let j = 0; j <= STOPS; j++) {
+        const target = (j / STOPS) * total;
+        while (cursor < SAMPLES && cum[cursor + 1] < target) cursor++;
+        const lo = cum[cursor];
+        const hi = cum[cursor + 1] != null ? cum[cursor + 1] : lo;
+        const span = hi - lo;
+        const frac = span > 0 ? (target - lo) / span : 0;
+        const th =
+          theta[cursor] +
+          (theta[Math.min(cursor + 1, SAMPLES)] - theta[cursor]) * frac;
+        pts.push(
+          th / (Math.PI * 2) + " " + ((j / STOPS) * 100).toFixed(3) + "%",
+        );
+      }
+      return "linear(" + pts.join(",") + ")";
+    }
+
+    function apply() {
+      cards.forEach((card) => {
+        const ease = easeFor(card.offsetWidth, card.offsetHeight);
+        if (ease) card.style.setProperty("--beam-ease", ease);
+      });
+    }
+
+    apply();
+    // Cheap and rare; the geometry only changes when the box does.
+    addEventListener("resize", apply, { passive: true });
+  })();
+
   // Don't loop an autoplaying clip at people who asked for less motion
   (function () {
     if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
