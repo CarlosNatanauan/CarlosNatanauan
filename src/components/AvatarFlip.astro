@@ -2,11 +2,12 @@
 // src/components/AvatarFlip.astro
 // Hero portrait. Two behaviours:
 //   1. Reveals a second image when the theme switches to light, then closes
-//      it again after a hold. Uses the same circular clip-path language as
-//      the theme toggle's View Transition wipe (see BaseLayout), so the two
-//      read as one gesture. The second photo sits on top and is the only
-//      thing that animates, over a fully opaque base — so there is no
-//      midpoint where both are semi-transparent.
+//      it again after a hold, with a clip-path iris. Deliberately stays
+//      circular even though the theme toggle's wipe is square (BaseLayout):
+//      the shape follows the element it opens in, and this one is round.
+//      The second photo sits on top and is the only thing that animates,
+//      over a fully opaque base — so there is no midpoint where both are
+//      semi-transparent.
 //   2. Click / Enter opens a larger preview in a native <dialog>, which
 //      brings Esc-to-close, focus trapping and a backdrop for free.
 interface Props {
@@ -143,12 +144,11 @@ const { src, alt, altSrc, holdMs = 5000 } = Astro.props as Props;
     box-shadow: 0 0 0 4px color-mix(in oklch, var(--tk-accent) 22%, transparent);
   }
 
-  /* Iris reveal, echoing the theme toggle's circular View Transition wipe.
-     Only the top face animates — the base photo stays fully opaque beneath
-     it, so there is never a frame without a solid image (fading both at once
-     dips each to ~50% at the midpoint, which is what read as a jump).
-     The avatar is already round, so a circle() clip opens along the shape
-     the eye is expecting rather than cutting across it. */
+  /* Iris reveal. Only the top face animates — the base photo stays fully
+     opaque beneath it, so there is never a frame without a solid image
+     (fading both at once dips each to ~50% at the midpoint, which is what
+     read as a jump). The avatar is already round, so a circle() clip opens
+     along the shape the eye is expecting rather than cutting across it. */
   .avatar-flip__back {
     /* 60%, not 50%: 50% inscribes the square exactly, which can leave an
        anti-aliased seam against the border. The border-radius clips the

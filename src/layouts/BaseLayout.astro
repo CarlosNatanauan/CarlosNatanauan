@@ -244,7 +244,7 @@ const year = new Date().getFullYear();
           window.dispatchEvent(new Event("themechange"));
         }
 
-        // Circular View Transition wipe, expanding from the button. Falls back
+        // Square View Transition wipe, expanding from the button. Falls back
         // to a plain toggle where the API is missing (Firefox < 144) or the
         // visitor asked for reduced motion.
         function toggleWithReveal(btn) {
@@ -263,19 +263,33 @@ const year = new Date().getFullYear();
           // the snapshot reference box, which includes classic scrollbars.
           const vw = window.innerWidth;
           const vh = window.innerHeight;
-          const maxRadius = Math.hypot(
-            Math.max(x, vw - x),
-            Math.max(y, vh - y),
-          );
 
           // Percentages, not px — Chrome mis-scales absolute clip-path
           // coordinates on fractional display scaling (e.g. Windows 150%).
-          const at = (x / vw) * 100 + "% " + (y / vh) * 100 + "%";
-          const radius =
-            (maxRadius / (Math.hypot(vw, vh) / Math.SQRT2)) * 100 + "%";
+          const toX = (v) => (v / vw) * 100 + "%";
+          const toY = (v) => (v / vh) * 100 + "%";
+          const point = (px, py) => toX(px) + " " + toY(py);
+
+          // Square reveal. Half-side is the distance to the farthest edge on
+          // either axis, so the square still covers the viewport when the
+          // button sits in a corner; 1.05 is overscan against a seam on the
+          // final frames.
+          const half =
+            Math.max(Math.max(x, vw - x), Math.max(y, vh - y)) * 1.05;
+
+          // Both polygons need the same vertex count or they cannot
+          // interpolate — the collapsed one is four points stacked on the
+          // button's centre.
+          const collapsed = new Array(4).fill(point(x, y)).join(", ");
+          const expanded = [
+            point(x - half, y - half),
+            point(x + half, y - half),
+            point(x + half, y + half),
+            point(x - half, y + half),
+          ].join(", ");
           const clipPath = [
-            "circle(0% at " + at + ")",
-            "circle(" + radius + " at " + at + ")",
+            "polygon(" + collapsed + ")",
+            "polygon(" + expanded + ")",
           ];
 
           root.dataset.themeVt = "active";

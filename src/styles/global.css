@@ -76,10 +76,11 @@ body {
   scroll-margin-top: 6rem;
 }
 
-/* ── Theme toggle: circular View Transition reveal ──────────────
+/* ── Theme toggle: square View Transition reveal ────────────────
    The default cross-fade is replaced by a clip-path wipe driven from
    the toggle button. Scoped behind the data attribute so it only ever
-   applies while a theme toggle is in flight. */
+   applies while a theme toggle is in flight. The shape itself is built
+   in BaseLayout; this only pins the collapsed state and the duration. */
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation: none;
