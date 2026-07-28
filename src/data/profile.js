@@ -26,13 +26,13 @@ export const profile = {
     { text: "I'm a software developer building production mobile apps with " },
     { tag: "Flutter", icon: "flutter" },
     {
-      text: " — three live on the App Store and Play Store, and I maintain them full-time: a social cinema platform, a restaurant reservation app, and a field operations tool that replaced paper forms. Lately I've gone full-stack on the web with ",
+      text: " — three live on the App Store and Play Store, and I maintain them full-time: a social cinema platform, a restaurant reservation app, and a field operations tool that replaced paper forms. Lately I've been expanding into full-stack web development with ",
     },
     { tag: "Astro", icon: "astro" },
     { text: " and " },
     { tag: "Express", icon: "express" },
     {
-      text: ", shipping a marketing site and custom CMS that a real business now runs on.",
+      text: ", taking projects from design to deployment.",
     },
   ],
 
