@@ -5,3 +5,10 @@ dist
 .vscode
 .env
 CLAUDE.md
+
+# Local scratch — client project docs (internal/NDA) and the icon source dump.
+# Kept on disk for reference, never committed to a public repo.
+README_osmonds.md
+README_screenwave.md
+README_table_magic.md
+techs.txt
