@@ -238,10 +238,19 @@ const mediaProps = imageHref
       position: absolute;
       top: 50%;
       left: 50%;
-      /* Square, and wide enough that its inscribed circle still covers the
-         card's corners at every angle — otherwise the sweep would visibly
-         detach from the border on the diagonals. */
-      width: 150%;
+      /* Must stay SQUARE, because this layer rotates: only a square is
+         rotation-invariant, so only a square keeps covering the card at
+         every angle. A non-square layer sized to reach a tall card's top
+         and bottom goes too narrow once it turns 90deg, and the beam
+         detaches from the left and right edges partway through each turn.
+
+         The side has to be at least the card's DIAGONAL — that is the
+         guaranteed-covered inscribed circle. CSS cannot derive a parent's
+         diagonal, so --beam-size is measured and set in JS below. The
+         fallback keeps the old width-derived square, which is correct
+         whenever the card is wider than it is tall. */
+      width: var(--beam-size, 150%);
+      height: var(--beam-size, auto);
       aspect-ratio: 1;
       /* Separate `translate` so the centring is not clobbered by the
          `rotate` the animation drives — both are independent properties,
@@ -373,16 +382,43 @@ const mediaProps = imageHref
       return "linear(" + pts.join(",") + ")";
     }
 
+    // Swapping the timing function on a running animation makes it jump, so
+    // only do it when the box has genuinely changed shape. This guard is the
+    // whole point on mobile: browsers fire `resize` every time the URL bar
+    // collapses or expands during a scroll, and recomputing on each one
+    // makes the beam stutter and appear to change direction.
+    const last = new WeakMap();
+
     function apply() {
       cards.forEach((card) => {
-        const ease = easeFor(card.offsetWidth, card.offsetHeight);
-        if (ease) card.style.setProperty("--beam-ease", ease);
+        const w = card.offsetWidth;
+        const h = card.offsetHeight;
+        const prev = last.get(card);
+        if (prev && prev.w === w && prev.h === h) return;
+        const ease = easeFor(w, h);
+        if (!ease) return;
+        last.set(card, { w: w, h: h });
+        card.style.setProperty("--beam-ease", ease);
+        // Square side >= the card's diagonal, so the rotating layer's
+        // inscribed circle always clears the corners. 1.04 is slack for
+        // sub-pixel rounding.
+        card.style.setProperty(
+          "--beam-size",
+          Math.ceil(Math.hypot(w, h) * 1.04) + "px",
+        );
       });
     }
 
     apply();
-    // Cheap and rare; the geometry only changes when the box does.
-    addEventListener("resize", apply, { passive: true });
+
+    // ResizeObserver watches the element's own box rather than the viewport,
+    // so URL-bar chrome changes never reach it in the first place.
+    if (typeof ResizeObserver === "function") {
+      const ro = new ResizeObserver(apply);
+      cards.forEach((card) => ro.observe(card));
+    } else {
+      addEventListener("resize", apply, { passive: true });
+    }
   })();
 
   // Don't loop an autoplaying clip at people who asked for less motion
