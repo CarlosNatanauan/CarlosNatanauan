@@ -13,7 +13,7 @@ export const profile = {
   // Easter egg: flashes over the portrait when the theme switches to light,
   // then fades back. Set to "" to turn it off.
   avatarAlt: "/thorfinn.jpg",
-  avatarAltHoldMs: 5000,
+  avatarAltHoldMs: 3000,
 
   // Headline: "Software Developer — Mobile & Web"
   headline: "Software Developer",

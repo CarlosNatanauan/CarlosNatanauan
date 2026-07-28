@@ -49,12 +49,20 @@ const sections = [
 
   /* Only shown once the side gutter is wide enough to hold it without
      crowding the 860px content column */
-  @media (min-width: 1340px) {
+  @media (min-width: 1200px) {
     .line-nav {
+      /* Every dimension below is expressed in em, so this one clamp scales
+         the whole rail with the viewport instead of pinning it to one size */
+      font-size: clamp(10px, 0.72vw, 12.5px);
       display: block;
       position: fixed;
+      /* Sits near the viewport edge rather than centred in the gutter.
+         Positioned by its own left edge, at a fraction of the gutter width
+         (the strip between the edge and the 860px column) so it still eases
+         outward on wider screens — but capped, so it never drifts far from
+         the edge on ultrawide. */
       top: 50%;
-      left: clamp(24px, calc(50vw - 430px - 190px), 72px);
+      left: clamp(12px, calc((50vw - 430px) * 0.09), 34px);
       z-index: 30;
       transform: translateY(-50%);
     }
@@ -66,7 +74,7 @@ const sections = [
     padding: 0;
     display: flex;
     flex-direction: column;
-    gap: 18px;
+    gap: 1.35em;
   }
 
   .line-nav a {
@@ -74,10 +82,10 @@ const sections = [
     position: relative;
     display: flex;
     align-items: baseline;
-    gap: 8px;
-    padding-left: 52px;
+    gap: 0.6em;
+    padding-left: 3.9em;
     text-decoration: none;
-    font-size: 13.5px;
+    font-size: 1em;
     line-height: 1.2;
     white-space: nowrap;
     color: color-mix(
@@ -85,7 +93,7 @@ const sections = [
       var(--tk-accent) calc(var(--effect) * 100%),
       var(--tk-faint)
     );
-    transform: translateX(calc(var(--effect) * 14px));
+    transform: translateX(calc(var(--effect) * 1.05em));
     transition:
       --effect 180ms linear,
       transform 180ms cubic-bezier(0.22, 1, 0.36, 1);
@@ -95,12 +103,12 @@ const sections = [
   .line-nav a::before {
     content: "";
     position: absolute;
-    inset: -9px -40px -9px -52px;
+    inset: -0.68em -3em -0.68em -3.9em;
   }
 
   .line-nav__index {
     font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    font-size: 10.5px;
+    font-size: 0.78em;
     opacity: calc(0.5 + var(--effect) * 0.5);
   }
 
@@ -114,7 +122,7 @@ const sections = [
     left: 0;
     top: 0.55em;
     height: 1px;
-    width: 40px;
+    width: 3em;
     transform-origin: left center;
     transform: scaleX(calc(0.55 + var(--effect) * 0.45));
     background-color: color-mix(
@@ -129,9 +137,9 @@ const sections = [
     content: "";
     position: absolute;
     left: 0;
-    top: calc(100% + 9px);
+    top: calc(100% + 0.68em);
     height: 1px;
-    width: 20px;
+    width: 1.5em;
     transform-origin: left center;
     transform: scaleX(calc(0.6 + var(--effect) * 0.4));
     background-color: var(--tk-line);
@@ -151,8 +159,19 @@ const sections = [
     const nav = document.querySelector("[data-line-nav]");
     if (!nav) return;
     const links = Array.from(nav.querySelectorAll("[data-nav-item]"));
-    const RADIUS = 90; // px of vertical influence
     let activeIndex = -1; // -1 so the first sync always applies
+
+    // Vertical influence, derived from real item spacing rather than a fixed
+    // px value — the rail's font-size is clamped to the viewport, so the
+    // spacing (and therefore the radius that feels right) changes with it.
+    let radius = 90;
+    function measureRadius() {
+      if (links.length < 2) return;
+      const a = links[0].getBoundingClientRect();
+      const b = links[1].getBoundingClientRect();
+      const spacing = Math.abs(b.top - a.top);
+      if (spacing > 0) radius = spacing * 2.6;
+    }
 
     // smoothstep, same curve as the reference's "smooth" falloff
     const ease = (p) => p * p * (3 - 2 * p);
@@ -172,7 +191,7 @@ const sections = [
       const effects = links.map((a) => {
         const r = a.getBoundingClientRect();
         const distance = Math.abs(e.clientY - (r.top + r.height / 2));
-        return ease(Math.max(0, 1 - distance / RADIUS));
+        return ease(Math.max(0, 1 - distance / radius));
       });
       apply(effects);
     });
@@ -201,8 +220,16 @@ const sections = [
     // rect reads is cheap, and a deferred version silently does nothing if
     // frames aren't being produced.
     addEventListener("scroll", syncActive, { passive: true });
-    addEventListener("resize", syncActive, { passive: true });
+    addEventListener(
+      "resize",
+      () => {
+        measureRadius();
+        syncActive();
+      },
+      { passive: true },
+    );
 
+    measureRadius();
     syncActive();
     clearProximity();
   })();
