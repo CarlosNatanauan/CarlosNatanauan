@@ -1,0 +1,60 @@
+---
+// src/components/SocialLinks.astro
+// Inline SVG icons (no icon-font CDN). Each lifts slightly and fades to its
+// brand color on hover.
+import { profile } from "../data/profile.js";
+
+interface Props {
+  size?: string;
+  class?: string;
+}
+const { size = "h-5 w-5", class: className = "" } = Astro.props as Props;
+
+const base =
+  "opacity-70 hover:opacity-100 transition-all hover:-translate-y-0.5 text-muted";
+---
+
+<div class={`flex items-center gap-3.5 ${className}`}>
+  <a
+    href={profile.links.github}
+    target="_blank"
+    rel="noopener noreferrer"
+    title="GitHub"
+    aria-label="GitHub"
+    class={`${base} hover:text-[#181717] dark:hover:text-white`}
+  >
+    <svg class={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path
+        d="M12 .5a11.5 11.5 0 0 0-3.64 22.4c.58.1.8-.25.8-.56v-2c-3.26.71-3.95-1.57-3.95-1.57-.53-1.34-1.3-1.7-1.3-1.7-1.06-.72.08-.71.08-.71 1.17.08 1.79 1.2 1.79 1.2 1.04 1.8 2.72 1.28 3.38.98.1-.76.41-1.28.75-1.58-2.6-.29-5.34-1.3-5.34-5.8 0-1.28.46-2.33 1.2-3.15-.12-.3-.52-1.52.12-3.17 0 0 .98-.31 3.2 1.2a11.1 11.1 0 0 1 5.82 0c2.22-1.5 3.2-1.2 3.2-1.2.64 1.65.24 2.87.12 3.17.75.82 1.2 1.87 1.2 3.15 0 4.5-2.75 5.51-5.36 5.8.43.37.81 1.1.81 2.22v3.3c0 .31.21.67.81.56A11.5 11.5 0 0 0 12 .5z"
+      ></path>
+    </svg>
+  </a>
+
+  <a
+    href={profile.links.linkedin}
+    target="_blank"
+    rel="noopener noreferrer"
+    title="LinkedIn"
+    aria-label="LinkedIn"
+    class={`${base} hover:text-[#0A66C2]`}
+  >
+    <svg class={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path
+        d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zM3 8.98h3.96V21H3zM9.5 8.98H13v1.63h.05c.49-.93 1.68-1.9 3.46-1.9 3.7 0 4.38 2.43 4.38 5.6V21h-3.96v-5.35c0-1.28-.02-2.93-1.79-2.93-1.8 0-2.07 1.4-2.07 2.84V21H9.5z"
+      ></path>
+    </svg>
+  </a>
+
+  <a
+    href={profile.links.email}
+    title="Email"
+    aria-label="Email"
+    class={`${base} hover:text-[#EA4335]`}
+  >
+    <svg class={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path
+        d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2Zm0 4-8 5L4 8V6l8 5 8-5z"
+      ></path>
+    </svg>
+  </a>
+</div>

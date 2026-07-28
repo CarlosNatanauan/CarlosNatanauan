@@ -1,0 +1,29 @@
+---
+// src/components/SectionHeading.astro
+interface Props {
+  eyebrow?: string;
+  title: string;
+  intro?: string;
+  /** Extra bottom margin, used when a section's first child isn't a card */
+  gap?: string;
+}
+const { eyebrow, title, intro, gap = "mb-12" } = Astro.props as Props;
+---
+
+<div class={intro ? gap : "mb-8"}>
+  {
+    eyebrow && (
+      <div class="mb-3 text-[13px] font-semibold uppercase tracking-[1.5px] text-accent">
+        {eyebrow}
+      </div>
+    )
+  }
+  <h2 class="m-0 text-[28px] sm:text-[36px] font-extrabold tracking-[-0.5px]">
+    {title}
+  </h2>
+  {
+    intro && (
+      <p class="mt-3 mb-0 max-w-[560px] text-[16px] text-muted">{intro}</p>
+    )
+  }
+</div>

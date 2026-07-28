@@ -1,0 +1,141 @@
+---
+// src/components/PhotoStack.astro
+// Click-to-cycle photo stack — the top card goes to the back.
+//
+// Deliberately click-only. The React original supports drag-to-throw, but
+// tracking a gesture means holding state (which card, which pointer, inline
+// transforms) that strands a card whenever a release goes missing. Cycling on
+// click needs no gesture state at all: `data-depth` is the only state, and CSS
+// derives every position from it.
+interface Photo {
+  src: string;
+  alt?: string;
+}
+interface Props {
+  photos: Photo[];
+  size?: number;
+}
+const { photos, size = 220 } = Astro.props as Props;
+---
+
+<div
+  class="photo-stack"
+  style={`--stack-size:${size}px`}
+  data-photo-stack
+  role="button"
+  tabindex="0"
+  aria-label={`Photo stack, ${photos.length} photos. Activate to show the next one.`}
+>
+  {
+    photos.map((p, i) => (
+      <figure class="photo-stack__card" data-depth={i}>
+        <img
+          src={p.src}
+          alt={p.alt ?? ""}
+          width="560"
+          height="560"
+          loading="lazy"
+          decoding="async"
+          draggable="false"
+        />
+      </figure>
+    ))
+  }
+</div>
+
+<style>
+  .photo-stack {
+    position: relative;
+    width: var(--stack-size);
+    height: var(--stack-size);
+    perspective: 700px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .photo-stack:focus-visible {
+    outline: 2px solid var(--tk-accent);
+    outline-offset: 8px;
+    border-radius: 18px;
+  }
+  .photo-stack__card {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    border-radius: 16px;
+    overflow: hidden;
+    background: var(--tk-card);
+    border: 1px solid var(--tk-line);
+    box-shadow: 0 10px 26px rgb(0 0 0 / 0.18);
+    /* Fan out from the bottom-right, as the original does */
+    transform-origin: 90% 90%;
+    /* Slight overshoot reads as a spring settle */
+    transition: transform 0.45s cubic-bezier(0.22, 1.2, 0.36, 1);
+    will-change: transform;
+  }
+  :root.dark .photo-stack__card {
+    box-shadow: 0 12px 30px rgb(0 0 0 / 0.5);
+  }
+
+  /* Depth 0 is the top card; each one behind rotates and shrinks a little */
+  .photo-stack__card[data-depth="0"] {
+    transform: rotate(0deg) scale(1);
+    z-index: 3;
+  }
+  .photo-stack__card[data-depth="1"] {
+    transform: rotate(5deg) scale(0.95);
+    z-index: 2;
+  }
+  .photo-stack__card[data-depth="2"] {
+    transform: rotate(10deg) scale(0.9);
+    z-index: 1;
+  }
+
+  .photo-stack__card img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    user-select: none;
+    -webkit-user-drag: none;
+    pointer-events: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .photo-stack__card {
+      transition: none;
+    }
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    document.querySelectorAll("[data-photo-stack]").forEach((stack) => {
+      const cards = Array.from(stack.querySelectorAll(".photo-stack__card"));
+      if (cards.length < 2) return;
+
+      let order = cards.map((_, i) => i); // order[0] is the top card
+
+      // The only state is the depth attribute; CSS derives the rest.
+      function paint() {
+        order.forEach((cardIndex, depth) => {
+          cards[cardIndex].dataset.depth = String(depth);
+        });
+      }
+
+      function next() {
+        order.push(order.shift());
+        paint();
+      }
+
+      stack.addEventListener("click", next);
+      stack.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          next();
+        }
+      });
+
+      paint();
+    });
+  })();
+</script>

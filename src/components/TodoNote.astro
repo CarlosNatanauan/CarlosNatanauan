@@ -1,0 +1,23 @@
+---
+// src/components/TodoNote.astro
+// Visible reminder for content Carlos still has to supply. Shown on the live
+// site on purpose — so nothing silently ships as an empty section.
+interface Props {
+  /** Where to edit the content */
+  file?: string;
+  label?: string;
+}
+const { file, label = "To do" } = Astro.props as Props;
+---
+
+<div class="todo">
+  <span class="todo-label">{label}</span>
+  <div><slot /></div>
+  {
+    file && (
+      <div class="mt-2 text-[12.5px] text-faint">
+        Edit: <code>{file}</code>
+      </div>
+    )
+  }
+</div>

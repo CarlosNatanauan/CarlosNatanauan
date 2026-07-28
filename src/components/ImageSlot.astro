@@ -1,0 +1,42 @@
+---
+// src/components/ImageSlot.astro
+// Renders an image, or a dashed placeholder when the src is still missing.
+interface Props {
+  src?: string;
+  alt?: string;
+  placeholder?: string;
+  radius?: string;
+  class?: string;
+  loading?: "lazy" | "eager";
+}
+const {
+  src,
+  alt = "",
+  placeholder = "Image",
+  radius = "rounded-[14px]",
+  class: className = "",
+  loading = "lazy",
+} = Astro.props as Props;
+---
+
+{
+  src ? (
+    <img
+      src={src}
+      alt={alt}
+      loading={loading}
+      decoding="async"
+      class={`block h-full w-full object-cover ${radius} ${className}`}
+    />
+  ) : (
+    <div
+      class={`flex h-full w-full flex-col items-center justify-center gap-1 border border-dashed border-accent bg-accent/5 px-3 text-center ${radius} ${className}`}
+      aria-hidden="true"
+    >
+      <span class="text-[11px] font-bold uppercase tracking-[1px] text-accent">
+        To do
+      </span>
+      <span class="text-[12px] leading-snug text-muted">{placeholder}</span>
+    </div>
+  )
+}

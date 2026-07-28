@@ -1,141 +1,176 @@
 ---
 // src/components/ContactForm.astro
+import { profile } from "../data/profile.js";
+
 interface Props {
   action?: string;
   subject?: string;
-  title?: string;
 }
-
 const {
   action = "https://formspree.io/f/mldekgro",
   subject = "New portfolio message!",
-  title = "Contact",
 } = Astro.props as Props;
+
+// Strip the mailto: wrapper so the address can be shown as text
+const emailAddress = (profile.links.email || "")
+  .replace(/^mailto:/, "")
+  .split("?")[0];
 ---
 
-<!-- Section header matching other sections -->
-<div class="text-center mb-12 lg:mb-16">
-  <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-200 dark:border-indigo-900 text-indigo-600 dark:text-indigo-400 text-sm font-medium mb-4">
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
-    </svg>
-    Get In Touch
+<form
+  id="contact-form"
+  action={action}
+  method="POST"
+  class="w-full rounded-[20px] border border-line bg-card p-6 sm:p-8"
+>
+  <!-- Name and email share a row on desktop; message spans both -->
+  <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+    <div>
+      <label
+        for="name"
+        class="mb-2 block text-[13px] font-semibold text-muted">Your Name</label
+      >
+      <input
+        id="name"
+        name="name"
+        type="text"
+        required
+        autocomplete="name"
+        placeholder="Jane Doe"
+        class="field"
+      />
+    </div>
+
+    <div>
+      <label
+        for="email"
+        class="mb-2 block text-[13px] font-semibold text-muted">Your Email</label
+      >
+      <input
+        id="email"
+        name="email"
+        type="email"
+        required
+        autocomplete="email"
+        placeholder="you@email.com"
+        class="field"
+      />
+    </div>
+
+    <div class="sm:col-span-2">
+      <label
+        for="message"
+        class="mb-2 block text-[13px] font-semibold text-muted">Message</label
+      >
+      <textarea
+        id="message"
+        name="message"
+        rows="5"
+        required
+        placeholder="Tell me about your project or just say hi!"
+        class="field resize-y"></textarea>
+    </div>
   </div>
-  
-  <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 dark:from-zinc-100 dark:via-zinc-200 dark:to-zinc-100 bg-clip-text text-transparent mb-4">
-    {title}
-  </h2>
-  
-  <p class="text-lg text-slate-600 dark:text-zinc-400 max-w-2xl mx-auto">
-    Have a project in mind or just want to chat? Drop me a message and I'll get back to you soon!
-  </p>
-</div>
 
-<!-- Modern Card Form -->
-<form id="contact-form" action={action} method="POST" class="group mx-auto w-full max-w-3xl rounded-3xl overflow-hidden bg-gradient-to-br from-white to-slate-50 dark:from-zinc-900 dark:to-zinc-900/50 border border-slate-200/60 dark:border-zinc-800/60 shadow-lg hover:shadow-2xl transition-all duration-500 p-8 lg:p-10">
-  
+  <input type="hidden" name="_subject" value={subject} />
+  <input
+    type="text"
+    name="_gotcha"
+    tabindex="-1"
+    autocomplete="off"
+    class="hidden"
+    aria-hidden="true"
+  />
 
-  <!-- Form Fields -->
-  <div class="relative">
-    <!-- Two-column grid on larger screens -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 lg:gap-6 mb-5 lg:mb-6">
-      <!-- Name -->
-      <div>
-        <label for="name" class="block text-sm font-semibold text-slate-800 dark:text-zinc-200 mb-2">
-          Your Name
-        </label>
-        <input id="name" name="name" type="text" required autocomplete="name" class="w-full rounded-xl border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-4 py-3 text-base text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all" placeholder="Jane Doe" />
-      </div>
-
-      <!-- Email -->
-      <div>
-        <label for="email" class="block text-sm font-semibold text-slate-800 dark:text-zinc-200 mb-2">
-          Your Email
-        </label>
-        <input id="email" name="email" type="email" required autocomplete="email" class="w-full rounded-xl border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-4 py-3 text-base text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all" placeholder="you@email.com" />
-      </div>
-    </div>
-
-    <!-- Message -->
-    <div class="mb-6">
-      <label for="message" class="block text-sm font-semibold text-slate-800 dark:text-zinc-200 mb-2">
-        Message
-      </label>
-      <textarea id="message" name="message" rows="6" required class="w-full rounded-xl border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-4 py-3 text-base text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all resize-none" placeholder="Tell me about your project or just say hi! 👋"></textarea>
-    </div>
-
-    <!-- Optional metadata -->
-    <input type="hidden" name="_subject" value={subject} />
-    <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" class="hidden" aria-hidden="true" />
-
-    <!-- Actions -->
-    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-      <p id="form-status" class="text-sm font-medium" aria-live="polite"></p>
-
-      <button id="submit-btn" type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 dark:from-indigo-500 dark:to-purple-500 dark:hover:from-indigo-400 dark:hover:to-purple-400 text-white px-8 py-3.5 text-base font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100">
-        <svg id="btn-spinner" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-5 w-5 animate-spin hidden" fill="none" aria-hidden="true">
-          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-opacity=".25" stroke-width="4"/>
-          <path d="M22 12a10 10 0 0 1-10 10" stroke="currentColor" stroke-width="4"/>
-        </svg>
+  <!-- Actions: button left, live status beside it, direct email as a fallback -->
+  <div
+    class="mt-6 flex flex-col gap-4 border-t border-line pt-5 sm:flex-row sm:items-center sm:justify-between"
+  >
+    <div class="flex flex-wrap items-center gap-4">
+      <button
+        id="submit-btn"
+        type="submit"
+        class="group inline-flex items-center gap-2 rounded-[10px] border-none bg-fg px-7 py-3.5 text-[14.5px] font-bold text-bg transition-transform hover:scale-[1.03] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
+      >
         <span id="btn-label">Send Message</span>
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transition-transform group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M5 12h14M12 5l7 7-7 7"/>
-        </svg>
+        <span class="inline-block transition-transform group-hover:translate-x-1"
+          >→</span
+        >
       </button>
+      <p id="form-status" class="m-0 text-[13.5px]" aria-live="polite"></p>
     </div>
-  </div>
 
-  <!-- Decorative corner accent -->
-  <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 dark:from-indigo-500/10 dark:to-purple-500/10 rounded-bl-[4rem] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" aria-hidden="true"></div>
+    {
+      emailAddress && (
+        <a
+          href={profile.links.email}
+          class="inline-flex items-center gap-2 text-[13.5px] text-muted hover:text-accent-hover"
+        >
+          <svg
+            class="size-4 shrink-0"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            aria-hidden="true"
+          >
+            <path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2Zm0 4-8 5L4 8V6l8 5 8-5z" />
+          </svg>
+          {emailAddress}
+        </a>
+      )
+    }
+  </div>
 </form>
 
 <script is:inline>
-  const form = document.getElementById('contact-form');
-  const statusEl = document.getElementById('form-status');
-  const btn = document.getElementById('submit-btn');
-  const spinner = document.getElementById('btn-spinner');
-  const btnLabel = document.getElementById('btn-label');
+  (function () {
+    const form = document.getElementById("contact-form");
+    const statusEl = document.getElementById("form-status");
+    const btn = document.getElementById("submit-btn");
+    const btnLabel = document.getElementById("btn-label");
+    if (!form || !statusEl) return;
 
-  function setStatus(msg, ok = null) {
-    statusEl.textContent = msg;
-    statusEl.className = 'text-sm font-medium';
-    if (ok === true) statusEl.classList.add('text-green-600', 'dark:text-green-400');
-    if (ok === false) statusEl.classList.add('text-red-600', 'dark:text-red-400');
-    if (ok === null) statusEl.classList.add('text-slate-600', 'dark:text-zinc-400');
-  }
+    function setStatus(msg, ok) {
+      statusEl.textContent = msg;
+      statusEl.style.color =
+        ok === true
+          ? "var(--tk-accent)"
+          : ok === false
+            ? "oklch(0.65 0.2 25)"
+            : "var(--tk-muted)";
+    }
 
-  function setLoading(loading) {
-    if (!btn || !spinner || !btnLabel) return;
-    btn.disabled = loading;
-    spinner.classList.toggle('hidden', !loading);
-    btnLabel.textContent = loading ? 'Sending…' : 'Send Message';
-  }
+    function setLoading(loading) {
+      if (!btn || !btnLabel) return;
+      btn.disabled = loading;
+      btnLabel.textContent = loading ? "Sending…" : "Send Message";
+    }
 
-  if (form && statusEl) {
-    form.addEventListener('submit', async (e) => {
+    form.addEventListener("submit", async (e) => {
       e.preventDefault();
-      setStatus('Sending your message…', null);
+      setStatus("Sending your message…", null);
       setLoading(true);
 
       try {
-        const fd = new FormData(form);
         const res = await fetch(form.action, {
-          method: 'POST',
-          body: fd,
-          headers: { 'Accept': 'application/json' }
+          method: "POST",
+          body: new FormData(form),
+          headers: { Accept: "application/json" },
         });
 
         if (res.ok) {
           form.reset();
-          setStatus('Thanks! Your message has been sent. I\'ll get back to you soon! 🎉', true);
+          setStatus("Thanks! I'll get back to you soon.", true);
         } else {
-          setStatus('Oops! Something went wrong. Please try again or email me directly.', false);
+          setStatus(
+            "Something went wrong. Please try again or email me directly.",
+            false,
+          );
         }
       } catch {
-        setStatus('Network error. Please check your connection and try again.', false);
+        setStatus("Network error. Please check your connection.", false);
       } finally {
         setLoading(false);
       }
     });
-  }
+  })();
 </script>

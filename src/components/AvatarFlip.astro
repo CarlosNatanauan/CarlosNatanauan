@@ -1,0 +1,311 @@
+---
+// src/components/AvatarFlip.astro
+// Hero portrait. Two behaviours:
+//   1. Flips to a second image when the theme switches to light, then flips
+//      back after a hold. A 3D flip rather than a crossfade — two photos
+//      dissolving into each other reads as a loading glitch.
+//   2. Click / Enter opens a larger preview in a native <dialog>, which
+//      brings Esc-to-close, focus trapping and a backdrop for free.
+interface Props {
+  src: string;
+  alt: string;
+  altSrc?: string;
+  holdMs?: number;
+}
+const { src, alt, altSrc, holdMs = 5000 } = Astro.props as Props;
+---
+
+<button
+  type="button"
+  class="avatar-flip h-24 w-24 shrink-0 sm:h-[144px] sm:w-[144px]"
+  data-avatar-flip
+  data-hold={holdMs}
+  aria-label="View larger portrait"
+>
+  <span class="avatar-flip__inner">
+    <img
+      class="avatar-flip__face"
+      src={src}
+      alt={alt}
+      width="288"
+      height="288"
+    />
+    {
+      altSrc && (
+        <img
+          class="avatar-flip__face avatar-flip__back"
+          src={altSrc}
+          alt=""
+          aria-hidden="true"
+          width="288"
+          height="288"
+          loading="lazy"
+        />
+      )
+    }
+  </span>
+</button>
+
+<dialog class="avatar-modal" data-avatar-modal aria-label="Portrait preview">
+  <div class="avatar-modal__panel">
+    <img data-avatar-modal-img src="" alt={alt} />
+    <button
+      type="button"
+      class="avatar-modal__close"
+      data-avatar-close
+      aria-label="Close preview"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        aria-hidden="true"
+      >
+        <path d="M18 6 6 18M6 6l12 12"></path>
+      </svg>
+    </button>
+  </div>
+</dialog>
+
+<style>
+  /* ── the portrait ─────────────────────────────────────────── */
+  .avatar-flip {
+    position: relative;
+    padding: 0;
+    border: 0;
+    background: none;
+    perspective: 800px;
+    cursor: zoom-in;
+    border-radius: 9999px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .avatar-flip:focus-visible {
+    outline: 2px solid var(--tk-accent);
+    outline-offset: 4px;
+  }
+
+  /* A slow, faint ring so it reads as clickable without nagging. Long rest
+     between pulses (visible for roughly a third of the cycle) and it stops
+     entirely once the cursor arrives — by then the hover ring has taken over
+     and the hint has done its job. */
+  .avatar-flip::after {
+    content: "";
+    position: absolute;
+    inset: -5px;
+    border-radius: 9999px;
+    pointer-events: none;
+    box-shadow: 0 0 0 2px
+      color-mix(in oklch, var(--tk-accent) 55%, transparent);
+    opacity: 0;
+    animation: avatar-hint 3.6s ease-in-out infinite;
+  }
+  .avatar-flip:hover::after,
+  .avatar-flip:focus-visible::after {
+    animation: none;
+    opacity: 0;
+  }
+
+  @keyframes avatar-hint {
+    0%,
+    62%,
+    100% {
+      opacity: 0;
+      transform: scale(0.99);
+    }
+    22% {
+      opacity: 0.4;
+      transform: scale(1.035);
+    }
+  }
+
+  .avatar-flip__inner {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    /* Overshoot on the way round so it lands with a little weight */
+    transition: transform 0.75s cubic-bezier(0.34, 1.28, 0.52, 1);
+  }
+  .avatar-flip.is-flipped .avatar-flip__inner {
+    transform: rotateY(180deg);
+  }
+
+  .avatar-flip__face {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 9999px;
+    border: 1px solid var(--tk-line);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transition: box-shadow 0.2s ease;
+  }
+  .avatar-flip:hover .avatar-flip__face {
+    box-shadow: 0 0 0 4px color-mix(in oklch, var(--tk-accent) 22%, transparent);
+  }
+  .avatar-flip__back {
+    transform: rotateY(180deg);
+  }
+
+  /* ── the preview ──────────────────────────────────────────── */
+  .avatar-modal {
+    /* Fill the viewport and centre the panel inside it. Relying on the UA's
+       `margin: auto` centring is fragile once max-width/height are reset, and
+       a full-bleed dialog also gives us a real backdrop click target. */
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    border: 0;
+    padding: 0;
+    background: transparent;
+    overflow: visible;
+  }
+  .avatar-modal[open] {
+    display: grid;
+    place-items: center;
+  }
+  .avatar-modal::backdrop {
+    background: rgb(0 0 0 / 0.6);
+    backdrop-filter: blur(6px);
+  }
+
+  .avatar-modal__panel {
+    position: relative;
+    /* Deliberately modest — big enough to see, not a full-screen takeover */
+    width: min(340px, 78vw);
+  }
+  .avatar-modal__panel img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 20px;
+    border: 1px solid var(--tk-line);
+    box-shadow: 0 24px 60px rgb(0 0 0 / 0.45);
+  }
+
+  .avatar-modal__close {
+    position: absolute;
+    top: -14px;
+    right: -14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 9999px;
+    border: 1px solid var(--tk-line);
+    background: var(--tk-card);
+    color: var(--tk-fg);
+    cursor: pointer;
+    transition:
+      transform 0.18s ease,
+      border-color 0.18s ease;
+  }
+  .avatar-modal__close:hover {
+    transform: scale(1.06);
+    border-color: var(--tk-accent);
+  }
+  .avatar-modal__close svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  /* Entrance — skipped for reduced motion, along with the flip */
+  .avatar-modal[open] .avatar-modal__panel {
+    animation: avatar-pop 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  @keyframes avatar-pop {
+    from {
+      opacity: 0;
+      transform: scale(0.94);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .avatar-flip__inner {
+      transition: none;
+    }
+    .avatar-modal[open] .avatar-modal__panel {
+      animation: none;
+    }
+    /* Keep the affordance, drop the pulsing */
+    .avatar-flip::after {
+      animation: none;
+      opacity: 0.28;
+    }
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    const el = document.querySelector("[data-avatar-flip]");
+    const modal = document.querySelector("[data-avatar-modal]");
+    if (!el) return;
+
+    // ── theme flip ────────────────────────────────────────────
+    const back = el.querySelector(".avatar-flip__back");
+    if (back) {
+      const hold = Number(el.dataset.hold) || 5000;
+      let timer;
+      window.addEventListener("themechange", () => {
+        clearTimeout(timer);
+        if (document.documentElement.classList.contains("dark")) {
+          el.classList.remove("is-flipped");
+          return;
+        }
+        el.classList.add("is-flipped");
+        timer = setTimeout(() => el.classList.remove("is-flipped"), hold);
+      });
+    }
+
+    // ── larger preview ────────────────────────────────────────
+    if (!modal || typeof modal.showModal !== "function") return;
+    const modalImg = modal.querySelector("[data-avatar-modal-img]");
+    const faces = el.querySelectorAll(".avatar-flip__face");
+
+    el.addEventListener("click", () => {
+      // Show whichever face is currently visible
+      const showingBack = el.classList.contains("is-flipped") && faces[1];
+      modalImg.src = (showingBack ? faces[1] : faces[0]).src;
+      modal.showModal();
+      document.documentElement.style.overflow = "hidden";
+    });
+
+    // Restoring scroll is wired to every route out of the dialog, not just
+    // the `close` event — if that one hook ever misses, the page is left
+    // unscrollable, which looks like a frozen site. unlock() is idempotent.
+    const unlock = () => {
+      document.documentElement.style.overflow = "";
+    };
+    const close = () => {
+      unlock();
+      modal.close();
+    };
+
+    modal.querySelector("[data-avatar-close]").addEventListener("click", close);
+
+    // Clicking the backdrop: the dialog fills the viewport, so a click landing
+    // on it rather than the panel means "outside".
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) close();
+    });
+
+    // Esc: `cancel` fires before the dialog closes, `close` after; keydown is
+    // the belt-and-braces in case neither is delivered.
+    modal.addEventListener("cancel", unlock);
+    modal.addEventListener("close", unlock);
+    modal.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") unlock();
+    });
+  })();
+</script>

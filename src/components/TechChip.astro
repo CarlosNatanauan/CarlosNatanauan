@@ -1,0 +1,51 @@
+---
+// src/components/TechChip.astro
+// A tech pill with its logo inlined from src/icons/ at build time.
+// Icons are inlined (not <img>) so the monochrome ones can inherit
+// currentColor and work in both themes.
+//
+// variant "tech"   — the chips in the Tech I've Used section (14px)
+// variant "inline" — small pills sitting inside a paragraph, e.g. the bio
+import fs from "node:fs";
+import path from "node:path";
+
+interface Props {
+  name: string;
+  icon?: string;
+  variant?: "tech" | "inline";
+  class?: string;
+}
+const {
+  name,
+  icon,
+  variant = "tech",
+  class: className = "",
+} = Astro.props as Props;
+
+let svg = "";
+if (icon) {
+  try {
+    svg = fs.readFileSync(
+      path.join(process.cwd(), "src/icons", `${icon}.svg`),
+      "utf8",
+    );
+  } catch {
+    svg = ""; // missing icon file just falls back to a text-only chip
+  }
+}
+
+const isInline = variant === "inline";
+// Inline pills mirror the Tech I've Used chips — same rounded-rect shape,
+// border and card background — just scaled down to sit in a paragraph.
+const chipClass = isInline
+  ? `inline-flex items-center gap-1.5 whitespace-nowrap rounded-[8px] border border-line bg-card px-2 py-[3px] align-middle text-[13px] font-medium text-fg ${className}`
+  : `tag-tech inline-flex items-center gap-2 ${className}`;
+const iconClass = isInline
+  ? "inline-flex size-[13px] shrink-0 items-center justify-center [&>svg]:size-full"
+  : "inline-flex size-[17px] shrink-0 items-center justify-center [&>svg]:size-full";
+---
+
+<span class={chipClass}>
+  {svg && <span class={iconClass} aria-hidden="true" set:html={svg} />}
+  {name}
+</span>

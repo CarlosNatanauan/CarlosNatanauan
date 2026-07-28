@@ -1,0 +1,191 @@
+---
+// src/components/FeaturedProject.astro — large featured card, Projects section
+import fs from "node:fs";
+import path from "node:path";
+import ImageSlot from "./ImageSlot.astro";
+
+interface TagGroup {
+  label: string;
+  tags: string[];
+}
+interface Project {
+  name: string;
+  tagline?: string;
+  description: string;
+  tagGroups?: TagGroup[];
+  tech?: string[];
+  image?: string;
+  /** Screencast (.mp4 / .webm). Falls back to `image` until the file exists. */
+  media?: string;
+  /** Still frame shown before the clip plays */
+  mediaPoster?: string;
+  live?: string;
+  demo?: string;
+  repo?: string;
+  /** Override the "Repo" button label, e.g. when it points at a backend repo */
+  repoLabel?: string;
+}
+const { project } = Astro.props as { project: Project };
+
+// Flat stack row — labelled groups are flattened if a project still has them
+const tags: string[] =
+  project.tech ?? project.tagGroups?.flatMap((g) => g.tags) ?? [];
+
+const missingLinks = !project.live && !project.demo && !project.repo;
+
+// The media links to the live site when there is one, else the repo
+const imageHref = project.live || project.repo || "";
+
+// Only treat the clip as present once the file is actually in /public, so the
+// card degrades to the placeholder instead of a broken player.
+function existsInPublic(src?: string) {
+  if (!src || !src.startsWith("/")) return false;
+  try {
+    return fs.existsSync(path.join(process.cwd(), "public", src.slice(1)));
+  } catch {
+    return false;
+  }
+}
+
+const videoSrc = existsInPublic(project.media) ? project.media : "";
+const posterSrc = existsInPublic(project.mediaPoster) ? project.mediaPoster : "";
+const MediaTag = imageHref ? "a" : "div";
+const mediaProps = imageHref
+  ? {
+      href: imageHref,
+      target: "_blank",
+      rel: "noopener noreferrer",
+      "aria-label": `Open ${project.name}`,
+    }
+  : {};
+---
+
+<section
+  class="mb-8 w-full overflow-hidden rounded-[20px] border border-line bg-card"
+>
+  <div class="grid grid-cols-1 gap-0 sm:grid-cols-[340px_1fr] sm:items-center">
+  <!-- No backdrop: the clip sits directly on the card so it blends in both
+       themes. Framed and vertically centred rather than full-bleed. -->
+  <MediaTag
+    class="group flex items-center justify-center p-5 sm:p-6"
+    {...mediaProps}
+  >
+    {
+      videoSrc ? (
+        <video
+          data-featured-video
+          src={videoSrc}
+          poster={posterSrc || undefined}
+          autoplay
+          muted
+          loop
+          playsinline
+          preload="metadata"
+          aria-label={`${project.name} website walkthrough`}
+          class="block h-auto w-full rounded-[10px] border border-line shadow-[0_8px_24px_rgba(0,0,0,0.16)] transition-transform duration-500 group-hover:scale-[1.03] dark:shadow-[0_12px_32px_rgba(0,0,0,0.55)]"
+        />
+      ) : (
+        <div class="aspect-[80/43] w-full">
+          <ImageSlot
+            src={project.image}
+            alt={`${project.name} screenshot`}
+            placeholder={`${project.name} screenshot`}
+            radius="rounded-[10px]"
+            loading="eager"
+          />
+        </div>
+      )
+    }
+  </MediaTag>
+
+  <div class="flex flex-col justify-center gap-4 p-6 sm:p-8">
+    <div>
+      <div
+        class="mb-2.5 text-[11px] font-bold uppercase tracking-[0.22em] text-accent"
+      >
+        Featured Project
+      </div>
+      <h3 class="m-0 mb-2 text-[24px] font-extrabold tracking-[-0.5px] sm:text-[28px]">
+        {project.name}
+      </h3>
+      <p class="m-0 max-w-[620px] text-[15px] leading-[1.65] text-muted">
+        {project.description}
+      </p>
+    </div>
+
+    {
+      tags.length > 0 && (
+        <div class="flex flex-wrap gap-2">
+          {tags.map((t) => (
+            <span class="tag">{t}</span>
+          ))}
+        </div>
+      )
+    }
+
+    {
+      missingLinks ? (
+        <div class="todo">
+          <span class="todo-label">To do</span>
+          <div>
+            Add the <strong>Live</strong> and <strong>Demo</strong> links for{" "}
+            {project.name}.
+          </div>
+          <div class="mt-2 text-[12.5px] text-faint">
+            Edit: <code>src/data/projects.js</code>
+          </div>
+        </div>
+      ) : (
+        <div class="flex flex-wrap items-center gap-3">
+          {project.live && (
+            <a
+              href={project.live}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn-solid btn-sm group inline-flex w-fit items-center gap-2 transition-transform hover:scale-[1.03]"
+            >
+              <span>Visit Live Site</span>
+              <span class="inline-block transition-transform group-hover:translate-x-1">
+                →
+              </span>
+            </a>
+          )}
+          {project.demo && (
+            <a
+              href={project.demo}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn-outline btn-sm"
+            >
+              Demo
+            </a>
+          )}
+          {project.repo && (
+            <a
+              href={project.repo}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn-outline btn-sm"
+            >
+              {project.repoLabel ?? "Repo"}
+            </a>
+          )}
+        </div>
+      )
+    }
+    </div>
+  </div>
+</section>
+
+<script is:inline>
+  // Don't loop an autoplaying clip at people who asked for less motion
+  (function () {
+    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    document.querySelectorAll("[data-featured-video]").forEach((v) => {
+      v.autoplay = false;
+      v.loop = false;
+      v.controls = true;
+      v.pause();
+    });
+  })();
+</script>

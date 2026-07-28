@@ -1,0 +1,58 @@
+---
+// src/components/ExperienceRow.astro
+interface Job {
+  role: string;
+  company: string;
+  companyUrl?: string;
+  period: string;
+  datetime?: string;
+  current?: boolean;
+  bullets: string[];
+}
+const { job } = Astro.props as { job: Job };
+---
+
+<div
+  class="grid grid-cols-1 gap-2 border-t border-line py-7 sm:grid-cols-[160px_1fr] sm:gap-7"
+>
+  <time
+    datetime={job.datetime}
+    class="pt-1 text-[13.5px] text-faint"
+  >
+    {job.period}
+  </time>
+
+  <div>
+    <div class="mb-1 flex flex-wrap items-center gap-2.5">
+      <h3 class="m-0 text-[19px] font-bold">{job.role}</h3>
+      {
+        job.current && (
+          <span class="rounded-full border border-accent px-[9px] py-[2px] text-[11px] font-bold text-accent">
+            Current
+          </span>
+        )
+      }
+    </div>
+
+    <div class="mb-3.5 text-[14.5px] text-muted">
+      {
+        job.companyUrl ? (
+          <a
+            href={job.companyUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-muted hover:text-accent-hover"
+          >
+            {job.company}
+          </a>
+        ) : (
+          job.company
+        )
+      }
+    </div>
+
+    <ul class="m-0 list-disc pl-[18px] text-[14.5px] leading-[1.75] text-muted">
+      {job.bullets.map((b) => <li class="mb-1.5">{b}</li>)}
+    </ul>
+  </div>
+</div>

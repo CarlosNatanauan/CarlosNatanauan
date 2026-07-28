@@ -1,202 +1,374 @@
-
-/*CarlosNatanauan/src/styles/global.css*/
-
 /* src/styles/global.css */
 @import "tailwindcss";
 
-/* Make dark: utilities respond to <html class="dark"> */
-@custom-variant dark (&:where(.dark *));
+/* Make dark: utilities respond to <html class="dark"> (including the element itself) */
+@custom-variant dark (&:where(.dark, .dark *));
 
-/* subtle metallic / neon shimmer */
-@keyframes gradient-move {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-.animate-gradient {
-  background-size: 200% 200%;
-  animation: gradient-move 6s ease infinite;
-}
-
-/* ── animate-fade-in-up (used on project/experience wrappers) ── */
-@keyframes fade-in-up {
-  from { opacity: 0; transform: translateY(24px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-.animate-fade-in-up {
-  opacity: 0;
-  animation: fade-in-up 0.6s ease forwards;
+/* ──────────────────────────────────────────────────────────────
+   Design tokens (handoff: design_handoff_portfolio_rework)
+   Light values live on :root, dark values override on :root.dark.
+   Tailwind utilities below (bg-bg, bg-card, text-muted, …) read
+   these vars, so a single class works in both themes.
+   ────────────────────────────────────────────────────────────── */
+:root {
+  --tk-bg: oklch(0.985 0.004 260);
+  --tk-card: oklch(1 0 0);
+  --tk-header: oklch(0.985 0.004 260 / 0.75);
+  --tk-fg: oklch(0.18 0.006 260);
+  --tk-muted: oklch(0.42 0.01 260);
+  --tk-faint: oklch(0.58 0.01 260);
+  --tk-line: oklch(0 0 0 / 0.09);
+  --tk-accent: oklch(0.55 0.16 255);
+  --tk-accent-hover: oklch(0.45 0.17 255);
 }
 
-/* ── Hero entrance animations (fire immediately on page load) ── */
-@keyframes hero-fade-down {
-  from { opacity: 0; transform: translateY(-16px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes hero-fade-up {
-  from { opacity: 0; transform: translateY(16px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes hero-fade-in {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-.hero-enter-down {
-  opacity: 0;
-  animation: hero-fade-down 0.6s ease forwards;
-}
-.hero-enter-up {
-  opacity: 0;
-  animation: hero-fade-up 0.6s ease forwards;
-}
-.hero-enter-in {
-  opacity: 0;
-  animation: hero-fade-in 0.5s ease forwards;
+:root.dark {
+  --tk-bg: oklch(0.16 0.006 260);
+  --tk-card: oklch(0.21 0.007 260);
+  --tk-header: oklch(0.16 0.006 260 / 0.75);
+  --tk-fg: oklch(0.96 0.004 260);
+  --tk-muted: oklch(0.72 0.01 260);
+  --tk-faint: oklch(0.55 0.01 260);
+  --tk-line: oklch(1 0 0 / 0.1);
+  --tk-accent: oklch(0.72 0.15 255);
+  --tk-accent-hover: oklch(0.8 0.13 255);
 }
 
-/* ── Scroll reveal system (triggered by IntersectionObserver) ── */
-.reveal {
-  opacity: 0;
-  transform: translateY(36px);
-  transition: opacity 0.65s ease, transform 0.65s ease;
-}
-.reveal-left {
-  opacity: 0;
-  transform: translateX(-36px);
-  transition: opacity 0.65s ease, transform 0.65s ease;
-}
-.reveal-scale {
-  opacity: 0;
-  transform: scale(0.96);
-  transition: opacity 0.65s ease, transform 0.65s ease;
-}
-.reveal-title {
-  opacity: 0;
-  transform: translateY(-12px);
-  transition: opacity 0.5s ease, transform 0.5s ease;
-}
-.reveal.is-visible,
-.reveal-left.is-visible,
-.reveal-scale.is-visible,
-.reveal-title.is-visible {
-  opacity: 1;
-  transform: none;
-}
-/* Respect reduced motion — show everything immediately */
-@media (prefers-reduced-motion: reduce) {
-  .hero-enter-down,
-  .hero-enter-up,
-  .hero-enter-in {
-    opacity: 1 !important;
-    animation: none !important;
-  }
-  .reveal,
-  .reveal-left,
-  .reveal-scale,
-  .reveal-title {
-    transition: none !important;
-    opacity: 1 !important;
-    transform: none !important;
-  }
+@theme {
+  --font-sans: "Inter", system-ui, sans-serif;
+
+  --color-bg: var(--tk-bg);
+  --color-card: var(--tk-card);
+  --color-header: var(--tk-header);
+  --color-fg: var(--tk-fg);
+  --color-muted: var(--tk-muted);
+  --color-faint: var(--tk-faint);
+  --color-line: var(--tk-line);
+  --color-accent: var(--tk-accent);
+  --color-accent-hover: var(--tk-accent-hover);
 }
 
-/* darker metallic (gunmetal → steel → obsidian) */
-.metal-gradient {
-  @apply text-transparent bg-clip-text bg-gradient-to-r from-zinc-800 via-slate-500 to-zinc-900;
+html {
+  color-scheme: light;
+}
+html.dark {
+  color-scheme: dark;
 }
 
-/* neon glow (electric blue mix) */
-.neon-gradient {
-  @apply text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-indigo-500 to-cyan-400;
-}
-
-/* optional underline accent for “Hello, I’m” */
-.headline-accent {
-  background-image: linear-gradient(to right, rgba(59,130,246,0.6) 0%, rgba(236,72,153,0.6) 100%);
-}
-
-
-
-/* Slow pulse animation for "Current" badge */
-@keyframes pulse-slow {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.8;
-  }
-}
-
-.animate-pulse-slow {
-  animation: pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-/* Timeline dot pulse effect */
-@keyframes timeline-pulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7);
-  }
-  70% {
-    box-shadow: 0 0 0 10px rgba(99, 102, 241, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
-  }
-}
-
-/* Optional: Add subtle animation to timeline dots */
-.timeline-dot {
-  animation: timeline-pulse 2s infinite;
-}
-
-/* Ensure smooth transitions */
-* {
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Improve readability */
-@media (prefers-contrast: high) {
-  .bg-gradient-to-br {
-    filter: contrast(1.2);
-  }
-}
-
-#hero,
-#hero *,
-#hero::before,
-#hero::after {
-  border-left: none !important;
-}
-
-/* Remove any left borders/decorations from the hero section (first section) */
-body > main > section:first-child,
-body > main > section:first-child *,
-body > main > section:first-child::before,
-body > main > section:first-child::after {
-  border-left: none !important;
-}
-
-/* Or use a more specific selector if the above doesn't work */
-section:not(#experience):not(#projects):not(#contact),
-section:not(#experience):not(#projects):not(#contact) * {
-  border-left: none !important;
-}
-
-/* Vanta handles the background in both modes — body stays transparent */
 body {
-  background-color: transparent !important;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-wrap: pretty;
+  background-color: var(--tk-bg);
+  color: var(--tk-fg);
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease;
 }
 
-/* Offset anchors so floating nav doesn't cover headings */
+::selection {
+  background: var(--tk-accent);
+  color: #fff;
+}
+
+/* Offset anchor targets so the sticky header doesn't cover headings */
 [id] {
-  scroll-margin-top: 5rem;
+  scroll-margin-top: 6rem;
 }
 
-/* Fallback colors for #vanta-bg before Vanta initialises */
-#vanta-bg {
-  background-color: #ededed;
+/* ── Theme toggle: circular View Transition reveal ──────────────
+   The default cross-fade is replaced by a clip-path wipe driven from
+   the toggle button. Scoped behind the data attribute so it only ever
+   applies while a theme toggle is in flight. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
 }
-html.dark #vanta-bg {
-  background-color: #1a1a20;
+html[data-theme-vt="active"]::view-transition-group(root) {
+  animation-duration: var(--theme-vt-duration, 450ms);
+}
+/* Pin the collapsed shape so the new theme is never painted unclipped
+   between the snapshot and the JS animation starting */
+html[data-theme-vt="active"]::view-transition-new(root) {
+  clip-path: var(--theme-vt-clip-from, circle(0%));
+}
+/* The body colour transition would fight the wipe */
+html[data-theme-vt="active"] body {
+  transition: none;
 }
 
+/* ── Shared primitives ─────────────────────────────────────── */
+
+/* Centered content column with generous side whitespace.
+   860px (vs the handoff's 760px) so the 53-week GitHub contribution grid
+   fits at normal zoom without a horizontal scrollbar. */
+.col {
+  width: 100%;
+  max-width: 860px;
+  margin-inline: auto;
+  padding-inline: 20px;
+}
+@media (min-width: 640px) {
+  .col {
+    padding-inline: 48px;
+  }
+}
+
+/* Small pill tag (12.5px) — used inline in the bio, on project cards */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  font-size: 12.5px;
+  font-weight: 500;
+  padding: 5px 11px;
+  border-radius: 999px;
+  border: 1px solid var(--tk-line);
+  color: var(--tk-muted);
+  background: transparent;
+  white-space: nowrap;
+}
+
+/* Larger tag (14px) — Technologies section, "Running" */
+.tag-tech {
+  display: inline-flex;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 9px 18px;
+  border-radius: 10px;
+  border: 1px solid var(--tk-line);
+  color: var(--tk-fg);
+  background: var(--tk-card);
+  transition:
+    transform 0.22s cubic-bezier(0.34, 1.4, 0.64, 1),
+    border-color 0.22s ease,
+    background-color 0.22s ease,
+    box-shadow 0.22s ease;
+}
+
+/* Lifts on hover — pairs with the marquee pausing under the cursor.
+   Light mode gets a tight two-layer shadow tinted with the neutral hue;
+   a single wide black blur reads as a grey smudge on a white card. */
+.tag-tech:hover {
+  transform: translateY(-3px);
+  border-color: color-mix(in oklch, var(--tk-accent) 45%, var(--tk-line));
+  background: color-mix(in oklch, var(--tk-accent) 4%, var(--tk-card));
+  box-shadow:
+    0 1px 2px oklch(0.2 0.02 260 / 0.05),
+    0 4px 10px oklch(0.2 0.02 260 / 0.08);
+}
+:root.dark .tag-tech:hover {
+  box-shadow: 0 6px 18px rgb(0 0 0 / 0.45);
+}
+
+/* Buttons live in the components layer so Tailwind utilities can override
+   them — unlayered CSS beats layered utilities, which silently killed
+   `inline-flex`/`gap-*` on any button that combined the two. */
+@layer components {
+  /* Solid button: fg background, bg-colored text */
+  .btn-solid {
+    display: inline-block;
+    background: var(--tk-fg);
+    color: var(--tk-bg);
+    font-weight: 600;
+    border-radius: 10px;
+    padding: 14px 26px;
+    font-size: 15px;
+    transition: opacity 0.2s ease;
+  }
+  .btn-solid:hover {
+    color: var(--tk-bg);
+    opacity: 0.88;
+  }
+
+  /* Outline button */
+  .btn-outline {
+    display: inline-block;
+    border: 1px solid var(--tk-line);
+    color: var(--tk-fg);
+    font-weight: 600;
+    border-radius: 10px;
+    padding: 14px 26px;
+    font-size: 15px;
+    transition:
+      border-color 0.2s ease,
+      background-color 0.2s ease;
+  }
+  .btn-outline:hover {
+    color: var(--tk-fg);
+    background: var(--tk-card);
+  }
+
+  /* Compact variants used inside the featured project card */
+  .btn-sm {
+    padding: 11px 20px;
+    font-size: 14px;
+    border-radius: 8px;
+  }
+}
+
+/* Form fields */
+.field {
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--tk-bg);
+  border: 1px solid var(--tk-line);
+  border-radius: 10px;
+  padding: 13px 16px;
+  color: var(--tk-fg);
+  font-size: 14.5px;
+  font-family: inherit;
+  transition: border-color 0.2s ease;
+}
+.field:focus {
+  outline: none;
+  border-color: var(--tk-accent);
+}
+.field::placeholder {
+  color: var(--tk-faint);
+}
+
+/* ── Tech stack: scrolling compact view ⇄ labelled grouped view ──
+   One set of markup serves both. Compact turns each row into a marquee
+   (rows alternate direction); grouped stops the motion, shows the
+   labels and lets the chips wrap. No framework — a marquee is just a
+   keyframe on a duplicated track. */
+.tech-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.tech-row {
+  min-width: 0;
+}
+
+.tech-track {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* Duplicate copies exist only to make the loop seamless */
+.tech-stack:not(.is-compact) .tech-chip-clone {
+  display: none;
+}
+
+.tech-stack.is-compact {
+  gap: 2px;
+}
+.tech-stack.is-compact .tech-label {
+  display: none;
+}
+.tech-stack.is-compact .tech-row {
+  overflow: hidden;
+  /* Vertical breathing room so the hover lift and its shadow aren't
+     clipped by the overflow that hides the scrolling track. */
+  padding-block: 10px;
+  /* Soften both edges without needing to know the background colour —
+     a mask works in either theme, unlike a colour gradient. Wide enough
+     that chips fade out rather than getting sliced at the boundary. */
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 14%,
+    #000 86%,
+    transparent
+  );
+}
+.tech-stack.is-compact .tech-track {
+  flex-wrap: nowrap;
+  width: max-content;
+  animation: tech-marquee var(--marquee-dur, 40s) linear infinite;
+  /* Keep the track on its own compositor layer so the loop stays smooth */
+  will-change: transform;
+}
+/* Middle row runs the other way */
+.tech-stack.is-compact .tech-row:nth-child(even) .tech-track {
+  animation-name: tech-marquee-reverse;
+}
+.tech-stack.is-compact .tech-row:hover .tech-track {
+  animation-play-state: paused;
+}
+
+/* Touch devices can't hover to pause, so give them a slower scroll they can
+   actually read. */
+@media (hover: none) {
+  .tech-stack.is-compact .tech-track {
+    animation-duration: calc(var(--marquee-dur, 40s) * 1.6);
+  }
+}
+
+@keyframes tech-marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+@keyframes tech-marquee-reverse {
+  from {
+    transform: translate3d(-50%, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Never scroll at someone who asked for less motion — fall back to a wrap */
+@media (prefers-reduced-motion: reduce) {
+  .tech-stack.is-compact .tech-track {
+    animation: none;
+    flex-wrap: wrap;
+    width: auto;
+  }
+  .tech-stack.is-compact .tech-chip-clone {
+    display: none;
+  }
+  .tech-stack.is-compact .tech-row {
+    overflow: visible;
+    mask-image: none;
+  }
+  /* Keep the hover affordance, drop the movement */
+  .tag-tech:hover {
+    transform: none;
+  }
+}
+
+/* Horizontal scroller without a visible scrollbar (project carousel) */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* TODO markers for content the site owner still has to supply */
+.todo {
+  border: 1px dashed var(--tk-accent);
+  border-radius: 12px;
+  padding: 16px 18px;
+  color: var(--tk-muted);
+  font-size: 13.5px;
+  line-height: 1.6;
+  background: color-mix(in oklch, var(--tk-accent) 6%, transparent);
+}
+.todo-label {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--tk-accent);
+  margin-bottom: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
