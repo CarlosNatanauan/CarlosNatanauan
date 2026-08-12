@@ -15,6 +15,7 @@ import TechChip from "../components/TechChip.astro";
 import SectionNav from "../components/SectionNav.astro";
 import PhotoStack from "../components/PhotoStack.astro";
 import AvatarFlip from "../components/AvatarFlip.astro";
+import NameFlip from "../components/NameFlip.astro";
 
 import { profile } from "../data/profile.js";
 import { projects } from "../data/projects.js";
@@ -44,11 +45,15 @@ const gridProjects = projects.filter((p) => !p.featured);
 
       <div class="min-w-0">
         <div class="flex items-center gap-2">
-          <h1 class="m-0 text-[22px] font-extrabold tracking-[-0.5px] sm:text-[32px]">
-            {profile.name}
-          </h1>
+          <NameFlip
+            name={profile.name}
+            quote={profile.nameFlipQuote}
+            holdMs={profile.avatarAltHoldMs}
+          />
           {profile.verified && (
-            <VerifiedBadge class="size-[18px] shrink-0 sm:size-[22px]" />
+            <span data-name-flip-badge>
+              <VerifiedBadge class="size-[18px] shrink-0 sm:size-[22px]" />
+            </span>
           )}
         </div>
         <SocialLinks class="mt-2.5" />

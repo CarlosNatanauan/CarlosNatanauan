@@ -15,6 +15,11 @@ export const profile = {
   avatarAlt: "/thorfinn.jpg",
   avatarAltHoldMs: 3000,
 
+  // Same easter egg, same trigger: the name flips to this line (Thorfinn's,
+  // Vinland Saga) alongside the portrait, then flips back once the hold
+  // above elapses. Set to "" to turn it off independently of the portrait.
+  nameFlipQuote: "I have no enemies.",
+
   // Headline: "Software Developer — Mobile & Web"
   headline: "Software Developer",
   headlineMuted: "— Mobile & Web",

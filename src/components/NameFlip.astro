@@ -1,0 +1,318 @@
+---
+// src/components/NameFlip.astro
+// Hero name. Flips to `quote` (letter by letter, 3D rotate + fade + blur,
+// staggered) when the theme switches to light, then flips back after
+// `holdMs` — same trigger and, by default, same hold as AvatarFlip, so the
+// portrait and name read as one gesture instead of two unrelated timers.
+//
+// The heading's accessible name stays pinned to `name` via aria-label: the
+// quote is a sighted-only easter egg, not a change to what the page is
+// actually titled for SEO or screen readers.
+interface Props {
+  name: string;
+  quote?: string;
+  holdMs?: number;
+  class?: string;
+}
+const { name, quote = "", holdMs = 3000, class: className = "" } = Astro.props as Props;
+---
+
+<h1
+  class={`name-flip m-0 ${className}`}
+  aria-label={name}
+  data-name-flip
+  data-name={name}
+  data-quote={quote}
+  data-hold={holdMs}
+>
+  <span class="name-flip__text" data-name-flip-text aria-hidden="true">{name}</span>
+</h1>
+
+<style>
+  .name-flip {
+    /* Fluid instead of a single breakpoint jump — the quote runs a little
+       longer than the name, and this has to hold up on small phones too. */
+    font-size: clamp(18px, 5.4vw, 32px);
+    font-weight: 800;
+    letter-spacing: -0.5px;
+  }
+
+  .name-flip__text {
+    display: inline-block;
+    perspective: 500px;
+  }
+
+  :global(.nf-word) {
+    display: inline-flex; /* letters never wrap mid-word */
+  }
+
+  :global(.nf-letter) {
+    display: inline-block;
+    transform-style: preserve-3d;
+    opacity: 1;
+    transform: rotateX(0deg) translateY(0);
+    filter: blur(0);
+    /* One curve for all three properties. Giving transform a bezier while
+       opacity/filter ran on `ease` meant the letter arrived in position
+       while still fading and un-blurring, so the last thing you saw was a
+       sharpen-and-solidify pop after the motion had already stopped. */
+    transition:
+      transform 0.62s cubic-bezier(0.16, 1, 0.3, 1),
+      opacity 0.62s cubic-bezier(0.16, 1, 0.3, 1),
+      filter 0.62s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  :global(.nf-letter.nf-exit) {
+    transform: rotateX(-90deg) translateY(-0.2em);
+    opacity: 0;
+    filter: blur(5px);
+    transition-duration: 0.44s;
+    /* Not ease-in: that curve ACCELERATES into its final frame, so the
+       letter's disappearance ends in a burst of speed right at the cutoff —
+       reads as a snap. This eases into the end state instead of slamming
+       into it. */
+    transition-timing-function: cubic-bezier(0.4, 0, 0.35, 1);
+  }
+
+  /* Starting point for an entering letter, applied with transitions
+     suppressed so it can't be seen animating into place before its turn. */
+  :global(.nf-letter.nf-enter-from) {
+    transform: rotateX(90deg) translateY(0.2em);
+    opacity: 0;
+    filter: blur(5px);
+    transition: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(.nf-letter) {
+      transition: opacity 0.2s ease;
+    }
+    :global(.nf-letter.nf-exit) {
+      transform: none;
+      filter: none;
+    }
+    :global(.nf-letter.nf-enter-from) {
+      transform: none;
+      filter: none;
+    }
+  }
+
+  /* Verified badge lives next to the name in markup, not inside this
+     component — it belongs to "Carlos Natanauan", not the quote, so it
+     hides itself for the duration of the flip instead of sitting there
+     pinned to unrelated text. */
+  :global([data-name-flip-badge]) {
+    display: inline-flex;
+    /* Slower and shallower than it used to be (0.2s / scale 0.7). The badge
+       returns at the very end of the flip, so a fast hard-scaling pop there
+       was the last thing you saw and made the whole gesture read as if it
+       stopped abruptly. Same landing curve as the letters. */
+    transition:
+      opacity 0.42s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.42s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  :global([data-name-flip-badge].is-hidden) {
+    opacity: 0;
+    transform: scale(0.86);
+    pointer-events: none;
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    const heading = document.querySelector("[data-name-flip]");
+    if (!heading) return;
+    const textEl = heading.querySelector("[data-name-flip-text]");
+    const name = heading.dataset.name || "";
+    const quote = heading.dataset.quote || "";
+    const hold = Number(heading.dataset.hold) || 3000;
+    if (!textEl || !quote) return;
+
+    // Looked up fresh on every call rather than cached once: this script
+    // runs synchronously as the parser reaches it, which is BEFORE the
+    // badge span — a later sibling in source order — has been parsed into
+    // the DOM. A cached reference taken here would always be null.
+    function getBadge() {
+      return heading.parentElement
+        ? heading.parentElement.querySelector("[data-name-flip-badge]")
+        : null;
+    }
+
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    // Kept in sync with the CSS transition-durations above (.nf-letter /
+    // .nf-letter.nf-exit) — these are the JS-side timers for when to swap
+    // the text, not what animates it.
+    const ENTER_MS = reduced ? 0 : 620;
+    const EXIT_MS = reduced ? 0 : 440;
+    // Total spread of the stagger, capped rather than per-letter × count:
+    // the quote is far longer than the name, and a flat per-letter delay
+    // made its cascade run twice as long and stop dead at the last letter.
+    // Capping keeps both texts resolving over the same window.
+    const ENTER_SPAN = reduced ? 0 : 480;
+    const EXIT_SPAN = reduced ? 0 : 320;
+    const PER_LETTER_ENTER = 30;
+    const PER_LETTER_EXIT = 22;
+    // Enter begins slightly before the last letters have finished leaving.
+    // By then they're ~93% faded, so nothing visibly gets cut — it just
+    // removes the dead beat where the line sat empty between the two halves.
+    const OVERLAP_MS = reduced ? 0 : 140;
+
+    function span(count, perLetter, max) {
+      return Math.min(Math.max(0, count - 1) * perLetter, max);
+    }
+
+    // Eased stagger instead of a fixed step. A constant step means letters
+    // arrive at a steady rate and then simply stop, which is what reads as
+    // the hard cutoff at the end; easing out compresses the later delays so
+    // the tail letters converge and the cascade resolves instead of halting.
+    function staggerDelay(i, count, total) {
+      if (count <= 1) return 0;
+      const p = i / (count - 1);
+      return total * (1 - (1 - p) * (1 - p));
+    }
+
+    // Letter count of the incoming text (spaces aren't wrapped in their own
+    // span, so they don't get a stagger delay or count toward the cascade).
+    function letterCount(text) {
+      return text.replace(/ /g, "").length;
+    }
+
+    // Words stay in their own inline-flex box (via buildLetters) so letters
+    // of one word never separate across a line break, but the space between
+    // word-boxes remains a normal, breakable point.
+    function buildLetters(text, startClass) {
+      const words = text.split(" ");
+      const total = letterCount(text);
+      const enterSpan = span(total, PER_LETTER_ENTER, ENTER_SPAN);
+      // Counts across the whole string, not per word. It used to reset to 0
+      // on every word, so the second word restarted its cascade from zero
+      // delay — two overlapping bursts colliding rather than one wave.
+      let index = 0;
+      words.forEach((word, wi) => {
+        const wordEl = document.createElement("span");
+        wordEl.className = "nf-word";
+        [...word].forEach((ch) => {
+          const letter = document.createElement("span");
+          letter.className = "nf-letter" + (startClass ? " " + startClass : "");
+          letter.style.transitionDelay = staggerDelay(index++, total, enterSpan) + "ms";
+          letter.textContent = ch;
+          wordEl.appendChild(letter);
+        });
+        textEl.appendChild(wordEl);
+        if (wi < words.length - 1) textEl.appendChild(document.createTextNode(" "));
+      });
+    }
+
+    let swapToken = 0;
+    let pendingTimer;
+    let badgeTimer;
+    // What's actually on screen right now (or committed to becoming, if a
+    // swap is mid-flight). Toggling dark→light→dark after the quote has
+    // already auto-reverted otherwise fires a second swapTo(name) call while
+    // "name" is already showing — a pointless replay of the flip.
+    let current = name;
+
+    // Reveals the badge strictly after the incoming name has finished — driven
+    // by the real transitionend of the last letter rather than a precomputed
+    // deadline, so a dropped frame or a slow paint delays the badge with the
+    // text instead of letting it appear over a name still animating in.
+    //
+    // `letters` is in DOM order and stagger delays increase monotonically with
+    // index, so the last element is always the last one to settle.
+    function revealBadgeAfter(letters, token) {
+      const badge = getBadge();
+      if (!badge) return;
+
+      const last = letters[letters.length - 1];
+      const show = () => {
+        if (token === swapToken) badge.classList.remove("is-hidden");
+      };
+
+      if (reduced || !last) {
+        show();
+        return;
+      }
+
+      const onDone = (e) => {
+        // Three properties transition per letter; transform is the one whose
+        // completion means the letter has actually landed.
+        if (e.target !== last || e.propertyName !== "transform") return;
+        last.removeEventListener("transitionend", onDone);
+        clearTimeout(badgeTimer);
+        show();
+      };
+      last.addEventListener("transitionend", onDone);
+
+      // transitionend never fires if the element is removed mid-flight or the
+      // tab is backgrounded, which would strand the badge hidden for good.
+      const delay = parseFloat(last.style.transitionDelay) || 0;
+      badgeTimer = setTimeout(() => {
+        last.removeEventListener("transitionend", onDone);
+        show();
+      }, delay + ENTER_MS + 120);
+    }
+
+    function enterLetters(next, token) {
+      textEl.textContent = "";
+      buildLetters(next, "nf-enter-from");
+      // Two frames, not one. A single rAF can land in the same style flush
+      // that applied nf-enter-from, in which case the browser sees no start
+      // value to interpolate from and some letters snap straight to their
+      // final state instead of transitioning.
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          if (token !== swapToken) return;
+          const letters = textEl.querySelectorAll(".nf-letter");
+          letters.forEach((l) => l.classList.remove("nf-enter-from"));
+          if (next === name) revealBadgeAfter(letters, token);
+        });
+      });
+    }
+
+    function swapTo(next) {
+      if (next === current) return;
+      current = next;
+
+      const token = ++swapToken;
+      clearTimeout(pendingTimer);
+      clearTimeout(badgeTimer);
+
+      // Badge reads as belonging to the real name, so it hides the instant the
+      // name starts leaving. Bringing it back is revealBadgeAfter's job, fired
+      // off the last letter landing — see enterLetters.
+      const badge = getBadge();
+      if (badge) badge.classList.add("is-hidden");
+
+      const letters = textEl.querySelectorAll(".nf-letter");
+      const exitSpan = span(letters.length, PER_LETTER_EXIT, EXIT_SPAN);
+      const exitTotal = letters.length ? exitSpan + EXIT_MS : 0;
+      const enterStart = Math.max(0, exitTotal - OVERLAP_MS);
+
+      if (!letters.length) {
+        enterLetters(next, token);
+        return;
+      }
+
+      letters.forEach((l, i) => {
+        l.style.transitionDelay = staggerDelay(i, letters.length, exitSpan) + "ms";
+        l.classList.add("nf-exit");
+      });
+
+      pendingTimer = setTimeout(() => {
+        if (token !== swapToken) return;
+        enterLetters(next, token);
+      }, enterStart);
+    }
+
+    let holdTimer;
+    window.addEventListener("themechange", () => {
+      clearTimeout(holdTimer);
+      if (document.documentElement.classList.contains("dark")) {
+        swapTo(name);
+        return;
+      }
+      swapTo(quote);
+      holdTimer = setTimeout(() => swapTo(name), hold);
+    });
+  })();
+</script>
