@@ -304,15 +304,62 @@ const { name, quote = "", holdMs = 3000, class: className = "" } = Astro.props a
       }, enterStart);
     }
 
+    // The heading ships from the server as a plain text node, so the first
+    // swap of a page load found no .nf-letter elements to animate out and
+    // hard-cut straight to the incoming text — no exit at all. Splitting it
+    // up front means every flip, including the first, has letters to fly out.
+    if (!textEl.querySelector(".nf-letter")) {
+      textEl.textContent = "";
+      buildLetters(name, "");
+    }
+
+    // The theme toggle dispatches themechange from inside its
+    // startViewTransition callback, and for the length of that transition the
+    // browser paints a frozen snapshot of the pre-toggle page over the live
+    // DOM. Flipping immediately meant the cascade ran underneath that
+    // snapshot and was revealed mid-flight when the wipe lifted, which reads
+    // as the animation restarting. Wait for the wipe, then flip.
+    let cancelPendingVt;
+    function afterThemeVt(run) {
+      const root = document.documentElement;
+      if (root.dataset.themeVt !== "active") {
+        run();
+        return;
+      }
+      let settled = false;
+      const finish = (skip) => {
+        if (settled) return;
+        settled = true;
+        observer.disconnect();
+        clearTimeout(failsafe);
+        cancelPendingVt = null;
+        if (!skip) run();
+      };
+      const observer = new MutationObserver(() => {
+        if (root.dataset.themeVt !== "active") finish(false);
+      });
+      observer.observe(root, { attributes: true, attributeFilter: ["data-theme-vt"] });
+      // The attribute is cleaned up on transition.finished, which can never
+      // settle if the transition is skipped; don't strand the flip on it.
+      const failsafe = setTimeout(() => finish(false), 1200);
+      cancelPendingVt = () => finish(true);
+    }
+
     let holdTimer;
     window.addEventListener("themechange", () => {
       clearTimeout(holdTimer);
-      if (document.documentElement.classList.contains("dark")) {
-        swapTo(name);
-        return;
-      }
-      swapTo(quote);
-      holdTimer = setTimeout(() => swapTo(name), hold);
+      // A toggle landing while an earlier one is still waiting out its wipe
+      // supersedes it, rather than queueing a second flip behind it.
+      if (cancelPendingVt) cancelPendingVt();
+      const isDark = document.documentElement.classList.contains("dark");
+      afterThemeVt(() => {
+        if (isDark) {
+          swapTo(name);
+          return;
+        }
+        swapTo(quote);
+        holdTimer = setTimeout(() => swapTo(name), hold);
+      });
     });
   })();
 </script>
