@@ -15,10 +15,12 @@ interface Shot {
 interface Props {
   images: Shot[];
   label: string;
+  /** Scopes the zoom dialog's prev/next to this card's screenshots */
+  group: string;
   /** Tall portrait phone captures get their own sizing */
   phone?: boolean;
 }
-const { images, label, phone = false } = Astro.props as Props;
+const { images, label, group, phone = false } = Astro.props as Props;
 
 // Desktop captures are hand-cropped and vary by up to 19px in width. Pinning
 // one aspect ratio and cropping to it stops the carousel jumping between
@@ -63,6 +65,7 @@ const zoomAttrs = (i: number) => {
   const w = Math.min(1700, images[i].src.width);
   return {
     "data-zoom": true,
+    "data-zoom-group": group,
     "data-full": zoomed[i].src,
     "data-zoom-alt": images[i].alt,
     "data-zoom-w": w,

@@ -71,6 +71,7 @@ const zoomed = screen.phone
           <button
             type="button"
             data-zoom
+            data-zoom-group={screen.id}
             data-full={zoomed[i].src}
             data-zoom-alt={im.alt}
             data-zoom-w={Math.min(900, im.src.width)}
@@ -98,6 +99,7 @@ const zoomed = screen.phone
       <ScreenCarousel
         images={screen.images}
         label={`${screen.name} screenshots`}
+        group={screen.id}
       />
     )
   }
