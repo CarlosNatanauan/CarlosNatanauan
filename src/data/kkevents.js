@@ -463,11 +463,20 @@ export const kkevents = {
       "Render",
     ],
     body: "The public site is prerendered to static files and refreshes its content in the browser, so it stays online even if the API is down. Login is passwordless. Media uploads go straight from the browser to Cloudinary and never pass through the API server. The analytics charts are hand-drawn SVG — no charting library, no UI kit anywhere in the project.",
+    // The two scale numbers sit together on purpose — this much interface,
+    // this much data behind it — and the restore drill lands last because
+    // almost nobody tests theirs, so saying it plainly is the line that stays
+    // with a reader.
+    //
+    // Not here, deliberately: "zero UI dependencies" repeats `body` above,
+    // which already ends "no charting library, no UI kit anywhere in the
+    // project". And the backups were described as weekly; the cadence is the
+    // one part of this row that says anything about a recovery window, and it
+    // was carrying no persuasive weight — "actually run" is what does that.
     facts: [
-      "14 database models",
       "~40 hand-built components",
-      "zero UI dependencies",
-      "weekly automated database backups, with a restore drill that was actually run",
+      "14 database models",
+      "automated database backups, with a restore drill that was actually run",
     ],
   },
 
