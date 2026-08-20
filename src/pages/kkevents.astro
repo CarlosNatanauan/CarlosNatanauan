@@ -1,0 +1,424 @@
+---
+// src/pages/kkevents.astro — K & K's Events case study
+//
+// All copy lives in src/data/kkevents.js and is fixed — read the note at the
+// top of that file before editing any of it. In particular: no metric, date,
+// version number, or technical claim goes on this page that is not already in
+// the data file, and the security note above `underTheHood` there lists what
+// must stay off the page permanently.
+//
+// The frontend and backend repos are private, so the spec's "Frontend repo" /
+// "Backend repo" links are deliberately absent — live site only.
+import BaseLayout from "../layouts/BaseLayout.astro";
+import KeyScreenCard from "../components/KeyScreenCard.astro";
+import ZoomDialog from "../components/ZoomDialog.astro";
+import { kkevents as cs } from "../data/kkevents.js";
+import { profile } from "../data/profile.js";
+
+const description =
+  "How I built a marketing site and a custom headless CMS for K & K's Events, an event styling team in Sta. Rosa, Laguna — so the owner runs the whole site herself.";
+
+const sectionLabel =
+  "mb-5 text-[11px] font-bold uppercase tracking-[0.22em] text-faint";
+
+// Padding is kept out of `panelBase` so a panel that wants its own can set it
+// without a conflict: Tailwind orders utilities by property and puts the
+// breakpoint variants last, so a `p-5 sm:p-6` in the shared string would beat
+// any `px-*`/`py-*` added after it at >=640px, silently.
+const panelBase = "rounded-[16px] border border-line bg-card";
+const panel = `${panelBase} p-5 sm:p-6`;
+
+// "kandkevents.online" — what a reader actually wants to know at this point,
+// where a generic "Visit Live Site" tells them nothing.
+const liveHost = new URL(cs.live).host.replace(/^www\./, "");
+
+// Structured data. Everything below is already stated on the page — no dates,
+// no metrics, no claims the reader cannot also see. The page is the creative
+// work; the site it is about is a separate entity, so `about` points at that
+// rather than conflating the two.
+const pageURL = new URL(Astro.url.pathname, Astro.site).toString();
+const schema = [
+  {
+    "@context": "https://schema.org",
+    "@type": "CreativeWork",
+    name: cs.title,
+    description,
+    url: pageURL,
+    image: new URL(cs.hero.poster, Astro.site).toString(),
+    inLanguage: "en",
+    keywords: cs.stack.chips.join(", "),
+    author: {
+      "@type": "Person",
+      name: profile.fullName,
+      url: new URL("/", Astro.site).toString(),
+    },
+    about: {
+      "@type": "WebSite",
+      name: "K & K's Events",
+      url: cs.live,
+    },
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Projects",
+        item: new URL("/#projects", Astro.site).toString(),
+      },
+      // Last crumb carries no `item`: it is the page you are already on.
+      { "@type": "ListItem", position: 2, name: "K & K's Events" },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title="K & K's Events — Case Study | Carlos Natanauan"
+  description={description}
+  navBase="/"
+  ogType="article"
+  ogImage={cs.hero.poster}
+  ogImageWidth={cs.hero.posterWidth}
+  ogImageHeight={cs.hero.posterHeight}
+  twitterCard="summary_large_image"
+  personSchema={false}
+  schema={schema}
+>
+  <!-- Set before the content below is parsed, so the first paint already has
+       the reveal state and nothing flashes in and back out. Gated on IO
+       existing: without it the CSS never hides anything. -->
+  <script is:inline>
+    if ("IntersectionObserver" in window) {
+      document.documentElement.classList.add("reveal-ready");
+    }
+  </script>
+
+  <div class="read-progress" aria-hidden="true"></div>
+
+  <article class="col pt-6 pb-16 sm:pt-9 sm:pb-20">
+    <!-- ── Header ─────────────────────────────────────────────── -->
+    <a
+      href="/#projects"
+      class="inline-flex items-center gap-1.5 text-[13.5px] font-medium text-muted transition-colors hover:text-accent-hover"
+    >
+      <svg
+        class="h-3.5 w-3.5"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="m12 19-7-7 7-7"></path>
+        <path d="M19 12H5"></path>
+      </svg>
+      Back to projects
+    </a>
+
+    <div
+      data-reveal
+      class="mt-7 mb-2.5 text-[11px] font-bold uppercase tracking-[0.22em] text-accent"
+    >
+      {cs.eyebrow}
+    </div>
+
+    <h1
+      data-reveal
+      style="transition-delay: 70ms"
+      class="m-0 mb-4 text-[28px] font-extrabold leading-[1.18] tracking-[-0.8px] sm:text-[38px]"
+    >
+      {cs.title}
+    </h1>
+
+    <p
+      data-reveal
+      style="transition-delay: 140ms"
+      class="m-0 max-w-[660px] text-[15.5px] leading-[1.75] text-muted sm:text-[16.5px]"
+    >
+      {cs.lead}
+    </p>
+
+    <!-- ── Hero: the walkthrough clip, full width, no card border ──
+         The live-site link lives on the clip rather than as a button above
+         it: the clip is a walkthrough of that exact site, so this is where
+         the link belongs, and it leaves the CTA at the foot of the page as
+         the only real button here.
+
+         The link is the pill alone, not the whole clip. Under reduced motion
+         the script below gives the video real controls, and a wrapping anchor
+         would turn every press of Play into a navigation. -->
+    <div
+      data-reveal
+      style="transition-delay: 210ms"
+      class="group relative mt-9 overflow-hidden rounded-[16px]"
+    >
+      <video
+        data-case-hero
+        src={cs.hero.video}
+        poster={cs.hero.poster}
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="metadata"
+        aria-label={cs.hero.label}
+        class="block h-auto w-full"></video>
+
+      <a
+        href={cs.live}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="absolute bottom-3 left-3 inline-flex items-center gap-2 rounded-full border border-line bg-card/80 px-3.5 py-2 text-[13px] font-semibold text-fg no-underline backdrop-blur-[6px] transition-colors hover:border-accent group-hover:border-accent sm:bottom-4 sm:left-4"
+      >
+        <span class="size-1.5 rounded-full bg-accent" aria-hidden="true"></span>
+        {liveHost}
+        <span class="text-faint transition-colors group-hover:text-accent" aria-hidden="true">↗</span>
+        <span class="sr-only">— opens the live site in a new tab</span>
+      </a>
+    </div>
+
+    <!-- Client's own published figures, not mine — hence the caption. -->
+    <div data-reveal class={`mt-5 ${panelBase} px-4 py-5 sm:px-6`}>
+      <div class="grid grid-cols-3 gap-3 text-center">
+        {
+          cs.clientStats.map((s) => (
+            <div>
+              <div class="text-[20px] font-extrabold tracking-[-0.5px] sm:text-[24px]">
+                {s.value}
+              </div>
+              <div class="mt-1 text-[12px] leading-tight text-faint">
+                {s.label}
+              </div>
+            </div>
+          ))
+        }
+      </div>
+      <p class="m-0 mt-4 text-center text-[11.5px] text-faint">
+        Figures published by the client on their own homepage.
+      </p>
+    </div>
+
+    <!-- ── Why / Goal ─────────────────────────────────────────── -->
+    <div class="mt-12 grid gap-4 sm:grid-cols-2">
+      {
+        [cs.why, cs.goal].map((block, i) => (
+          <section
+            data-reveal
+            style={`transition-delay: ${i * 90}ms`}
+            class={panel}
+          >
+            <h2 class="mb-3 text-[11px] font-bold uppercase tracking-[0.22em] text-accent">
+              {block.label}
+            </h2>
+            <p class="m-0 text-[14.5px] leading-[1.7] text-muted">
+              {block.body}
+            </p>
+          </section>
+        ))
+      }
+    </div>
+
+    <!-- ── Overview + what it does ────────────────────────────── -->
+    <section data-reveal class={`mt-4 ${panel}`}>
+      <h2 class="mb-5 text-[11px] font-bold uppercase tracking-[0.22em] text-accent">
+        Project overview
+      </h2>
+
+      <dl class="m-0 grid grid-cols-2 gap-x-4 gap-y-5 sm:grid-cols-4">
+        {
+          cs.overview.map((row) => (
+            <div>
+              <dt class="text-[10.5px] font-bold uppercase tracking-[0.16em] text-faint">
+                {row.label}
+              </dt>
+              <dd class="m-0 mt-1.5 text-[14px] font-semibold leading-[1.45]">
+                {row.value}
+              </dd>
+            </div>
+          ))
+        }
+      </dl>
+
+      <div class="my-6 h-px bg-line"></div>
+
+      <h3 class="mb-3.5 text-[11px] font-bold uppercase tracking-[0.22em] text-faint">
+        What it does
+      </h3>
+      <ul class="m-0 grid list-none grid-cols-1 gap-2.5 p-0 sm:grid-cols-2">
+        {
+          cs.whatItDoes.map((item) => (
+            <li class="flex gap-2.5 text-[14px] leading-[1.6] text-muted">
+              <span
+                class="mt-[9px] size-[3px] shrink-0 rounded-full bg-accent"
+                aria-hidden="true"
+              />
+              <span>{item}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <!-- ── Key screens ────────────────────────────────────────── -->
+    <section class="mt-14">
+      <h2 data-reveal class={`${sectionLabel} mb-4`}>Key screens</h2>
+
+      <!-- Fourteen cards is a long stretch to scroll through looking for one
+           of them. Each card already had a stable id; this is what makes them
+           reachable, and makes a single screen linkable on its own. -->
+      <nav data-reveal aria-label="Jump to a key screen" class="mb-7">
+        <ul class="m-0 flex list-none flex-wrap gap-2 p-0">
+          {cs.screens.map((screen) => (
+            <li>
+              <a
+                href={`#${screen.id}`}
+                class="inline-flex rounded-full border border-line bg-card px-3 py-1.5 text-[12.5px] font-medium text-muted no-underline transition-colors hover:border-accent hover:text-fg"
+              >
+                {screen.name}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      <div class="flex flex-col gap-5">
+        {cs.screens.map((screen) => <KeyScreenCard screen={screen} />)}
+      </div>
+    </section>
+
+    <!-- ── Under the hood ─────────────────────────────────────────
+         Carries more weight than the panels around it: this is the part
+         that separates a case study from a product tour. -->
+    <section class="mt-14">
+      <h2 data-reveal class={sectionLabel}>Under the hood</h2>
+      <div class="flex flex-col gap-4">
+        {
+          cs.underTheHood.map((card, i) => (
+            <div
+              data-reveal
+              class="rounded-[16px] border border-accent/25 bg-accent/[0.045] p-5 sm:p-7"
+            >
+              <div class="mb-3 flex items-baseline gap-3">
+                <span class="text-[11px] font-bold tabular-nums tracking-[0.14em] text-accent">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <h3 class="m-0 text-[16.5px] font-extrabold leading-[1.35] tracking-[-0.3px] sm:text-[18px]">
+                  {card.title}
+                </h3>
+              </div>
+              <p class="m-0 text-[14.5px] leading-[1.75] text-muted sm:pl-[calc(1.5rem+8px)]">
+                {card.body}
+              </p>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    <!-- ── Tech stack ─────────────────────────────────────────── -->
+    <section class="mt-14">
+      <h2 data-reveal class={sectionLabel}>Tech stack</h2>
+      <div data-reveal class={panel}>
+        <div class="flex flex-wrap gap-2">
+          {cs.stack.chips.map((chip) => <span class="tag">{chip}</span>)}
+        </div>
+
+        <p class="m-0 mt-5 text-[14.5px] leading-[1.7] text-muted">
+          {cs.stack.body}
+        </p>
+
+        <div class="my-5 h-px bg-line"></div>
+
+        <div class="flex flex-wrap items-center gap-x-3 gap-y-2 text-[13px] leading-[1.5]">
+          {
+            cs.stack.facts.map((fact, i) => (
+              <Fragment>
+                {i > 0 && (
+                  <span class="text-faint" aria-hidden="true">
+                    ·
+                  </span>
+                )}
+                <span class="font-semibold text-fg">{fact}</span>
+              </Fragment>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- ── CTA ────────────────────────────────────────────────── -->
+    <section class="mt-14">
+      <div
+        data-reveal
+        class="rounded-[20px] border border-line bg-card p-6 text-center sm:p-9"
+      >
+        <h2
+          class="m-0 mb-3 text-[21px] font-extrabold tracking-[-0.5px] sm:text-[25px]"
+        >
+          {cs.cta.title}
+        </h2>
+        <p
+          class="mx-auto m-0 mb-6 max-w-[520px] text-[14.5px] leading-[1.7] text-muted"
+        >
+          {cs.cta.body}
+        </p>
+        <div class="flex flex-wrap items-center justify-center gap-3">
+          <a href="/#contact" class="btn-hover w-fit">
+            <span class="btn-hover-idle">
+              <span class="btn-hover-dot" aria-hidden="true"></span>
+              <span class="btn-hover-idle-text">Let's talk</span>
+            </span>
+            <span class="btn-hover-reveal" aria-hidden="true">
+              <span>Let's talk</span>
+              <span>→</span>
+            </span>
+          </a>
+          <a href={profile.links.email} class="btn-outline btn-sm">Email</a>
+        </div>
+      </div>
+    </section>
+  </article>
+
+  <ZoomDialog />
+</BaseLayout>
+
+<script is:inline>
+  // Don't loop an autoplaying clip at people who asked for less motion
+  (function () {
+    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    document.querySelectorAll("[data-case-hero]").forEach((v) => {
+      v.autoplay = false;
+      v.loop = false;
+      v.controls = true;
+      v.pause();
+    });
+  })();
+
+  // Reveal each block as it arrives. One-shot: elements are unobserved once
+  // shown, so nothing re-animates on the way back up a page this long, and
+  // the observer empties itself as you read.
+  (function () {
+    if (!document.documentElement.classList.contains("reveal-ready")) return;
+
+    const targets = document.querySelectorAll("[data-reveal]");
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add("is-visible");
+          io.unobserve(entry.target);
+        });
+      },
+      // Fires a little before the element's edge clears the fold, so the
+      // motion reads as the block settling into place rather than catching up.
+      { rootMargin: "0px 0px -10% 0px", threshold: 0.04 },
+    );
+
+    targets.forEach((el) => io.observe(el));
+  })();
+</script>

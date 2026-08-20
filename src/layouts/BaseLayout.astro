@@ -6,18 +6,56 @@ import ScrollTop from "../components/ScrollTop.astro";
 interface Props {
   title?: string;
   description?: string;
+  /**
+   * Prefix for the header's section links. Empty on the home page, where the
+   * sections are on this page already; "/" on a sub-page, so the links point
+   * back at the home page's sections instead of resolving to nothing.
+   */
+  navBase?: string;
+  /** og:type — "profile" for the home page, "article" for a case study */
+  ogType?: string;
+  /** Social preview image, relative to the site root */
+  ogImage?: string;
+  /**
+   * Pixel size of `ogImage`. Optional, but worth passing: some scrapers will
+   * not render a preview on their first fetch without it. Both or neither.
+   */
+  ogImageWidth?: number;
+  ogImageHeight?: number;
+  /**
+   * "summary" crops to a small square — right for the portrait on the home
+   * page, wrong for anything wide. Pass "summary_large_image" when the
+   * preview image is a landscape screenshot.
+   */
+  twitterCard?: string;
+  /** Skip the Person structured data on pages that are not about the person */
+  personSchema?: boolean;
+  /**
+   * Structured data for pages that need their own. Assert only what the page
+   * actually says — schema that outruns the page is the machine-readable
+   * version of making things up.
+   */
+  schema?: Record<string, unknown> | Record<string, unknown>[];
 }
 const {
   title = "Carlos Natanauan — Portfolio",
   description = "Software developer focused on mobile app development with Flutter, branching into web with Astro.",
+  navBase = "",
+  ogType = "profile",
+  ogImage = profile.avatar,
+  ogImageWidth,
+  ogImageHeight,
+  twitterCard = "summary",
+  personSchema: withPersonSchema = true,
+  schema,
 } = Astro.props as Props;
 
 const year = new Date().getFullYear();
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
-const ogImageURL = new URL(profile.avatar, Astro.site);
+const ogImageURL = new URL(ogImage, Astro.site);
 
-const personSchema = {
+const personSchemaData = {
   "@context": "https://schema.org",
   "@type": "Person",
   name: profile.name,
@@ -73,23 +111,46 @@ const personSchema = {
     />
 
     <!-- Open Graph / social + search preview -->
-    <meta property="og:type" content="profile" />
+    <meta property="og:type" content={ogType} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonicalURL} />
     <meta property="og:image" content={ogImageURL} />
-    <meta property="profile:first_name" content="Carlos" />
-    <meta property="profile:last_name" content="Natanauan" />
+    {ogImageWidth && ogImageHeight && (
+      <Fragment>
+        <meta property="og:image:width" content={String(ogImageWidth)} />
+        <meta property="og:image:height" content={String(ogImageHeight)} />
+      </Fragment>
+    )}
+    {withPersonSchema && (
+      <Fragment>
+        <meta property="profile:first_name" content="Carlos" />
+        <meta property="profile:last_name" content="Natanauan" />
+      </Fragment>
+    )}
 
     <!-- Twitter card -->
-    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:card" content={twitterCard} />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImageURL} />
 
     <!-- Structured data: ties this portrait to "Carlos Natanauan" /
          "Carlos Benedict Natanauan" as one entity for Google -->
-    <script type="application/ld+json" is:inline set:html={JSON.stringify(personSchema)} />
+    {withPersonSchema && (
+      <script
+        type="application/ld+json"
+        is:inline
+        set:html={JSON.stringify(personSchemaData)}
+      />
+    )}
+    {schema && (
+      <script
+        type="application/ld+json"
+        is:inline
+        set:html={JSON.stringify(schema)}
+      />
+    )}
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
@@ -125,7 +186,7 @@ const personSchema = {
         class="mx-auto flex max-w-[860px] items-center justify-between px-5 py-3.5 sm:px-12 sm:py-5"
       >
         <a
-          href="#top"
+          href={navBase || "#top"}
           class="text-[16px] font-extrabold tracking-[0.5px] text-fg sm:text-[18px] hover:text-fg"
           >{profile.siteName}</a
         >
@@ -134,15 +195,15 @@ const personSchema = {
           <!-- Desktop links -->
           <div class="hidden items-center gap-9 sm:flex">
             <a
-              href="#projects"
+              href={`${navBase}#projects`}
               class="text-[14px] font-medium text-muted hover:text-fg">Projects</a
             >
             <a
-              href="#experience"
+              href={`${navBase}#experience`}
               class="text-[14px] font-medium text-muted hover:text-fg">Experience</a
             >
             <a
-              href="#contact"
+              href={`${navBase}#contact`}
               class="text-[14px] font-medium text-muted hover:text-fg">Contact</a
             >
           </div>
@@ -211,17 +272,17 @@ const personSchema = {
         class="hidden border-t border-line bg-header px-5 py-2 sm:hidden"
       >
         <a
-          href="#projects"
+          href={`${navBase}#projects`}
           class="block rounded-lg py-2.5 text-[14px] font-medium text-muted hover:text-fg"
           >Projects</a
         >
         <a
-          href="#experience"
+          href={`${navBase}#experience`}
           class="block rounded-lg py-2.5 text-[14px] font-medium text-muted hover:text-fg"
           >Experience</a
         >
         <a
-          href="#contact"
+          href={`${navBase}#contact`}
           class="block rounded-lg py-2.5 text-[14px] font-medium text-muted hover:text-fg"
           >Contact</a
         >

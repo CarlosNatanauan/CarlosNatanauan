@@ -24,6 +24,8 @@ interface Project {
   repo?: string;
   /** Override the "Repo" button label, e.g. when it points at a backend repo */
   repoLabel?: string;
+  /** Internal detail page. When set, it becomes the card's primary action. */
+  caseStudy?: string;
 }
 const { project } = Astro.props as { project: Project };
 
@@ -31,10 +33,12 @@ const { project } = Astro.props as { project: Project };
 const tags: string[] =
   project.tech ?? project.tagGroups?.flatMap((g) => g.tags) ?? [];
 
-const missingLinks = !project.live && !project.demo && !project.repo;
+const missingLinks =
+  !project.live && !project.demo && !project.repo && !project.caseStudy;
 
-// The media links to the live site when there is one, else the repo
-const imageHref = project.live || project.repo || "";
+// The media links to the case study when there is one — that page is the
+// fuller version of what the clip is showing — else the live site, else the repo
+const imageHref = project.caseStudy || project.live || project.repo || "";
 
 // Only treat the clip as present once the file is actually in /public, so the
 // card degrades to the placeholder instead of a broken player.
@@ -49,13 +53,18 @@ function existsInPublic(src?: string) {
 
 const videoSrc = existsInPublic(project.media) ? project.media : "";
 const posterSrc = existsInPublic(project.mediaPoster) ? project.mediaPoster : "";
+// Internal links stay in the tab; only outbound ones open a new one
+const mediaIsInternal = imageHref.startsWith("/");
 const MediaTag = imageHref ? "a" : "div";
 const mediaProps = imageHref
   ? {
       href: imageHref,
-      target: "_blank",
-      rel: "noopener noreferrer",
-      "aria-label": `Open ${project.name}`,
+      ...(mediaIsInternal
+        ? {}
+        : { target: "_blank", rel: "noopener noreferrer" }),
+      "aria-label": mediaIsInternal
+        ? `Read the ${project.name} case study`
+        : `Open ${project.name}`,
     }
   : {};
 ---
@@ -143,23 +152,47 @@ const mediaProps = imageHref
         </div>
       ) : (
         <div class="flex flex-wrap items-center gap-3">
-          {project.live && (
-            <a
-              href={project.live}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="btn-hover w-fit"
-            >
+          {/* The case study is the primary action when there is one: it is the
+              whole story, and the live site is one click further in from it. */}
+          {project.caseStudy && (
+            <a href={project.caseStudy} class="btn-hover w-fit">
               <span class="btn-hover-idle">
                 <span class="btn-hover-dot" aria-hidden="true"></span>
-                <span class="btn-hover-idle-text">Visit Live Site</span>
+                <span class="btn-hover-idle-text">Read the case study</span>
               </span>
               <span class="btn-hover-reveal" aria-hidden="true">
-                <span>Visit Live Site</span>
+                <span>Read the case study</span>
                 <span>→</span>
               </span>
             </a>
           )}
+          {project.live &&
+            (project.caseStudy ? (
+              <a
+                href={project.live}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="btn-outline btn-sm"
+              >
+                Visit Live Site
+              </a>
+            ) : (
+              <a
+                href={project.live}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="btn-hover w-fit"
+              >
+                <span class="btn-hover-idle">
+                  <span class="btn-hover-dot" aria-hidden="true"></span>
+                  <span class="btn-hover-idle-text">Visit Live Site</span>
+                </span>
+                <span class="btn-hover-reveal" aria-hidden="true">
+                  <span>Visit Live Site</span>
+                  <span>→</span>
+                </span>
+              </a>
+            ))}
           {project.demo && (
             <a
               href={project.demo}

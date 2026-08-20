@@ -1,0 +1,249 @@
+---
+// src/components/ScreenCarousel.astro — one screenshot at a time, with dot
+// indicators and prev/next.
+//
+// Same mechanics as ProjectCarousel (CSS scroll-snap + a small script, no
+// library), with three differences: one full-width slide per view instead of
+// 85%/50%, dot indicators, and Astro <Image> so the source PNGs come out as
+// WebP with a srcset.
+import { Image, getImage } from "astro:assets";
+
+interface Shot {
+  src: ImageMetadata;
+  alt: string;
+}
+interface Props {
+  images: Shot[];
+  label: string;
+  /** Scopes the zoom dialog's prev/next to this card's screenshots */
+  group: string;
+  /** Tall portrait phone captures get their own sizing */
+  phone?: boolean;
+}
+const { images, label, group, phone = false } = Astro.props as Props;
+
+// Desktop captures are hand-cropped and vary by up to 19px in width. Pinning
+// one aspect ratio and cropping to it stops the carousel jumping between
+// slides; object-top keeps the app's own header in frame.
+const frame = phone
+  ? "aspect-[1284/2778]"
+  : "aspect-[1900/948]";
+
+// Held well inside the column rather than filling it. A 1900px-wide admin UI
+// is past reading at any width this page can give it, so the extra pixels only
+// bought scroll — 13 of these at full width made the page a very long haul.
+// Small enough to read as a specimen, big enough to see the layout.
+const box = phone ? "" : "mx-auto w-full max-w-[600px]";
+
+const imgWidths = phone ? [220, 440] : [400, 600, 1200];
+const imgSizes = phone
+  ? "(min-width: 640px) 200px, 30vw"
+  : "(min-width: 700px) 600px, 92vw";
+
+const navBtn =
+  "flex size-8 shrink-0 items-center justify-center rounded-full border border-line bg-card text-fg transition-colors hover:border-accent disabled:pointer-events-none disabled:opacity-40";
+
+// The enlarged copy behind the click-to-zoom. Generated at build so the URL
+// is known, but never requested by the page — ZoomDialog assigns the src only
+// when someone opens it. Capped at the source width so nothing is upscaled.
+const zoomed = await Promise.all(
+  images.map((im) =>
+    getImage({
+      src: im.src,
+      format: "webp",
+      width: Math.min(1700, im.src.width),
+      quality: 80,
+    }),
+  ),
+);
+
+// Cropped inline, whole in the dialog — so the frame is a real affordance.
+// The dimensions travel with the URL: without them the dialog opens at zero
+// content height and resizes once the file decodes, which on a centred dialog
+// reads as a jump.
+const zoomAttrs = (i: number) => {
+  const w = Math.min(1700, images[i].src.width);
+  return {
+    "data-zoom": true,
+    "data-zoom-group": group,
+    "data-full": zoomed[i].src,
+    "data-zoom-alt": images[i].alt,
+    "data-zoom-w": w,
+    "data-zoom-h": Math.round((images[i].src.height * w) / images[i].src.width),
+    "aria-label": `Enlarge: ${images[i].alt}`,
+  };
+};
+
+const zoomBtn =
+  "block cursor-zoom-in overflow-hidden rounded-[10px] border border-line bg-bg transition-colors hover:border-accent";
+
+const single = images.length < 2;
+---
+
+{
+  single ? (
+    <button type="button" class={`${box} ${frame} ${zoomBtn}`} {...zoomAttrs(0)}>
+      <Image
+        src={images[0].src}
+        alt={images[0].alt}
+        widths={imgWidths}
+        sizes={imgSizes}
+        format="webp"
+        quality={72}
+        loading="lazy"
+        decoding="async"
+        class="block h-full w-full object-cover object-top"
+      />
+    </button>
+  ) : (
+    <div
+      class={`relative ${box}`}
+      data-screen-carousel
+      role="region"
+      aria-roledescription="carousel"
+      aria-label={label}
+    >
+      <div
+        data-screen-track
+        class="no-scrollbar flex snap-x snap-mandatory gap-3 overflow-x-auto"
+        tabindex="0"
+      >
+        {images.map((im, i) => (
+          <div
+            role="group"
+            aria-roledescription="slide"
+            aria-label={`${i + 1} of ${images.length}`}
+            class="min-w-0 shrink-0 grow-0 basis-full snap-start"
+          >
+            <button
+              type="button"
+              class={`${frame} w-full ${zoomBtn}`}
+              {...zoomAttrs(i)}
+            >
+              <Image
+                src={im.src}
+                alt={im.alt}
+                widths={imgWidths}
+                sizes={imgSizes}
+                format="webp"
+                quality={72}
+                loading="lazy"
+                decoding="async"
+                class="block h-full w-full object-cover object-top"
+              />
+            </button>
+          </div>
+        ))}
+      </div>
+
+      <div class="mt-3 flex items-center justify-between gap-3">
+        <div class="flex items-center gap-1.5" data-screen-dots>
+          {images.map((_, i) => (
+            <button
+              type="button"
+              data-screen-dot
+              data-index={i}
+              aria-label={`Go to slide ${i + 1}`}
+              aria-current={i === 0 ? "true" : "false"}
+              class="h-1.5 w-1.5 cursor-pointer rounded-full bg-faint/50 transition-all duration-200 hover:bg-faint aria-[current=true]:w-4 aria-[current=true]:bg-accent"
+            />
+          ))}
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button type="button" data-screen-prev class={navBtn} disabled>
+            <svg
+              class="h-4 w-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="m12 19-7-7 7-7" />
+              <path d="M19 12H5" />
+            </svg>
+            <span class="sr-only">Previous screenshot</span>
+          </button>
+          <button type="button" data-screen-next class={navBtn}>
+            <svg
+              class="h-4 w-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M5 12h14" />
+              <path d="m12 5 7 7-7 7" />
+            </svg>
+            <span class="sr-only">Next screenshot</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+{/* Not `is:inline`: this component renders 13 times on the case study, and an
+    inline script would be emitted 13 times over — each copy binding handlers to
+    every carousel on the page, so one click on Next would scroll 13 slides.
+    A bundled module script is hoisted and emitted once, whatever the count. */}
+<script>
+  (function () {
+    document.querySelectorAll("[data-screen-carousel]").forEach((root) => {
+      const track = root.querySelector<HTMLElement>("[data-screen-track]");
+      const prev = root.querySelector<HTMLButtonElement>("[data-screen-prev]");
+      const next = root.querySelector<HTMLButtonElement>("[data-screen-next]");
+      const dots = Array.from(
+        root.querySelectorAll<HTMLElement>("[data-screen-dot]"),
+      );
+      if (!track || !prev || !next) return;
+
+      // Arrow consts rather than function declarations: declarations are
+      // hoisted above the null guard, so TypeScript will not carry the
+      // narrowing into them and every use of track/prev/next below reads as
+      // possibly-null.
+
+      // One slide plus the gap between slides
+      const step = () => {
+        const slide = track.firstElementChild;
+        if (!slide) return track.clientWidth;
+        const gap = parseFloat(getComputedStyle(track).columnGap || "0") || 0;
+        return slide.getBoundingClientRect().width + gap;
+      };
+
+      const sync = () => {
+        const max = track.scrollWidth - track.clientWidth;
+        prev.disabled = track.scrollLeft <= 1;
+        next.disabled = track.scrollLeft >= max - 1;
+
+        const i = Math.round(track.scrollLeft / step());
+        dots.forEach((dot, j) => {
+          dot.setAttribute("aria-current", j === i ? "true" : "false");
+        });
+      };
+
+      prev.addEventListener("click", () => {
+        track.scrollBy({ left: -step(), behavior: "smooth" });
+      });
+      next.addEventListener("click", () => {
+        track.scrollBy({ left: step(), behavior: "smooth" });
+      });
+      dots.forEach((dot) => {
+        dot.addEventListener("click", () => {
+          const i = Number(dot.dataset.index) || 0;
+          track.scrollTo({ left: i * step(), behavior: "smooth" });
+        });
+      });
+
+      track.addEventListener("scroll", sync, { passive: true });
+      addEventListener("resize", sync, { passive: true });
+      sync();
+    });
+  })();
+</script>
