@@ -151,11 +151,19 @@ const mediaProps = imageHref
           </div>
         </div>
       ) : (
-        <div class="flex flex-wrap items-center gap-3">
-          {/* The case study is the primary action when there is one: it is the
+        <div class="flex items-center gap-2.5 sm:flex-wrap sm:gap-3">
+          {/* No wrapping below `sm`: the two actions belong on one line, and
+              stacked at different widths they read as a layout accident rather
+              than a pair. They fit because both tighten up on small screens
+              and the secondary shortens its label.
+
+              The case study is the primary action when there is one: it is the
               whole story, and the live site is one click further in from it. */}
           {project.caseStudy && (
-            <a href={project.caseStudy} class="btn-hover w-fit">
+            <a
+              href={project.caseStudy}
+              class="btn-hover w-fit whitespace-nowrap max-sm:px-3.5 max-sm:text-[13px]"
+            >
               <span class="btn-hover-idle">
                 <span class="btn-hover-dot" aria-hidden="true"></span>
                 <span class="btn-hover-idle-text">Read the case study</span>
@@ -172,9 +180,14 @@ const mediaProps = imageHref
                 href={project.live}
                 target="_blank"
                 rel="noopener noreferrer"
-                class="btn-outline btn-sm"
+                class="btn-outline btn-sm whitespace-nowrap max-sm:px-3.5 max-sm:text-[13px]"
               >
-                Visit Live Site
+                {/* "Visit" is the widest word here and the least informative
+                    one. Dropping it on phones is what buys the pair its single
+                    line, and it costs nothing: the case study button beside it
+                    already establishes that these are both places to go. */}
+                <span class="sm:hidden">Live Site</span>
+                <span class="max-sm:hidden">Visit Live Site</span>
               </a>
             ) : (
               <a
