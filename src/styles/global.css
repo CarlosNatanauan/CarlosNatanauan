@@ -450,3 +450,67 @@ html[data-theme-vt="active"] body {
     animation-duration: 0.01ms !important;
   }
 }
+
+/* ── Scroll reveal ────────────────────────────────────────────
+   Opt in per element with data-reveal; the script on the case study page
+   adds .is-visible as each one crosses into view.
+
+   The hidden state is gated on .reveal-ready, which that script only sets
+   when IntersectionObserver actually exists. With JS off, or in a browser
+   old enough to lack IO, nothing is ever hidden in the first place — the
+   page renders plainly rather than staying blank forever.
+
+   Wrapped in no-preference rather than relying on the blanket reduce rule
+   at the bottom of this file: that rule only shortens the transition, which
+   would still leave the content hidden until it is observed. Here the whole
+   effect is simply absent, and everything is visible from the start. */
+@media (prefers-reduced-motion: no-preference) {
+  .reveal-ready [data-reveal] {
+    opacity: 0;
+    /* Both properties are composited, so a page carrying a dozen of these
+       animates entirely off the main thread. */
+    transform: translateY(16px);
+    transition:
+      opacity 700ms cubic-bezier(0.16, 1, 0.3, 1),
+      transform 700ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .reveal-ready [data-reveal].is-visible {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ── Reading progress ─────────────────────────────────────────
+   A hairline under the top edge showing how far through a long page you
+   are. Driven by a scroll timeline, so it is pure CSS and composited —
+   no scroll listener, nothing on the main thread.
+
+   Hidden entirely where scroll timelines are unsupported: a progress bar
+   that cannot track progress is worse than no progress bar, and there is
+   no sensible static state for it to sit in. */
+.read-progress {
+  display: none;
+}
+
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .read-progress {
+      display: block;
+      position: fixed;
+      inset: 0 0 auto 0;
+      z-index: 30;
+      height: 2px;
+      background: var(--tk-accent);
+      transform-origin: 0 50%;
+      scale: 0 1;
+      animation: read-progress linear both;
+      animation-timeline: scroll(root block);
+    }
+  }
+}
+
+@keyframes read-progress {
+  to {
+    scale: 1 1;
+  }
+}

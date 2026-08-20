@@ -1,0 +1,214 @@
+---
+// src/components/ZoomDialog.astro — click-to-enlarge for the case study's
+// screenshots. Include once per page; every [data-zoom] button on the page
+// feeds this one dialog.
+//
+// Native <dialog> + showModal(), so the focus trap, Esc-to-close, background
+// inertness and the ::backdrop are all the platform's job — no library, in
+// keeping with the rest of this build.
+//
+// The enlarged file is only fetched when someone actually opens the dialog:
+// the button carries its URL in data-full and nothing requests it until the
+// src is assigned here.
+---
+
+<dialog data-zoom-dialog aria-label="Enlarged screenshot" class="zoom-dialog">
+  <button
+    type="button"
+    data-zoom-close
+    aria-label="Close enlarged screenshot"
+    class="zoom-close"
+  >
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M18 6 6 18M6 6l12 12"></path>
+    </svg>
+  </button>
+
+  <figure class="zoom-figure">
+    <img data-zoom-img alt="" decoding="async" />
+    <figcaption data-zoom-caption class="zoom-caption"></figcaption>
+  </figure>
+</dialog>
+
+<style>
+  /* Deliberately not fullscreen: big enough to read the UI in the shot, small
+     enough that the page is still visibly behind it. */
+  .zoom-dialog {
+    width: min(1100px, 92vw);
+    max-width: min(1100px, 92vw);
+    max-height: 88vh;
+    padding: 0;
+    /* Both explicit: a modal dialog is fixed to inset 0, and centring is the
+       UA's `margin: auto` — which Tailwind's preflight zeroes out, leaving the
+       dialog pinned to the top-left corner. */
+    inset: 0;
+    margin: auto;
+    border: 1px solid var(--tk-line);
+    border-radius: 16px;
+    background: var(--tk-card);
+    color: var(--tk-fg);
+    overflow: visible;
+  }
+
+  .zoom-dialog::backdrop {
+    background: oklch(0 0 0 / 0.62);
+    backdrop-filter: blur(2px);
+  }
+
+  .zoom-dialog:not([open]) {
+    display: none;
+  }
+
+  .zoom-figure {
+    margin: 0;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 88vh;
+  }
+
+  .zoom-figure img {
+    display: block;
+    min-height: 0;
+    /* auto on both axes so the width/height attributes set on open act as an
+       aspect ratio rather than a fixed box: whichever max- rule bites first
+       drives the other dimension, and wide desktop shots and tall phone ones
+       both land right. */
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    /* Room left for the figure's padding, the gap, and the caption. */
+    max-height: calc(88vh - 96px);
+    /* Whole screenshot, uncropped — the inline thumbnails crop to a fixed
+       ratio, this is the one place the full frame is shown. */
+    object-fit: contain;
+    margin-inline: auto;
+    border-radius: 8px;
+    border: 1px solid var(--tk-line);
+  }
+
+  .zoom-caption {
+    flex: none;
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--tk-muted);
+    text-align: center;
+    padding-inline: 4px;
+  }
+
+  /* Sits on the dialog's corner rather than over the screenshot, so it never
+     covers part of what you opened the dialog to look at. */
+  .zoom-close {
+    position: absolute;
+    top: -14px;
+    right: -14px;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    border: 1px solid var(--tk-line);
+    background: var(--tk-card);
+    color: var(--tk-fg);
+    cursor: pointer;
+    transition: border-color 150ms ease;
+  }
+  .zoom-close:hover {
+    border-color: var(--tk-accent);
+  }
+  .zoom-close svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  /* On a phone the corner button would sit off-screen */
+  @media (max-width: 480px) {
+    .zoom-close {
+      top: 8px;
+      right: 8px;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .zoom-dialog[open] {
+      animation: zoom-in 180ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes zoom-in {
+      from {
+        opacity: 0;
+        scale: 0.97;
+      }
+    }
+  }
+</style>
+
+<script>
+  (function () {
+    const dialog = document.querySelector<HTMLDialogElement>(
+      "[data-zoom-dialog]",
+    );
+    if (!dialog || typeof dialog.showModal !== "function") return;
+
+    const img = dialog.querySelector<HTMLImageElement>("[data-zoom-img]");
+    const caption = dialog.querySelector<HTMLElement>("[data-zoom-caption]");
+    const closeBtn = dialog.querySelector<HTMLButtonElement>("[data-zoom-close]");
+    if (!img || !caption) return;
+
+    // Delegated, so carousel slides that are off-screen at load are covered
+    // too and nothing needs re-binding.
+    document.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      const trigger = target.closest<HTMLElement>("[data-zoom]");
+      if (!trigger) return;
+
+      const full = trigger.dataset.full;
+      if (!full) return;
+
+      event.preventDefault();
+      // Dimensions before src: with both set, the browser knows the aspect
+      // ratio up front and lays the dialog out at its final size instead of
+      // growing into it once the file decodes.
+      const w = Number(trigger.dataset.zoomW);
+      const h = Number(trigger.dataset.zoomH);
+      if (w && h) {
+        img.width = w;
+        img.height = h;
+      } else {
+        img.removeAttribute("width");
+        img.removeAttribute("height");
+      }
+      img.src = full;
+      img.alt = trigger.dataset.zoomAlt || "";
+      caption.textContent = trigger.dataset.zoomAlt || "";
+      dialog.showModal();
+    });
+
+    // Clicking the dialog itself means the padding around the figure — the
+    // image and caption are children, so they never match.
+    dialog.addEventListener("click", (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+
+    closeBtn?.addEventListener("click", () => dialog.close());
+
+    // Drop the src on close so the decoded bitmap is released rather than
+    // held for every screenshot the reader happens to have opened.
+    dialog.addEventListener("close", () => {
+      img.removeAttribute("src");
+      img.alt = "";
+      caption.textContent = "";
+    });
+  })();
+</script>

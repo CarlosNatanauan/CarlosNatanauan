@@ -6,19 +6,27 @@
 export const projects = [
   {
     name: "K & K's Events",
+    // Deliberately short: this card only has to earn the click now that
+    // /kkevents exists. What each admin screen does, and the full stack,
+    // belong there — not here.
     description:
-      "A marketing site and custom headless CMS for an event styling team in Sta. Rosa, Laguna. The owner publishes the gallery, reviews, schedule, and inquiries through a passwordless admin panel — no code, no rebuilds.",
-    tech: ["Astro", "React", "TypeScript", "Express", "PostgreSQL", "Prisma"],
+      "A marketing site and custom CMS for an event styling team in Sta. Rosa, Laguna. The owner runs the whole site herself — no code, no rebuilds.",
+    // One chip per layer — public site, admin panel, API, data. The rest of
+    // the stack (TypeScript, Prisma, Cloudinary, Resend, Playwright) is on
+    // the case study page.
+    tech: ["Astro", "React", "Express", "PostgreSQL"],
     // Website walkthrough clip. Save the ezgif MP4 export to /public with this
     // exact name and it appears automatically — the card falls back to the
     // placeholder until the file exists.
     media: "/kkevents_website_showcase.mp4",
     // Optional still frame shown before the clip plays
     mediaPoster: "/kkevents_website_showcase.jpg",
-    // TODO: add a K & K's Events screenshot to /public and point `image` at it
+    // Only a fallback for the clip above, which is the real media here
     image: "",
-    // Live site only — no repo link for this one.
+    // Live site only — both repos are private.
     live: "https://www.kandkevents.online",
+    // Detail page: src/pages/kkevents.astro
+    caseStudy: "/kkevents",
     featured: true,
   },
 

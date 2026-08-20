@@ -1,0 +1,124 @@
+---
+// src/components/KeyScreenCard.astro — one of the 14 key-screen blocks on the
+// case study: icon + screen name, then the screenshots, then a summary
+// sentence and its bullets.
+//
+// Panel treatment matches the featured project card on the home page minus the
+// border beam — that stays exclusive to the one card it was built for, so it
+// keeps reading as a signature instead of wallpaper.
+import { Image, getImage } from "astro:assets";
+import CaseIcon from "./CaseIcon.astro";
+import ScreenCarousel from "./ScreenCarousel.astro";
+
+interface Shot {
+  src: ImageMetadata;
+  alt: string;
+}
+interface Props {
+  screen: {
+    id: string;
+    name: string;
+    icon: string;
+    images: Shot[];
+    summary: string;
+    bullets: string[];
+    phone?: boolean;
+  };
+}
+const { screen } = Astro.props as Props;
+
+// Phone shots render here rather than through ScreenCarousel, so they need
+// their own enlarged copies for the zoom dialog. They matter more here than
+// anywhere else on the page: at 165px wide nothing in them is legible.
+const zoomed = screen.phone
+  ? await Promise.all(
+      screen.images.map((im) =>
+        getImage({
+          src: im.src,
+          format: "webp",
+          width: Math.min(900, im.src.width),
+          quality: 80,
+        }),
+      ),
+    )
+  : [];
+---
+
+<!-- scroll-mt clears the sticky header: without it every jump from the nav
+     above lands this card's top edge underneath it. -->
+<article
+  id={screen.id}
+  data-reveal
+  class="scroll-mt-20 rounded-[16px] border border-line bg-card p-4 sm:scroll-mt-24 sm:p-6"
+>
+  <header class="mb-4 flex items-center gap-2.5">
+    <span
+      class="flex size-8 shrink-0 items-center justify-center rounded-full border border-line bg-bg text-accent"
+    >
+      <CaseIcon name={screen.icon} />
+    </span>
+    <h3 class="m-0 text-[16px] font-bold tracking-[-0.2px] sm:text-[17px]">
+      {screen.name}
+    </h3>
+  </header>
+
+  {
+    screen.phone ? (
+      /* Tall portrait captures, kept whole — the iOS status bar and Safari
+         URL bar are the evidence that this is a phone browser, not an app. */
+      <div class="mx-auto grid max-w-[520px] grid-cols-3 gap-2.5 sm:gap-4">
+        {screen.images.map((im, i) => (
+          <button
+            type="button"
+            data-zoom
+            data-full={zoomed[i].src}
+            data-zoom-alt={im.alt}
+            data-zoom-w={Math.min(900, im.src.width)}
+            data-zoom-h={Math.round(
+              (im.src.height * Math.min(900, im.src.width)) / im.src.width,
+            )}
+            aria-label={`Enlarge: ${im.alt}`}
+            class="block cursor-zoom-in overflow-hidden rounded-[10px] border border-line bg-bg transition-colors hover:border-accent"
+          >
+            <Image
+              src={im.src}
+              alt={im.alt}
+              widths={[220, 440]}
+              sizes="(min-width: 640px) 165px, 30vw"
+              format="webp"
+              quality={72}
+              loading="lazy"
+              decoding="async"
+              class="block h-auto w-full"
+            />
+          </button>
+        ))}
+      </div>
+    ) : (
+      <ScreenCarousel
+        images={screen.images}
+        label={`${screen.name} screenshots`}
+      />
+    )
+  }
+
+  <p class="mt-5 mb-0 text-[15px] font-semibold leading-[1.6] text-fg">
+    {screen.summary}
+  </p>
+
+  {
+    screen.bullets.length > 0 && (
+      <ul class="mt-2.5 mb-0 flex list-none flex-col gap-1.5 p-0">
+        {screen.bullets.map((b) => (
+          <li class="flex gap-2.5 text-[14px] leading-[1.6] text-muted">
+            <span
+              class="mt-[9px] size-[3px] shrink-0 rounded-full bg-accent"
+              aria-hidden="true"
+            />
+            <span>{b}</span>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+</article>
