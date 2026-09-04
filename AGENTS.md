@@ -15,6 +15,9 @@
 - `public/`: files that must keep a fixed URL — `robots.txt`, favicons, the kkevents clip, `outside/` photos, and `CNAME`.
 - `astro.config.mjs`: canonical site URL, sitemap integration, link prefetching, and the Tailwind Vite plugin.
 
+## Requirements
+- Node 22.12 or newer — Astro 7 will not run on Node 20. CI pins Node 22 in `.github/workflows/deploy.yml`.
+
 ## Common Commands
 - `npm run dev`: start local Astro dev server.
 - `npm run build`: create production build.
