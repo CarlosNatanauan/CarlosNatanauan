@@ -25,9 +25,24 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          # Caches ~/.npm, so the miss path below re-downloads nothing.
+          cache: npm
+
+      # `npm ci` was 210s of a 4-minute pipeline — the build itself is 13s.
+      # The tree only changes when the lockfile does, so key the whole of
+      # node_modules on it and skip the install entirely the rest of the time.
+      # Safe to cache wholesale here because the runner and Node version are
+      # both pinned; bump the key's prefix if either changes.
+      - name: Restore node_modules
+        id: node-modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: node-modules-ubuntu-node20-${{ hashFiles('package-lock.json') }}
 
       - name: Install
-        run: npm ci
+        if: steps.node-modules.outputs.cache-hit != 'true'
+        run: npm ci --prefer-offline --no-audit --fund=false
 
       - name: Build
         run: npm run build
