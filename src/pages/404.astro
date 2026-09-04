@@ -1,0 +1,57 @@
+---
+// src/pages/404.astro — GitHub Pages serves this for any unmatched path.
+// Without it visitors get GitHub's own 404, which drops them off the site
+// entirely instead of back into it.
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const links = [
+  { href: "/#projects", label: "Projects" },
+  { href: "/#experience", label: "Experience" },
+  { href: "/#contact", label: "Contact" },
+];
+---
+
+<BaseLayout
+  title="Page not found — Carlos Natanauan"
+  description="That page does not exist. Head back to the portfolio."
+  navBase="/"
+  personSchema={false}
+  noindex
+>
+  <section
+    class="col flex min-h-[62vh] flex-col items-center justify-center py-16 text-center"
+  >
+    <p
+      class="m-0 mb-3 text-[11px] font-bold uppercase tracking-[0.22em] text-accent"
+    >
+      404
+    </p>
+    <h1
+      class="m-0 mb-4 text-[30px] font-extrabold leading-[1.15] tracking-[-0.5px] sm:text-[38px]"
+    >
+      This page doesn't exist
+    </h1>
+    <p class="m-0 mb-8 max-w-[440px] text-[15.5px] leading-[1.75] text-muted">
+      The link may be out of date, or the address slightly off. Everything is
+      one page over.
+    </p>
+
+    <div class="flex flex-wrap items-center justify-center gap-2.5">
+      <a
+        href="/"
+        class="inline-flex h-10 items-center rounded-lg bg-accent px-5 text-[14px] font-semibold text-white transition-colors hover:bg-accent-hover"
+        >Back to home</a
+      >
+      {
+        links.map((link) => (
+          <a
+            href={link.href}
+            class="inline-flex h-10 items-center rounded-lg border border-line bg-card px-4 text-[14px] font-medium text-muted transition-colors hover:border-accent hover:text-fg"
+          >
+            {link.label}
+          </a>
+        ))
+      }
+    </div>
+  </section>
+</BaseLayout>

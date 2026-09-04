@@ -1,6 +1,25 @@
 ---
 // src/components/ImageSlot.astro
 // Renders an image, or a dashed placeholder when the src is still missing.
+//
+// Project screenshots live in src/assets/projects/ rather than /public so
+// Astro can process them: the data files still name them by path (see
+// projects.js), and the glob below resolves that name to the real asset.
+// Anything it cannot resolve — a /public path, a remote URL — falls through
+// to a plain <img>, unprocessed but not broken.
+import { Image } from "astro:assets";
+
+const assets = import.meta.glob<{ default: ImageMetadata }>(
+  "/src/assets/projects/*.{png,jpg,jpeg,webp,avif}",
+  { eager: true },
+);
+const byFilename = new Map(
+  Object.entries(assets).map(([path, mod]) => [
+    path.slice(path.lastIndexOf("/") + 1),
+    mod.default,
+  ]),
+);
+
 interface Props {
   src?: string;
   alt?: string;
@@ -8,6 +27,12 @@ interface Props {
   radius?: string;
   class?: string;
   loading?: "lazy" | "eager";
+  /**
+   * Rendered width at each breakpoint, so the browser can pick the smallest
+   * usable candidate from the srcset. The default describes the project
+   * cards; the featured card passes its own.
+   */
+  sizes?: string;
 }
 const {
   src,
@@ -16,17 +41,40 @@ const {
   radius = "rounded-[14px]",
   class: className = "",
   loading = "lazy",
+  sizes = "(min-width: 640px) 430px, 90vw",
 } = Astro.props as Props;
+
+const asset = src ? byFilename.get(src.slice(src.lastIndexOf("/") + 1)) : undefined;
+const imgClass = `block h-full w-full object-cover ${radius} ${className}`;
+
+// Never upscale: a source narrower than a candidate would be padded out to a
+// bigger file with no extra detail in it.
+const widths = asset
+  ? [400, 640, 900].filter((w) => w <= asset.width)
+  : [];
+if (asset && widths.length === 0) widths.push(asset.width);
 ---
 
 {
-  src ? (
+  asset ? (
+    <Image
+      src={asset}
+      alt={alt}
+      widths={widths}
+      sizes={sizes}
+      format="webp"
+      quality={78}
+      loading={loading}
+      decoding="async"
+      class={imgClass}
+    />
+  ) : src ? (
     <img
       src={src}
       alt={alt}
       loading={loading}
       decoding="async"
-      class={`block h-full w-full object-cover ${radius} ${className}`}
+      class={imgClass}
     />
   ) : (
     <div

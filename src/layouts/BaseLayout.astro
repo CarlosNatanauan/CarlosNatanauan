@@ -1,6 +1,9 @@
 ---
 import "../styles/global.css";
+import { getImage } from "astro:assets";
 import { profile } from "../data/profile.js";
+import { experience } from "../data/experience.js";
+import { technologies } from "../data/technologies.js";
 import ScrollTop from "../components/ScrollTop.astro";
 
 interface Props {
@@ -16,6 +19,8 @@ interface Props {
   ogType?: string;
   /** Social preview image, relative to the site root */
   ogImage?: string;
+  /** Alt text for that preview. Falls back to the page title. */
+  ogImageAlt?: string;
   /**
    * Pixel size of `ogImage`. Optional, but worth passing: some scrapers will
    * not render a preview on their first fetch without it. Both or neither.
@@ -30,6 +35,9 @@ interface Props {
   twitterCard?: string;
   /** Skip the Person structured data on pages that are not about the person */
   personSchema?: boolean;
+  /** Keep a page out of the index — the 404, and anything else with no
+   *  reason to be a search result. */
+  noindex?: boolean;
   /**
    * Structured data for pages that need their own. Assert only what the page
    * actually says — schema that outruns the page is the machine-readable
@@ -43,17 +51,44 @@ const {
   navBase = "",
   ogType = "profile",
   ogImage = profile.avatar,
+  ogImageAlt,
   ogImageWidth,
   ogImageHeight,
   twitterCard = "summary",
   personSchema: withPersonSchema = true,
+  noindex = false,
   schema,
 } = Astro.props as Props;
 
 const year = new Date().getFullYear();
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
-const ogImageURL = new URL(ogImage, Astro.site);
+
+// The portrait moved into src/assets, so it no longer has a stable public
+// path — resolve it to its built file. JPEG, not WebP: this image exists
+// only for link-preview scrapers, and their WebP support is still uneven.
+const socialAssets = import.meta.glob<{ default: ImageMetadata }>(
+  "/src/assets/profile/*.{png,jpg,jpeg}",
+  { eager: true },
+);
+const ogAsset =
+  socialAssets[`/src/assets/profile/${ogImage.slice(ogImage.lastIndexOf("/") + 1)}`]
+    ?.default;
+const ogGenerated = ogAsset
+  ? await getImage({ src: ogAsset, format: "jpeg", width: 600, quality: 82 })
+  : null;
+const ogImageURL = new URL(ogGenerated?.src ?? ogImage, Astro.site);
+
+// Scrapers are happier with explicit dimensions, and when this layout
+// generated the file it knows them without the caller passing anything.
+const ogWidth = ogImageWidth ?? ogGenerated?.attributes.width;
+const ogHeight = ogImageHeight ?? ogGenerated?.attributes.height;
+
+// Current role, for `worksFor`. The company field carries a location suffix
+// after a bullet ("Creative Outline • Remote (UK)") that is not part of the
+// organisation's name.
+const currentRole = experience.find((job) => job.current);
+const employer = currentRole?.company.split("•")[0].trim();
 
 const personSchemaData = {
   "@context": "https://schema.org",
@@ -64,26 +99,41 @@ const personSchemaData = {
   description,
   image: ogImageURL.toString(),
   url: canonicalURL.toString(),
+  email: profile.links.email.replace(/^mailto:/, "").split("?")[0],
+  address: {
+    "@type": "PostalAddress",
+    addressLocality: profile.address.locality,
+    addressRegion: profile.address.region,
+    addressCountry: profile.address.country,
+  },
+  ...(currentRole && {
+    worksFor: {
+      "@type": "Organization",
+      name: employer,
+      url: currentRole.companyUrl,
+    },
+  }),
+  // Everything already listed on the page's tech section — asserting only
+  // what the page itself backs up.
+  knowsAbout: technologies.flatMap((row) => row.items.map((item) => item.name)),
   sameAs: Object.values(profile.links).filter((link) => link.startsWith("http")),
+};
+
+// One WebSite node per page, so search engines can name the site itself
+// rather than inferring it from the title of whichever page they crawled.
+const siteSchemaData = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: profile.siteName,
+  alternateName: `${profile.fullName} — Portfolio`,
+  url: new URL("/", Astro.site).toString(),
+  inLanguage: "en",
+  author: { "@type": "Person", name: profile.fullName },
 };
 ---
 
 <html lang="en" class="scroll-smooth">
   <head>
-    <!-- Google tag (gtag.js) -->
-    <script
-      is:inline
-      async
-      src="https://www.googletagmanager.com/gtag/js?id=G-ZQW8V8K7VS"></script>
-    <script is:inline>
-      window.dataLayer = window.dataLayer || [];
-      function gtag() {
-        dataLayer.push(arguments);
-      }
-      gtag("js", new Date());
-      gtag("config", "G-ZQW8V8K7VS");
-    </script>
-
     <!-- Theme resolved before first paint. Dark is the default. -->
     <script is:inline>
       (function () {
@@ -98,6 +148,7 @@ const personSchemaData = {
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
     <link rel="canonical" href={canonicalURL} />
     <meta
       name="theme-color"
@@ -112,14 +163,17 @@ const personSchemaData = {
 
     <!-- Open Graph / social + search preview -->
     <meta property="og:type" content={ogType} />
+    <meta property="og:site_name" content={profile.siteName} />
+    <meta property="og:locale" content="en_US" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonicalURL} />
     <meta property="og:image" content={ogImageURL} />
-    {ogImageWidth && ogImageHeight && (
+    <meta property="og:image:alt" content={ogImageAlt ?? title} />
+    {ogWidth && ogHeight && (
       <Fragment>
-        <meta property="og:image:width" content={String(ogImageWidth)} />
-        <meta property="og:image:height" content={String(ogImageHeight)} />
+        <meta property="og:image:width" content={String(ogWidth)} />
+        <meta property="og:image:height" content={String(ogHeight)} />
       </Fragment>
     )}
     {withPersonSchema && (
@@ -134,6 +188,7 @@ const personSchemaData = {
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImageURL} />
+    <meta name="twitter:image:alt" content={ogImageAlt ?? title} />
 
     <!-- Structured data: ties this portrait to "Carlos Natanauan" /
          "Carlos Benedict Natanauan" as one entity for Google -->
@@ -144,6 +199,11 @@ const personSchemaData = {
         set:html={JSON.stringify(personSchemaData)}
       />
     )}
+    <script
+      type="application/ld+json"
+      is:inline
+      set:html={JSON.stringify(siteSchemaData)}
+    />
     {schema && (
       <script
         type="application/ld+json"
@@ -152,17 +212,6 @@ const personSchemaData = {
       />
     )}
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link
-      rel="preconnect"
-      href="https://fonts.gstatic.com"
-      crossorigin
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
-
     <!-- Same portrait as the hero. One image for both themes, so there is no
          theme-swap script here any more. Cropped to the face and downscaled
          to 128px: the browser fetches the whole file to draw a 16px tab
@@ -170,12 +219,6 @@ const personSchemaData = {
     <link id="favicon" rel="icon" type="image/png" href="/favicon.png" />
 
     <title>{title}</title>
-
-    <script
-      is:inline
-      data-goatcounter="https://kuyacarlos.goatcounter.com/count"
-      async
-      src="//gc.zgo.at/count.js"></script>
   </head>
 
   <body class="min-h-screen">
@@ -300,6 +343,53 @@ const personSchemaData = {
     </footer>
 
     <ScrollTop />
+
+    <!-- Analytics, loaded after the page is interactive rather than from
+         <head>. gtag.js alone is ~100KB of third-party JavaScript; fetching
+         it on the critical path competes with the page's own first paint for
+         no benefit, since neither tool needs to run before the content does.
+         Both still record the pageview. -->
+    <script is:inline>
+      (function () {
+        let started = false;
+
+        function load() {
+          if (started) return;
+          started = true;
+
+          // GA4. dataLayer is a queue, so the config calls can be made
+          // before the script that drains them has arrived.
+          window.dataLayer = window.dataLayer || [];
+          window.gtag = function () {
+            window.dataLayer.push(arguments);
+          };
+          window.gtag("js", new Date());
+          window.gtag("config", "G-ZQW8V8K7VS");
+
+          const ga = document.createElement("script");
+          ga.async = true;
+          ga.src = "https://www.googletagmanager.com/gtag/js?id=G-ZQW8V8K7VS";
+          document.head.appendChild(ga);
+
+          // GoatCounter reads the endpoint off its own tag and counts the
+          // pageview as soon as it executes.
+          const gc = document.createElement("script");
+          gc.async = true;
+          gc.dataset.goatcounter = "https://kuyacarlos.goatcounter.com/count";
+          gc.src = "https://gc.zgo.at/count.js";
+          document.head.appendChild(gc);
+        }
+
+        // Idle if the browser offers it, with a timeout so a permanently busy
+        // page still reports; otherwise a beat after load. Either way the
+        // visitor is counted before any realistic bounce.
+        if ("requestIdleCallback" in window) {
+          requestIdleCallback(load, { timeout: 4000 });
+        } else {
+          addEventListener("load", () => setTimeout(load, 1200));
+        }
+      })();
+    </script>
 
     <script is:inline>
       (function () {

@@ -7,6 +7,15 @@ export const profile = {
   verified: true,
   location: "Silang, Cavite, Philippines",
 
+  // Machine-readable form of `location`. Kept as its own field rather than
+  // parsed out of the string above: that one is prose for the page, this one
+  // feeds the Person structured data and wants ISO country codes.
+  address: {
+    locality: "Silang",
+    region: "Cavite",
+    country: "PH",
+  },
+
   // Hero portrait — same photo in both themes
   avatar: "/profiles/carlos_natanauan.png",
 

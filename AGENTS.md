@@ -3,16 +3,17 @@
 ## Project Overview
 - This repo is an Astro 5 portfolio site with Tailwind CSS 4 via the Vite plugin.
 - The site is currently a mostly single-page portfolio rendered from `src/pages/index.astro`.
-- Treat this project as content-driven: most visible updates should come from `src/data/*`, assets in `public/`, and small Astro components in `src/components/`.
+- Treat this project as content-driven: most visible updates should come from `src/data/*`, assets in `src/assets/`, and small Astro components in `src/components/`.
 
 ## Key Structure
 - `src/pages/index.astro`: main landing page that assembles hero, projects, experience, and contact sections.
 - `src/layouts/BaseLayout.astro`: shared shell, header/nav, theme setup, mobile menu, footer, and back-to-top button.
-- `src/components/`: reusable UI pieces such as `ProfileCard`, `ProjectCard`, `ExperienceItem`, `ContactForm`, `AvailabilityBadge`, and `BackToTop`.
+- `src/components/`: reusable UI pieces such as `FeaturedProject`, `ProjectGridCard`, `ExperienceRow`, `ContactForm`, `AvatarFlip`, and `ImageSlot`.
 - `src/data/`: portfolio content sources for profile, projects, and experience.
 - `src/styles/global.css`: Tailwind import plus project-wide custom animations, gradients, and overrides.
-- `public/`: static images, profile variants, animation JSON files, favicon assets, and `CNAME`.
-- `astro.config.mjs`: canonical site URL and Tailwind Vite integration.
+- `src/assets/`: images that go through `astro:assets` — `projects/` (card screenshots), `profile/` (portrait), `kkevents/` (case study).
+- `public/`: files that must keep a fixed URL — `robots.txt`, favicons, the kkevents clip, `outside/` photos, and `CNAME`.
+- `astro.config.mjs`: canonical site URL, sitemap integration, link prefetching, and the Tailwind Vite plugin.
 
 ## Common Commands
 - `npm run dev`: start local Astro dev server.
@@ -31,11 +32,10 @@
 ## Quality Guardrails
 - Accessibility: preserve semantic headings, button labels, link labels, focus states, reduced-motion handling, and image alt text.
 - Responsiveness: verify small-screen layouts first, especially header controls, project cards, experience cards, and the contact form.
-- Performance: keep images optimized, avoid unnecessary client-side JavaScript, and be cautious with new animations or third-party scripts.
+- Performance: render images through `astro:assets` (see `ImageSlot.astro`) rather than dropping them in `public/`, avoid unnecessary client-side JavaScript, and load third-party scripts after first paint — analytics in `BaseLayout.astro` is the pattern to follow.
 - Maintainability: prefer small, localized edits; avoid duplicating section markup when a component or data file can handle the change cleanly.
 
 ## Notable Repo-Specific Observations
 - There are several inline scripts handling theme, mobile menu, typing animation, contact submission, profile image behavior, and back-to-top logic.
-- `ProfileCard.astro` loads `lottie-web` from a CDN at runtime even though the package is also installed locally.
 - Some files show mojibake/encoding artifacts in text content; preserve meaning carefully if cleaning copy in the future.
 - There is no test suite in the repo right now, so future changes should at minimum be verified with `npm run build`.
