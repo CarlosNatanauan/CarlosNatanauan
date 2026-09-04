@@ -22,6 +22,8 @@
 - `npm run dev`: start local Astro dev server.
 - `npm run build`: create production build.
 - `npm run preview`: preview production output locally.
+- `npm run check`: smoke-test `dist/` after a build — canonical URLs, structured data, sitemap contents, image/video dimensions, no published email. CI runs this and fails the deploy on a regression.
+- `npm run og`: regenerate the 1200x630 social card into `src/assets/profile/og-home.jpg`. Run after changing the headline or portrait.
 
 ## Working Rules For Future Codex Edits
 - Preserve the current implementation unless the task explicitly asks for redesign or refactor work.

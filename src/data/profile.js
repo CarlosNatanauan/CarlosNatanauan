@@ -19,6 +19,11 @@ export const profile = {
   // Hero portrait — same photo in both themes
   avatar: "/profiles/carlos_natanauan.png",
 
+  // 1200x630 social preview card. Regenerate with `npm run og` after changing
+  // the headline or the portrait; the script reads both from here and from
+  // the dark theme's tokens.
+  ogImage: "/og-home.jpg",
+
   // Easter egg: flashes over the portrait when the theme switches to light,
   // then fades back. Set to "" to turn it off.
   avatarAlt: "/thorfinn.jpg",

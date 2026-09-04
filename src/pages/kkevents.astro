@@ -161,6 +161,11 @@ const schema = [
         data-case-hero
         src={cs.hero.video}
         poster={cs.hero.poster}
+        {/* Same reserved box as the poster, for the same reason as the
+            featured card on the home page: without it the browser reserves
+            nothing until metadata lands, then reflows. */}
+        width={cs.hero.posterWidth}
+        height={cs.hero.posterHeight}
         autoplay
         muted
         loop

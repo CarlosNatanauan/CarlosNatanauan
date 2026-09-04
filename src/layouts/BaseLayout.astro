@@ -50,7 +50,7 @@ const {
   description = "Software developer focused on mobile app development with Flutter, branching into web with Astro.",
   navBase = "",
   ogType = "profile",
-  ogImage = profile.avatar,
+  ogImage = profile.ogImage,
   ogImageAlt,
   ogImageWidth,
   ogImageHeight,
@@ -71,13 +71,31 @@ const socialAssets = import.meta.glob<{ default: ImageMetadata }>(
   "/src/assets/profile/*.{png,jpg,jpeg}",
   { eager: true },
 );
-const ogAsset =
-  socialAssets[`/src/assets/profile/${ogImage.slice(ogImage.lastIndexOf("/") + 1)}`]
+const resolveProfileAsset = (path: string) =>
+  socialAssets[`/src/assets/profile/${path.slice(path.lastIndexOf("/") + 1)}`]
     ?.default;
+
+const ogAsset = resolveProfileAsset(ogImage);
 const ogGenerated = ogAsset
-  ? await getImage({ src: ogAsset, format: "jpeg", width: 600, quality: 82 })
+  ? await getImage({
+      src: ogAsset,
+      format: "jpeg",
+      // Never upscale, and never exceed what a link preview will render.
+      width: Math.min(1200, ogAsset.width),
+      quality: 86,
+    })
   : null;
 const ogImageURL = new URL(ogGenerated?.src ?? ogImage, Astro.site);
+
+// The Person node wants a picture of the person, not the social banner —
+// they are different images now that the card exists.
+const portraitAsset = resolveProfileAsset(profile.avatar);
+const portraitURL = new URL(
+  portraitAsset
+    ? (await getImage({ src: portraitAsset, format: "jpeg", width: 600, quality: 82 })).src
+    : profile.avatar,
+  Astro.site,
+);
 
 // Scrapers are happier with explicit dimensions, and when this layout
 // generated the file it knows them without the caller passing anything.
@@ -97,7 +115,7 @@ const personSchemaData = {
   alternateName: profile.fullName,
   jobTitle: profile.headline,
   description,
-  image: ogImageURL.toString(),
+  image: portraitURL.toString(),
   url: canonicalURL.toString(),
   ...(profile.links.email && {
     email: profile.links.email.replace(/^mailto:/, "").split("?")[0],

@@ -60,7 +60,8 @@ const projectListSchema = {
 <BaseLayout
   title="Carlos Natanauan — Flutter & Web Developer | Kuya Carlos"
   description={description}
-  ogImageAlt={`Portrait of ${profile.name}`}
+  ogImageAlt={`${profile.fullName}, ${profile.headline} ${profile.headlineMuted}`}
+  twitterCard="summary_large_image"
   schema={projectListSchema}
 >
   <SectionNav />
