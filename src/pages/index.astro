@@ -26,9 +26,43 @@ import { outside } from "../data/outside.js";
 
 const featured = projects.find((p) => p.featured);
 const gridProjects = projects.filter((p) => !p.featured);
+
+const description =
+  "Carlos Natanauan (Kuya Carlos) — software developer in Cavite, Philippines, building production Flutter apps and full-stack web with Astro, Express, and PostgreSQL.";
+
+// The projects the page already lists, in the order it lists them. Each one
+// points at the best destination it actually has — case study, live site,
+// then source — and claims nothing the card does not.
+const projectListSchema = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  name: `Projects by ${profile.fullName}`,
+  numberOfItems: projects.length,
+  itemListOrder: "https://schema.org/ItemListOrderAscending",
+  itemListElement: projects.map((project, i) => {
+    const href = project.caseStudy ?? project.live ?? project.repo ?? project.demo;
+    return {
+      "@type": "ListItem",
+      position: i + 1,
+      item: {
+        "@type": "CreativeWork",
+        name: project.name,
+        description: project.description,
+        ...(href && { url: new URL(href, Astro.site).toString() }),
+        ...(project.tech?.length && { keywords: project.tech.join(", ") }),
+        author: { "@type": "Person", name: profile.fullName },
+      },
+    };
+  }),
+};
 ---
 
-<BaseLayout title="Kuya Carlos — Carlos Natanauan">
+<BaseLayout
+  title="Carlos Natanauan — Flutter & Web Developer | Kuya Carlos"
+  description={description}
+  ogImageAlt={`Portrait of ${profile.name}`}
+  schema={projectListSchema}
+>
   <SectionNav />
 
   <!-- Hero / About -->

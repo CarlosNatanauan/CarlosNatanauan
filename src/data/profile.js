@@ -7,6 +7,15 @@ export const profile = {
   verified: true,
   location: "Silang, Cavite, Philippines",
 
+  // Machine-readable form of `location`. Kept as its own field rather than
+  // parsed out of the string above: that one is prose for the page, this one
+  // feeds the Person structured data and wants ISO country codes.
+  address: {
+    locality: "Silang",
+    region: "Cavite",
+    country: "PH",
+  },
+
   // Hero portrait — same photo in both themes
   avatar: "/profiles/carlos_natanauan.png",
 
@@ -47,6 +56,9 @@ export const profile = {
   links: {
     github: "https://github.com/CarlosNatanauan",
     linkedin: "https://www.linkedin.com/in/carlosnatanauan/",
-    email: "mailto:carlosbenedictn@gmail.com?subject=Hello%20Carlos",
+    // No mailto here on purpose: a raw address in the page HTML is what
+    // address harvesters scrape. The Formspree form in the Contact section is
+    // the way to reach me. Everything that used to render an email link is
+    // guarded on this key, so setting it again brings those links back.
   },
 };

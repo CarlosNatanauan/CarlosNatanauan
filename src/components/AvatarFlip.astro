@@ -10,6 +10,42 @@
 //      semi-transparent.
 //   2. Click / Enter opens a larger preview in a native <dialog>, which
 //      brings Esc-to-close, focus trapping and a backdrop for free.
+import { getImage } from "astro:assets";
+
+// The portrait is the largest thing above the fold, so it is the LCP element
+// on the home page. Served from src/assets rather than /public so it can be
+// resized and re-encoded: the source is ~1124px square, the face renders at
+// 144px, and the modal at 340px.
+const assets = import.meta.glob<{ default: ImageMetadata }>(
+  "/src/assets/profile/*.{png,jpg,jpeg,webp}",
+  { eager: true },
+);
+const byFilename = new Map(
+  Object.entries(assets).map(([path, mod]) => [
+    path.slice(path.lastIndexOf("/") + 1),
+    mod.default,
+  ]),
+);
+
+/**
+ * Two encodings per face: one for the 144px avatar, one for the 340px modal.
+ * The modal cannot reuse the small one — blown up to 340px it is visibly
+ * soft — and the avatar must not reuse the large one, which is the whole
+ * point of the exercise.
+ */
+async function faceOf(path: string | undefined) {
+  const asset = path
+    ? byFilename.get(path.slice(path.lastIndexOf("/") + 1))
+    : undefined;
+  // Unresolved (a /public path or a remote URL): pass it straight through.
+  if (!asset) return { src: path ?? "", zoom: path ?? "" };
+  const [small, large] = await Promise.all([
+    getImage({ src: asset, format: "webp", width: 288, quality: 82 }),
+    getImage({ src: asset, format: "webp", width: 680, quality: 80 }),
+  ]);
+  return { src: small.src, zoom: large.src };
+}
+
 interface Props {
   src: string;
   alt: string;
@@ -17,6 +53,9 @@ interface Props {
   holdMs?: number;
 }
 const { src, alt, altSrc, holdMs = 5000 } = Astro.props as Props;
+
+const front = await faceOf(src);
+const back = altSrc ? await faceOf(altSrc) : null;
 ---
 
 <button
@@ -29,16 +68,19 @@ const { src, alt, altSrc, holdMs = 5000 } = Astro.props as Props;
   <span class="avatar-flip__inner">
     <img
       class="avatar-flip__face"
-      src={src}
+      src={front.src}
+      data-zoom={front.zoom}
       alt={alt}
       width="288"
       height="288"
+      fetchpriority="high"
     />
     {
-      altSrc && (
+      back && (
         <img
           class="avatar-flip__face avatar-flip__back"
-          src={altSrc}
+          src={back.src}
+          data-zoom={back.zoom}
           alt=""
           aria-hidden="true"
           width="288"
@@ -299,7 +341,10 @@ const { src, alt, altSrc, holdMs = 5000 } = Astro.props as Props;
     el.addEventListener("click", () => {
       // Show whichever face is currently visible
       const showingBack = el.classList.contains("is-flipped") && faces[1];
-      modalImg.src = (showingBack ? faces[1] : faces[0]).src;
+      const face = showingBack ? faces[1] : faces[0];
+      // The rendered face is a 288px crop — too soft at the modal's size, so
+      // prefer the larger encoding hung off it.
+      modalImg.src = face.dataset.zoom || face.src;
       modal.showModal();
       document.documentElement.style.overflow = "hidden";
     });
