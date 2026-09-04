@@ -91,6 +91,12 @@ const mediaProps = imageHref
           data-featured-video
           src={videoSrc}
           poster={posterSrc || undefined}
+          {/* Intrinsic size of the poster, and of the clip it fronts. Without
+              these the browser reserves no space until metadata arrives, then
+              reflows — which was the whole of the page's 0.105 CLS on desktop,
+              where this card sits inside the first viewport. */}
+          width="1280"
+          height="688"
           autoplay
           muted
           loop

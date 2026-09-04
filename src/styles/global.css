@@ -21,7 +21,7 @@
   --tk-header: oklch(0.985 0.004 260 / 0.75);
   --tk-fg: oklch(0.18 0.006 260);
   --tk-muted: oklch(0.42 0.01 260);
-  --tk-faint: oklch(0.58 0.01 260);
+  --tk-faint: oklch(0.555 0.01 260); /* AA: 4.55 on bg, 4.75 on card */
   --tk-line: oklch(0 0 0 / 0.09);
   --tk-accent: oklch(0.55 0.16 255);
   --tk-accent-hover: oklch(0.45 0.17 255);
@@ -33,7 +33,7 @@
   --tk-header: oklch(0.16 0.006 260 / 0.75);
   --tk-fg: oklch(0.96 0.004 260);
   --tk-muted: oklch(0.72 0.01 260);
-  --tk-faint: oklch(0.55 0.01 260);
+  --tk-faint: oklch(0.604 0.01 260); /* AA: 5.00 on bg, 4.56 on card */
   --tk-line: oklch(1 0 0 / 0.1);
   --tk-accent: oklch(0.72 0.15 255);
   --tk-accent-hover: oklch(0.8 0.13 255);

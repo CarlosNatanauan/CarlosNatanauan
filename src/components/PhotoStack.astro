@@ -7,6 +7,22 @@
 // transforms) that strands a card whenever a release goes missing. Cycling on
 // click needs no gesture state at all: `data-depth` is the only state, and CSS
 // derives every position from it.
+import { getImage } from "astro:assets";
+
+// Photos live in src/assets/outside/ so they can be re-encoded: the sources
+// are 560px JPEG crops, and these render in a 220px box. Shipping the JPEGs
+// straight from /public made run3 the single heaviest asset on the page.
+const assets = import.meta.glob<{ default: ImageMetadata }>(
+  "/src/assets/outside/*.{png,jpg,jpeg,webp}",
+  { eager: true },
+);
+const byFilename = new Map(
+  Object.entries(assets).map(([path, mod]) => [
+    path.slice(path.lastIndexOf("/") + 1),
+    mod.default,
+  ]),
+);
+
 interface Photo {
   src: string;
   alt?: string;
@@ -16,6 +32,24 @@ interface Props {
   size?: number;
 }
 const { photos, size = 220 } = Astro.props as Props;
+
+// One encoding each, at twice the rendered size for high-DPI screens. A path
+// that does not resolve falls through unprocessed rather than breaking.
+const rendered = await Promise.all(
+  photos.map(async (photo) => {
+    const asset = byFilename.get(
+      photo.src.slice(photo.src.lastIndexOf("/") + 1),
+    );
+    if (!asset) return { src: photo.src, alt: photo.alt ?? "" };
+    const out = await getImage({
+      src: asset,
+      format: "webp",
+      width: size * 2,
+      quality: 80,
+    });
+    return { src: out.src, alt: photo.alt ?? "" };
+  }),
+);
 ---
 
 <div
@@ -27,13 +61,13 @@ const { photos, size = 220 } = Astro.props as Props;
   aria-label={`Photo stack, ${photos.length} photos. Activate to show the next one.`}
 >
   {
-    photos.map((p, i) => (
+    rendered.map((p, i) => (
       <figure class="photo-stack__card" data-depth={i}>
         <img
           src={p.src}
-          alt={p.alt ?? ""}
-          width="560"
-          height="560"
+          alt={p.alt}
+          width={size * 2}
+          height={size * 2}
           loading="lazy"
           decoding="async"
           draggable="false"
