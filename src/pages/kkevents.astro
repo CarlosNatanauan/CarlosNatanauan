@@ -378,7 +378,11 @@ const schema = [
               <span>→</span>
             </span>
           </a>
-          <a href={profile.links.email} class="btn-outline btn-sm">Email</a>
+          {profile.links.email && (
+            <a href={profile.links.email} class="btn-outline btn-sm">
+              Email
+            </a>
+          )}
         </div>
       </div>
     </section>

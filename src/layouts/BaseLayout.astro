@@ -99,7 +99,9 @@ const personSchemaData = {
   description,
   image: ogImageURL.toString(),
   url: canonicalURL.toString(),
-  email: profile.links.email.replace(/^mailto:/, "").split("?")[0],
+  ...(profile.links.email && {
+    email: profile.links.email.replace(/^mailto:/, "").split("?")[0],
+  }),
   address: {
     "@type": "PostalAddress",
     addressLocality: profile.address.locality,
