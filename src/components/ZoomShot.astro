@@ -1,0 +1,56 @@
+---
+// src/components/ZoomShot.astro — one screenshot, shown whole, that opens in
+// the page's ZoomDialog when clicked. For figures that sit outside a
+// ScreenCarousel: before-and-after pairs, share images.
+import { Image, getImage } from "astro:assets";
+
+interface Props {
+  shot: { src: ImageMetadata; alt: string };
+  /** Scopes the zoom dialog's prev/next */
+  group: string;
+  /** Rendered width at each breakpoint, for the srcset */
+  sizes?: string;
+  class?: string;
+}
+const {
+  shot,
+  group,
+  sizes = "(min-width: 640px) 370px, 92vw",
+  class: className = "",
+} = Astro.props as Props;
+
+// Capped at the source width so nothing is upscaled
+const fullWidth = Math.min(1700, shot.src.width);
+const full = await getImage({
+  src: shot.src,
+  format: "webp",
+  width: fullWidth,
+  quality: 80,
+});
+const widths = [400, 800].filter((w) => w <= shot.src.width);
+if (widths.length === 0) widths.push(shot.src.width);
+---
+
+<button
+  type="button"
+  data-zoom
+  data-zoom-group={group}
+  data-full={full.src}
+  data-zoom-alt={shot.alt}
+  data-zoom-w={fullWidth}
+  data-zoom-h={Math.round((shot.src.height * fullWidth) / shot.src.width)}
+  aria-label={`Enlarge: ${shot.alt}`}
+  class={`block w-full cursor-zoom-in overflow-hidden rounded-[10px] border border-line bg-bg transition-colors hover:border-accent ${className}`}
+>
+  <Image
+    src={shot.src}
+    alt={shot.alt}
+    widths={widths}
+    sizes={sizes}
+    format="webp"
+    quality={72}
+    loading="lazy"
+    decoding="async"
+    class="block h-auto w-full"
+  />
+</button>

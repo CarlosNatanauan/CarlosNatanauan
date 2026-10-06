@@ -23,6 +23,7 @@ interface Props {
     summary: string;
     bullets: string[];
     phone?: boolean;
+    aspect?: "wide" | "screen";
   };
 }
 const { screen } = Astro.props as Props;
@@ -100,6 +101,7 @@ const zoomed = screen.phone
         images={screen.images}
         label={`${screen.name} screenshots`}
         group={screen.id}
+        aspect={screen.aspect}
       />
     )
   }

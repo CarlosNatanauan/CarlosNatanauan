@@ -122,6 +122,41 @@ const { name, class: className = "" } = Astro.props as Props;
     )
   }
   {
+    name === "map" && (
+      <Fragment>
+        <path d="M9 4 3 6.5v13.5l6-2.5 6 2.5 6-2.5V4l-6 2.5z" />
+        <path d="M9 4v13.5M15 6.5V20" />
+      </Fragment>
+    )
+  }
+  {
+    name === "search" && (
+      <Fragment>
+        <circle cx="11" cy="11" r="7" />
+        <path d="m20 20-3.8-3.8" />
+      </Fragment>
+    )
+  }
+  {
+    name === "shuffle" && (
+      <Fragment>
+        <path d="M16 3h5v5" />
+        <path d="M4 20 21 3" />
+        <path d="M21 16v5h-5" />
+        <path d="m15 15 6 6M4 4l5 5" />
+      </Fragment>
+    )
+  }
+  {
+    name === "help" && (
+      <Fragment>
+        <circle cx="12" cy="12" r="10" />
+        <path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 2.6-3 4.5" />
+        <path d="M12 17.5h.01" />
+      </Fragment>
+    )
+  }
+  {
     name === "phone" && (
       <Fragment>
         <rect x="6" y="2" width="12" height="20" rx="2.5" />

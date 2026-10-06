@@ -30,6 +30,7 @@ const countOf = (s, re) => (s.match(re) || []).length;
 const PAGES = [
   { file: "index.html", canonical: `${SITE}/`, schema: ["Person", "WebSite", "ItemList"] },
   { file: "kkevents/index.html", canonical: `${SITE}/kkevents/` },
+  { file: "saantayo/index.html", canonical: `${SITE}/saantayo/` },
   { file: "404.html", canonical: `${SITE}/404/`, noindex: true },
 ];
 
@@ -37,6 +38,7 @@ const PAGES = [
 for (const f of [
   "index.html",
   "kkevents/index.html",
+  "saantayo/index.html",
   "404.html",
   "sitemap-index.xml",
   "sitemap-0.xml",
@@ -139,7 +141,7 @@ for (const page of PAGES) {
 // ── sitemap ───────────────────────────────────────────────────
 check("sitemap lists exactly the real pages", () => {
   const locs = [...read("sitemap-0.xml").matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
-  const want = [`${SITE}/`, `${SITE}/kkevents/`];
+  const want = [`${SITE}/`, `${SITE}/kkevents/`, `${SITE}/saantayo/`];
   assert(locs.length === want.length, `expected ${want.length} urls, got ${locs.length}: ${locs}`);
   for (const w of want) assert(locs.includes(w), `missing ${w}`);
   assert(!locs.some((l) => l.includes("404")), "the 404 page must not be in the sitemap");
@@ -157,7 +159,7 @@ check("no email address is published anywhere in the build", () => {
   // "you@email.com" placeholder, and writing the real one into this file to
   // search for it would republish the thing we removed.
   assert(!profile.links.email, "profile.links.email is set again — that publishes a mailto: link");
-  for (const p of ["index.html", "kkevents/index.html", "404.html", "llms.txt"]) {
+  for (const p of ["index.html", "kkevents/index.html", "saantayo/index.html", "404.html", "llms.txt"]) {
     assert(!/mailto:/.test(read(p)), `${p} contains a mailto: link`);
   }
 });

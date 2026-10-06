@@ -19,6 +19,11 @@ interface Project {
   media?: string;
   /** Still frame shown before the clip plays */
   mediaPoster?: string;
+  /** Pixel size of the clip and its poster. Defaults to 1280x688. */
+  mediaWidth?: number;
+  mediaHeight?: number;
+  /** Playback speed for the clip, e.g. 1.25. Defaults to normal speed. */
+  mediaRate?: number;
   live?: string;
   demo?: string;
   repo?: string;
@@ -89,20 +94,21 @@ const mediaProps = imageHref
       videoSrc ? (
         <video
           data-featured-video
+          data-rate={project.mediaRate}
           src={videoSrc}
           poster={posterSrc || undefined}
           {/* Intrinsic size of the poster, and of the clip it fronts. Without
               these the browser reserves no space until metadata arrives, then
               reflows — which was the whole of the page's 0.105 CLS on desktop,
               where this card sits inside the first viewport. */}
-          width="1280"
-          height="688"
+          width={project.mediaWidth ?? 1280}
+          height={project.mediaHeight ?? 688}
           autoplay
           muted
           loop
           playsinline
           preload="metadata"
-          aria-label={`${project.name} website walkthrough`}
+          aria-label={`${project.name} walkthrough`}
           class="block h-auto w-full rounded-[10px] border border-line shadow-[0_8px_24px_rgba(0,0,0,0.16)] transition-transform duration-500 group-hover:scale-[1.03] dark:shadow-[0_12px_32px_rgba(0,0,0,0.55)]"
         />
       ) : (
@@ -473,6 +479,13 @@ const mediaProps = imageHref
       addEventListener("resize", apply, { passive: true });
     }
   })();
+
+  // Play the clip at the speed its project asks for. Both properties: a loop
+  // keeps playbackRate, but a reload falls back to the default one.
+  document.querySelectorAll("[data-featured-video][data-rate]").forEach((v) => {
+    const rate = Number(v.dataset.rate);
+    if (rate > 0) v.defaultPlaybackRate = v.playbackRate = rate;
+  });
 
   // Don't loop an autoplaying clip at people who asked for less motion
   (function () {
