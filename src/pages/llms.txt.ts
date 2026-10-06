@@ -44,6 +44,7 @@ ${bioText}
 
 - [Portfolio home](${url("/")}): bio, projects, experience, tech stack, and contact form.
 - [K & K's Events case study](${url("/kkevents")}): how a marketing site and custom headless CMS were built for an event styling team, screen by screen.
+- [Saan Tayo? case study](${url("/saantayo")}): how a map of all 1,642 Philippine cities and municipalities was tagged by vibe from open data, what the tags agree with, and where they fall short.
 
 ## Projects
 

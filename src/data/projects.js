@@ -5,6 +5,33 @@
 
 export const projects = [
   {
+    name: "Saan Tayo?",
+    // Short on purpose: the card only has to earn the click. The pipeline,
+    // the agreement table and the limits are on /saantayo.
+    description:
+      "An interactive map of all 1,642 Philippine cities and municipalities, each tagged for 13 vibes by a small AI model reading open data. Pick what you want and every town that fits lights up, including the ones you've never heard of.",
+    // One chip per layer — the model that judged the tags (first: testing it
+    // is why the project exists), site, map, data pipeline. The rest of the
+    // stack is on the case study page.
+    tech: ["TypeSafe Jev", "Astro", "MapLibre GL", "Bun"],
+    // A recording of the live build, in /public with its poster.
+    media: "/saantayo_walkthrough.mp4",
+    mediaPoster: "/saantayo_walkthrough.jpg",
+    mediaWidth: 1280,
+    mediaHeight: 720,
+    // Playback speed; 1 is the recorded speed. Keep in step with
+    // `hero.rate` in saantayo.js.
+    mediaRate: 1.25,
+    // Only a fallback for the clip above
+    image: "",
+    // Live site only — the repo is private.
+    live: "https://saantayo.vercel.app",
+    // Detail page: src/pages/saantayo.astro
+    caseStudy: "/saantayo",
+    featured: true,
+  },
+
+  {
     name: "K & K's Events",
     // Deliberately short: this card only has to earn the click now that
     // /kkevents exists. What each admin screen does, and the full stack,
@@ -21,13 +48,13 @@ export const projects = [
     media: "/kkevents_website_showcase.mp4",
     // Optional still frame shown before the clip plays
     mediaPoster: "/kkevents_website_showcase.jpg",
-    // Only a fallback for the clip above, which is the real media here
-    image: "",
+    // What the grid card shows. The clip above only plays when this project
+    // holds the featured slot.
+    image: "/kkevents_website_showcase.jpg",
     // Live site only — both repos are private.
     live: "https://www.kandkevents.online",
     // Detail page: src/pages/kkevents.astro
     caseStudy: "/kkevents",
-    featured: true,
   },
 
   {

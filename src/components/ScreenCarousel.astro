@@ -19,15 +19,23 @@ interface Props {
   group: string;
   /** Tall portrait phone captures get their own sizing */
   phone?: boolean;
+  /**
+   * "screen" for uncropped 1440x900 browser captures, where the bottom edge
+   * (a legend, a call to action) is part of what the shot is showing.
+   */
+  aspect?: "wide" | "screen";
 }
-const { images, label, group, phone = false } = Astro.props as Props;
+const { images, label, group, phone = false, aspect = "wide" } =
+  Astro.props as Props;
 
 // Desktop captures are hand-cropped and vary by up to 19px in width. Pinning
 // one aspect ratio and cropping to it stops the carousel jumping between
 // slides; object-top keeps the app's own header in frame.
 const frame = phone
   ? "aspect-[1284/2778]"
-  : "aspect-[1900/948]";
+  : aspect === "screen"
+    ? "aspect-[16/10]"
+    : "aspect-[1900/948]";
 
 // Held well inside the column rather than filling it. A 1900px-wide admin UI
 // is past reading at any width this page can give it, so the extra pixels only
