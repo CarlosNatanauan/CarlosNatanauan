@@ -516,10 +516,6 @@ export const saantayo = {
       title: "The calls that mattered were mine.",
       body: "I set the rule that a tag must agree at least 85% of the time when it says yes, and kept it even though it means Festivals and Food miss about half the towns, because a wrong tag is worse than a missing one. When I saw that my first version looked almost the same as two other Philippine map sites, I pushed for a full redesign. And when clicking a town zoomed the map in and lost my place, I asked for the map to stay still and move only when it has to.",
     },
-    {
-      title: "One mistake worth telling.",
-      body: "Two sessions were working in the same folder, and one of them switched the folder to the main branch while the other was committing. A change landed on the live site without review. Nothing broke, but the rule that followed held for the rest of the project: one separate working copy for every builder, and nothing pushed to the main branch without my approval.",
-    },
   ],
 
   limits: [
