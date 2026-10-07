@@ -107,7 +107,7 @@ export const saantayo = {
   // Carlos's own reason for the project. What the test showed is stated only
   // as far as the brief's numbers go — no verdict on the model beyond them.
   whyJev:
-    "The project started as a way to test Jev, a small decision model by TypeSafe, on something real. Tagging every town in the country was the test: 1,642 towns, 15 yes-or-no questions each, with a reference set to check the answers against. It did the whole country for about US$0.51, and 12 of the 13 vibes met my 85% bar. Its own “is there enough text?” answer turned out too strict, so plain code makes that call instead.",
+    "The project started as a way to test Jev, a small decision model by TypeSafe, on something real. Tagging every town in the country was the test: 1,642 towns, 15 questions each (a yes-or-no question for each of the 13 vibes, plus “how well known is it?” and “does the text say enough?”), with a reference set to check the answers against. It did the whole country for about US$0.51, and 12 of the 13 vibes met my 85% bar. Its own “is there enough text?” answer turned out too strict, so plain code makes that call instead.",
 
   // Said once, plainly, near the top — so nothing below reads as hand-written
   // when it was not.
@@ -151,7 +151,7 @@ export const saantayo = {
         name: "Judge",
         title: "One yes-or-no question per vibe",
         points: [
-          "Jev, a decision model by TypeSafe, reads the text and answers 15 questions per town.",
+          "Jev, a decision model by TypeSafe, reads the text and answers 15 questions per town: one for each of the 13 vibes, plus “how well known is it?” (1 to 5, shown as “How touristy”) and “does the text say enough?”.",
           "It returns how likely “yes” is. Example: “Does the town have a beach that visitors go to?”",
           "A budget cap in code, and every answer cached: nothing is paid for twice.",
         ],
@@ -383,7 +383,7 @@ export const saantayo = {
     },
     {
       title: "The missing beaches.",
-      body: "587 of 899 coastal towns had no Beach tag, in a country of islands. The cause was not the model: in 98% of those towns the word “beach” appears nowhere in the article text. I tried the map first, but no rule like “OpenStreetMap shows a beach here” reached the 85% bar (the best was 83.3%), so the map stays context only. What worked was a different source of text: the titles and descriptions of each coastal town's photos on Wikimedia Commons, because many beaches are photographed but never written about. Two gates had to pass before I used it. Coastal towns tagged Beach went from 253 to 348, for about 7 US cents.",
+      body: "587 of 899 coastal towns had no Beach tag, in a country of islands. The cause was not the model: in 98% of those towns the word “beach” appears nowhere in the article text. I tried the map first, but no rule like “OpenStreetMap shows a beach here” reached the 85% bar (the best was 83.3%), so the map stays context only. What worked was a different source of text: the titles and descriptions of each coastal town's photos on Wikimedia Commons, because many beaches are photographed but never written about. Those titles and descriptions are used as text to judge Beach; showing the photos themselves as evidence on town pages was switched off (see “Tried and dropped”).Two gates had to pass before I used it. Coastal towns tagged Beach went from 253 to 348, for about 7 US cents.",
     },
     {
       title: "Deciding when to say “not enough info”.",
@@ -525,7 +525,7 @@ export const saantayo = {
     "Several vibes catch fewer than half the reference towns: Festivals 44%, Caves 41%, Cool climate 33%, Countryside 27%.",
     "Map facts come from OpenStreetMap and can be off. Distances are straight lines.",
     "8 towns appear as dots, because no border shape exists for them yet.",
-    "The map home is the slowest page: 76 to 78 on Lighthouse's mobile test, held down by the map itself.",
+    "The map home is the slowest page: 91 to 92 on Lighthouse's mobile test of the live site, held down by the map itself (it takes about 5 s to fill in).",
     "Not tested: Safari, and a full screen-reader pass beyond the TalkBack checks I did myself.",
   ],
 
