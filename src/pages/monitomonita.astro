@@ -218,10 +218,21 @@ const bullet =
     </figure>
 
     <div data-reveal class={`mt-5 ${panelBase} px-4 py-5 sm:px-6`}>
-      <div class="grid grid-cols-2 gap-x-3 gap-y-5 text-center sm:grid-cols-4">
+      {/* One column per stat from `sm`. On phones, two per row, and an odd
+          last one spans the row instead of sitting in half of it. */}
+      <div
+        class="grid grid-cols-2 gap-x-3 gap-y-5 text-center sm:grid-cols-[repeat(var(--stat-cols),minmax(0,1fr))]"
+        style={`--stat-cols: ${cs.stats.length}`}
+      >
         {
-          cs.stats.map((s) => (
-            <div>
+          cs.stats.map((s, i) => (
+            <div
+              class={
+                i === cs.stats.length - 1 && cs.stats.length % 2 === 1
+                  ? "max-sm:col-span-2"
+                  : ""
+              }
+            >
               <div class="text-[20px] font-extrabold tracking-[-0.5px] sm:text-[24px]">
                 {s.value}
               </div>

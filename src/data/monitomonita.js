@@ -74,7 +74,6 @@ export const monitomonita = {
     { value: "No accounts", label: "a name and a 4-digit PIN to join" },
     { value: "233", label: "unit tests, 33 of them for the draw" },
     { value: "98", label: "PageSpeed mobile score on the live landing" },
-    { value: "138", label: "commits, 9 to 21 Nov 2026" },
   ],
 
   summary:
