@@ -38,20 +38,15 @@ export const profile = {
   headline: "Software Developer",
   headlineMuted: "— Mobile & Web",
 
-  // Bio rendered as segments so tech names appear as inline pill tags.
+  // Bio rendered as segments. A segment can also be { tag, icon } to show an
+  // inline tech pill, but the bio deliberately names no tools or projects:
+  // naming a few made them read as the only ones. The Tech I've Used section
+  // and the projects carry the specifics.
   // Client apps are described by category, not name — same framing as the
   // Experience section, since those products aren't mine to publicise.
   bio: [
-    { text: "I'm a software developer building production mobile apps with " },
-    { tag: "Flutter", icon: "flutter" },
     {
-      text: " — three live on the App Store and Play Store, and I maintain them full-time: a social cinema platform, a restaurant reservation app, and a field operations tool that replaced paper forms. Lately I've been expanding into full-stack web development with ",
-    },
-    { tag: "Astro", icon: "astro" },
-    { text: " and " },
-    { tag: "Express", icon: "express" },
-    {
-      text: ", taking projects from design to deployment.",
+      text: "I build mobile and full-stack web apps end to end, from design to deployment, and keep them running in production. I have apps live on the App Store and Play Store, including a social cinema platform, a restaurant reservation app, and a field operations tool that replaced paper forms.",
     },
   ],
 
