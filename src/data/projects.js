@@ -5,6 +5,35 @@
 
 export const projects = [
   {
+    name: "Monito Monita",
+    // The pitch, word for word from the case study handoff. The card only has
+    // to earn the click; the rest is on /monitomonita.
+    description:
+      "The Filipino exchange gift, run from one link: draw names, share wishlists, play the theme weeks and do the reveal at the party. No app, no sign-up.",
+    // One chip per layer: app, language, data, testing. The full stack is on
+    // the case study page.
+    tech: ["Next.js", "TypeScript", "Neon Postgres", "Playwright"],
+    // The 11-second muted loop from the demo video, in /public with its
+    // poster. The MP4 is an H.264 copy for older iPhones; the card lists it
+    // as a second <source> once the file is in /public.
+    media: "/monitomonita_loop.webm",
+    mediaFallback: "/monitomonita_loop.mp4",
+    mediaPoster: "/monitomonita_loop.webp",
+    mediaWidth: 1280,
+    mediaHeight: 720,
+    // What the grid card shows if this project ever leaves the featured slot
+    image: "/monitomonita.webp",
+    // The repo and the one-click demo are linked from the case study: a third
+    // and fourth button would not fit the card's single row on a phone.
+    live: "https://monitomonita-ph.vercel.app",
+    // The 51-second demo. Adds a Watch button to the featured card.
+    video: "https://youtu.be/DBNKbfwfE50",
+    // Detail page: src/pages/monitomonita.astro
+    caseStudy: "/monitomonita",
+    featured: true,
+  },
+
+  {
     name: "Saan Tayo?",
     // Short on purpose: the card only has to earn the click. The pipeline,
     // the agreement table and the limits are on /saantayo.
@@ -22,13 +51,13 @@ export const projects = [
     // Playback speed; 1 is the recorded speed. Keep in step with
     // `hero.rate` in saantayo.js.
     mediaRate: 1.25,
-    // Only a fallback for the clip above
-    image: "",
+    // What the grid card shows: the clip's poster frame. The clip above only
+    // plays when this project holds the featured slot.
+    image: "/saantayo_walkthrough.jpg",
     // Live site only — the repo is private.
     live: "https://saantayo.vercel.app",
     // Detail page: src/pages/saantayo.astro
     caseStudy: "/saantayo",
-    featured: true,
   },
 
   {

@@ -1,0 +1,111 @@
+---
+// src/components/YouTubeFacade.astro — a YouTube video that costs nothing
+// until it is pressed.
+//
+// The page ships one poster image and a link. YouTube's player is several
+// hundred KB of script and a handful of third-party requests, so it is only
+// created on click, from youtube-nocookie.com, and starts playing at once.
+//
+// Without JavaScript, or on a modified click (new tab, etc.), the link simply
+// opens the video on YouTube.
+import { Image } from "astro:assets";
+
+interface Props {
+  /** YouTube video id, e.g. "DBNKbfwfE50" */
+  id: string;
+  poster: ImageMetadata;
+  /** Alt text for the poster; it also names the link */
+  alt: string;
+  /** Accessible title for the player once it loads */
+  title: string;
+  /** Rendered width at each breakpoint, for the poster's srcset */
+  sizes?: string;
+}
+const {
+  id,
+  poster,
+  alt,
+  title,
+  sizes = "(min-width: 860px) 764px, calc(100vw - 40px)",
+} = Astro.props as Props;
+
+const widths = [640, 960, 1280].filter((w) => w <= poster.width);
+if (widths.length === 0) widths.push(poster.width);
+---
+
+<div
+  class="relative aspect-video overflow-hidden rounded-[16px] border border-line bg-bg"
+>
+  <a
+    href={`https://youtu.be/${id}`}
+    target="_blank"
+    rel="noopener noreferrer"
+    data-yt={id}
+    data-yt-title={title}
+    class="group block h-full w-full"
+  >
+    <!-- Eager and high priority: this poster is the page's largest paint. -->
+    <Image
+      src={poster}
+      alt={alt}
+      widths={widths}
+      sizes={sizes}
+      format="webp"
+      quality={78}
+      loading="eager"
+      fetchpriority="high"
+      decoding="async"
+      class="block h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+    />
+  </a>
+</div>
+
+<script is:inline>
+  (function () {
+    document.querySelectorAll("[data-yt]").forEach((link) => {
+      // Open the connections as soon as someone reaches for the poster, so
+      // the player is already on its way by the time the click lands.
+      let warmed = false;
+      const warm = () => {
+        if (warmed) return;
+        warmed = true;
+        // The embed page, then the player script it pulls from youtube.com
+        [
+          "https://www.youtube-nocookie.com",
+          "https://www.youtube.com",
+        ].forEach((href) => {
+          const l = document.createElement("link");
+          l.rel = "preconnect";
+          l.href = href;
+          document.head.append(l);
+        });
+      };
+      link.addEventListener("pointerenter", warm, { once: true });
+      link.addEventListener("focus", warm, { once: true });
+      link.addEventListener("touchstart", warm, { once: true, passive: true });
+
+      link.addEventListener("click", (e) => {
+        // Let new-tab and new-window clicks go to YouTube as normal
+        if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey)
+          return;
+        e.preventDefault();
+
+        const frame = document.createElement("iframe");
+        frame.src =
+          "https://www.youtube-nocookie.com/embed/" +
+          encodeURIComponent(link.dataset.yt) +
+          "?autoplay=1&rel=0&playsinline=1";
+        frame.title = link.dataset.ytTitle || "YouTube video";
+        frame.allow =
+          "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+        frame.allowFullscreen = true;
+        // YouTube refuses to play an embed that sends no referrer at all
+        frame.referrerPolicy = "strict-origin-when-cross-origin";
+        frame.className = "absolute inset-0 h-full w-full border-0";
+
+        link.replaceWith(frame);
+        frame.focus();
+      });
+    });
+  })();
+</script>

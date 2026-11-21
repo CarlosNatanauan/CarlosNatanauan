@@ -17,6 +17,12 @@ interface Project {
   image?: string;
   /** Screencast (.mp4 / .webm). Falls back to `image` until the file exists. */
   media?: string;
+  /**
+   * A second encoding of the same clip, listed after `media` so a browser
+   * that cannot play the first one falls through to it — e.g. an H.264 MP4
+   * behind a WebM, for older iPhones. Skipped until the file exists.
+   */
+  mediaFallback?: string;
   /** Still frame shown before the clip plays */
   mediaPoster?: string;
   /** Pixel size of the clip and its poster. Defaults to 1280x688. */
@@ -31,12 +37,20 @@ interface Project {
   repoLabel?: string;
   /** Internal detail page. When set, it becomes the card's primary action. */
   caseStudy?: string;
+  /** A video about the project (e.g. a YouTube link). Adds a Watch button. */
+  video?: string;
 }
 const { project } = Astro.props as { project: Project };
 
 // Flat stack row — labelled groups are flattened if a project still has them
 const tags: string[] =
   project.tech ?? project.tagGroups?.flatMap((g) => g.tags) ?? [];
+
+// With a Watch button there are three actions beside the clip, in a 358px
+// column on a laptop. They fit on one line only with slightly less side
+// padding (16px, from 20px) and "Live Site" without "Visit".
+const hasWatch = !!project.video;
+const rowPad = hasWatch ? "sm:px-4" : "";
 
 const missingLinks =
   !project.live && !project.demo && !project.repo && !project.caseStudy;
@@ -58,6 +72,21 @@ function existsInPublic(src?: string) {
 
 const videoSrc = existsInPublic(project.media) ? project.media : "";
 const posterSrc = existsInPublic(project.mediaPoster) ? project.mediaPoster : "";
+
+// One <source> per encoding that is actually present, in preference order.
+// The type lets a browser skip a format it can't play without fetching it.
+const VIDEO_TYPES: Record<string, string> = {
+  webm: "video/webm",
+  mp4: "video/mp4",
+};
+const videoSources = videoSrc
+  ? [videoSrc, project.mediaFallback]
+      .filter((src): src is string => !!src && existsInPublic(src))
+      .map((src) => ({
+        src,
+        type: VIDEO_TYPES[src.slice(src.lastIndexOf(".") + 1).toLowerCase()],
+      }))
+  : [];
 // Internal links stay in the tab; only outbound ones open a new one
 const mediaIsInternal = imageHref.startsWith("/");
 const MediaTag = imageHref ? "a" : "div";
@@ -95,7 +124,6 @@ const mediaProps = imageHref
         <video
           data-featured-video
           data-rate={project.mediaRate}
-          src={videoSrc}
           poster={posterSrc || undefined}
           {/* Intrinsic size of the poster, and of the clip it fronts. Without
               these the browser reserves no space until metadata arrives, then
@@ -110,7 +138,11 @@ const mediaProps = imageHref
           preload="metadata"
           aria-label={`${project.name} walkthrough`}
           class="block h-auto w-full rounded-[10px] border border-line shadow-[0_8px_24px_rgba(0,0,0,0.16)] transition-transform duration-500 group-hover:scale-[1.03] dark:shadow-[0_12px_32px_rgba(0,0,0,0.55)]"
-        />
+        >
+          {videoSources.map((s) => (
+            <source src={s.src} type={s.type} />
+          ))}
+        </video>
       ) : (
         <div class="aspect-[80/43] w-full">
           <ImageSlot
@@ -175,14 +207,17 @@ const mediaProps = imageHref
           {project.caseStudy && (
             <a
               href={project.caseStudy}
-              class="btn-hover w-fit whitespace-nowrap max-sm:px-3.5 max-sm:text-[13px]"
+              class={`btn-hover w-fit whitespace-nowrap max-sm:px-3.5 max-sm:text-[13px] ${rowPad}`}
             >
+              {/* "Case study", not "Read the case study": short enough that
+                  a third button (Watch) still fits the row, on a 360px phone
+                  and beside the clip on a laptop. */}
               <span class="btn-hover-idle">
                 <span class="btn-hover-dot" aria-hidden="true"></span>
-                <span class="btn-hover-idle-text">Read the case study</span>
+                <span class="btn-hover-idle-text">Case study</span>
               </span>
               <span class="btn-hover-reveal" aria-hidden="true">
-                <span>Read the case study</span>
+                <span>Case study</span>
                 <span>→</span>
               </span>
             </a>
@@ -193,14 +228,21 @@ const mediaProps = imageHref
                 href={project.live}
                 target="_blank"
                 rel="noopener noreferrer"
-                class="btn-outline btn-sm whitespace-nowrap max-sm:px-3.5 max-sm:text-[13px]"
+                class={`btn-outline btn-sm whitespace-nowrap max-sm:px-3.5 max-sm:text-[13px] ${rowPad}`}
               >
                 {/* "Visit" is the widest word here and the least informative
                     one. Dropping it on phones is what buys the pair its single
                     line, and it costs nothing: the case study button beside it
-                    already establishes that these are both places to go. */}
-                <span class="sm:hidden">Live Site</span>
-                <span class="max-sm:hidden">Visit Live Site</span>
+                    already establishes that these are both places to go. With
+                    a Watch button too, it is dropped on every screen size. */}
+                {hasWatch ? (
+                  "Live Site"
+                ) : (
+                  <>
+                    <span class="sm:hidden">Live Site</span>
+                    <span class="max-sm:hidden">Visit Live Site</span>
+                  </>
+                )}
               </a>
             ) : (
               <a
@@ -219,6 +261,32 @@ const mediaProps = imageHref
                 </span>
               </a>
             ))}
+          {project.video && (
+            <a
+              href={project.video}
+              target="_blank"
+              rel="noopener noreferrer"
+              class={`btn-outline btn-sm inline-flex items-center gap-2 self-stretch whitespace-nowrap max-sm:px-3.5 ${rowPad}`}
+            >
+              {/* YouTube's own mark, in its own red: the one colour on the
+                  button, so the video reads as a video before anyone taps.
+                  On phones the mark stands alone; the label stays for
+                  screen readers. */}
+              <svg
+                class="size-[18px] shrink-0"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  fill="#FF0000"
+                  d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31.4 31.4 0 0 0 0 12a31.4 31.4 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31.4 31.4 0 0 0 24 12a31.4 31.4 0 0 0-.5-5.8z"
+                />
+                <path fill="#FFFFFF" d="M9.6 15.6 15.8 12 9.6 8.4z" />
+              </svg>
+              <span class="max-sm:sr-only">Watch</span>
+              <span class="sr-only"> the demo on YouTube (opens in a new tab)</span>
+            </a>
+          )}
           {project.demo && (
             <a
               href={project.demo}

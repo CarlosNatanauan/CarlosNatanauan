@@ -1,0 +1,625 @@
+---
+// src/pages/monitomonita.astro — Monito Monita case study
+//
+// All copy lives in src/data/monitomonita.js — read the note at the top of
+// that file before editing any of it. Layout follows saantayo.astro: same
+// panels, labels and zoomable screenshots, nothing restyled.
+import fs from "node:fs";
+import path from "node:path";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import CaptionedShot from "../components/CaptionedShot.astro";
+import YouTubeFacade from "../components/YouTubeFacade.astro";
+import ZoomDialog from "../components/ZoomDialog.astro";
+import ZoomShot from "../components/ZoomShot.astro";
+import { monitomonita as cs } from "../data/monitomonita.js";
+import { profile } from "../data/profile.js";
+
+const description =
+  "How Monito Monita runs a Filipino Christmas gift exchange from one link: the design process, the draw, keeping pairs secret without accounts, and the testing behind it.";
+
+const sectionLabel =
+  "mb-5 text-[11px] font-bold uppercase tracking-[0.22em] text-faint";
+const panelLabel =
+  "mb-3 text-[11px] font-bold uppercase tracking-[0.22em] text-accent";
+const subLabel =
+  "mb-3.5 text-[11px] font-bold uppercase tracking-[0.22em] text-faint";
+
+const panelBase = "rounded-[16px] border border-line bg-card";
+const panel = `${panelBase} p-5 sm:p-6`;
+
+// Shared srcset presets. Full width is the 764px text column; the 2x sources
+// are 2400–2732px wide, so the largest candidate stays sharp on a 2x laptop.
+const FULL = {
+  sizes: "(min-width: 860px) 716px, calc(100vw - 80px)",
+  widths: [800, 1200, 1600],
+};
+const HALF = {
+  sizes: "(min-width: 640px) 370px, calc(100vw - 40px)",
+  widths: [600, 800, 1200],
+};
+
+// Use the case study's own 1200×630 preview once it is in /public; until
+// then, the demo loop's poster frame.
+const og = fs.existsSync(path.join(process.cwd(), "public", cs.og.image.slice(1)))
+  ? cs.og
+  : cs.ogFallback;
+
+const designPairs = cs.design.pairs.filter((p) => p.before && p.after);
+
+// Structured data. Everything below is already stated on the page.
+const pageURL = new URL(Astro.url.pathname, Astro.site).toString();
+const schema = [
+  {
+    "@context": "https://schema.org",
+    "@type": "CreativeWork",
+    name: `${cs.title} — Case Study`,
+    description,
+    url: pageURL,
+    image: new URL(og.image, Astro.site).toString(),
+    inLanguage: "en",
+    keywords: cs.stack.chips.join(", "),
+    author: {
+      "@type": "Person",
+      name: profile.fullName,
+      url: new URL("/", Astro.site).toString(),
+    },
+    about: {
+      "@type": "WebApplication",
+      name: cs.title,
+      url: cs.live,
+      applicationCategory: "LifestyleApplication",
+      operatingSystem: "Any (web browser)",
+    },
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Projects",
+        item: new URL("/#projects", Astro.site).toString(),
+      },
+      { "@type": "ListItem", position: 2, name: cs.title },
+    ],
+  },
+];
+
+const bullet =
+  "mt-[9px] size-[3px] shrink-0 rounded-full bg-accent";
+---
+
+<BaseLayout
+  title="Monito Monita — Case Study | Carlos Natanauan"
+  description={description}
+  navBase="/"
+  ogType="article"
+  ogImage={og.image}
+  ogImageAlt={og.alt}
+  ogImageWidth={og.width}
+  ogImageHeight={og.height}
+  twitterCard="summary_large_image"
+  personSchema={false}
+  schema={schema}
+>
+  <!-- Set before the content below is parsed — see saantayo.astro. -->
+  <script is:inline>
+    if ("IntersectionObserver" in window) {
+      document.documentElement.classList.add("reveal-ready");
+    }
+  </script>
+
+  <div class="read-progress" aria-hidden="true"></div>
+
+  <article class="col pt-6 pb-16 sm:pt-9 sm:pb-20">
+    <!-- ── Header ─────────────────────────────────────────────── -->
+    <a
+      href="/#projects"
+      class="inline-flex items-center gap-1.5 text-[13.5px] font-medium text-muted transition-colors hover:text-accent-hover"
+    >
+      <svg
+        class="h-3.5 w-3.5"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="m12 19-7-7 7-7"></path>
+        <path d="M19 12H5"></path>
+      </svg>
+      Back to projects
+    </a>
+
+    <div
+      data-reveal
+      class="mt-7 mb-2.5 text-[11px] font-bold uppercase tracking-[0.22em] text-accent"
+    >
+      {cs.eyebrow}
+    </div>
+
+    <h1
+      data-reveal
+      style="transition-delay: 70ms"
+      class="m-0 mb-4 text-[28px] font-extrabold leading-[1.18] tracking-[-0.8px] sm:text-[38px]"
+    >
+      {cs.title}
+    </h1>
+
+    <p
+      data-reveal
+      style="transition-delay: 140ms"
+      class="m-0 max-w-[660px] text-[15.5px] leading-[1.75] text-muted sm:text-[16.5px]"
+    >
+      {cs.lead}
+    </p>
+
+    <div
+      data-reveal
+      style="transition-delay: 180ms"
+      class="mt-6 flex flex-wrap items-center gap-2.5 sm:gap-3"
+    >
+      <a
+        href={cs.demo}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="btn-hover w-fit whitespace-nowrap"
+      >
+        <span class="btn-hover-idle">
+          <span class="btn-hover-dot" aria-hidden="true"></span>
+          <span class="btn-hover-idle-text">Try the demo</span>
+        </span>
+        <span class="btn-hover-reveal" aria-hidden="true">
+          <span>Try the demo</span>
+          <span>→</span>
+        </span>
+      </a>
+      <a
+        href={cs.live}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="btn-outline btn-sm whitespace-nowrap"
+      >
+        Live site
+      </a>
+      <a
+        href={cs.repo}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="btn-outline btn-sm whitespace-nowrap"
+      >
+        Code
+      </a>
+    </div>
+    <p
+      data-reveal
+      style="transition-delay: 200ms"
+      class="m-0 mt-3 text-[12.5px] text-faint"
+    >
+      The demo is one click, no sign-up.
+    </p>
+
+    <!-- ── Hero: the demo video ───────────────────────────────────
+         Deliberately not data-reveal: the poster is the page's largest
+         paint, and holding it at opacity 0 for the fade would delay it. -->
+    <figure class="m-0 mt-8">
+      <YouTubeFacade
+        id={cs.hero.youtubeId}
+        poster={cs.hero.poster.src}
+        alt={cs.hero.poster.alt}
+        title="Monito Monita demo video"
+      />
+      <figcaption class="mt-2.5 text-[11.5px] leading-[1.6] text-faint">
+        {cs.hero.poster.caption}
+      </figcaption>
+    </figure>
+
+    <div data-reveal class={`mt-5 ${panelBase} px-4 py-5 sm:px-6`}>
+      <div class="grid grid-cols-2 gap-x-3 gap-y-5 text-center sm:grid-cols-4">
+        {
+          cs.stats.map((s) => (
+            <div>
+              <div class="text-[20px] font-extrabold tracking-[-0.5px] sm:text-[24px]">
+                {s.value}
+              </div>
+              <div class="mt-1 text-[12px] leading-tight text-faint">
+                {s.label}
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+
+    <!-- ── What it is / problem / role ────────────────────────── -->
+    <section data-reveal class={`mt-12 ${panel}`}>
+      <h2 class={panelLabel}>What it is</h2>
+      <p class="m-0 text-[14.5px] leading-[1.7] text-muted">{cs.summary}</p>
+    </section>
+
+    <div class="mt-4 grid gap-4 sm:grid-cols-2">
+      {
+        [cs.problem, cs.role].map((block, i) => (
+          <section
+            data-reveal
+            style={`transition-delay: ${i * 90}ms`}
+            class={panel}
+          >
+            <h2 class={panelLabel}>{block.label}</h2>
+            {block.body.map((para, j) => (
+              <p
+                class={`m-0 text-[14.5px] leading-[1.7] text-muted ${j > 0 ? "mt-3" : ""}`}
+              >
+                {para}
+              </p>
+            ))}
+          </section>
+        ))
+      }
+    </div>
+
+    <!-- ── Design process ─────────────────────────────────────── -->
+    <section class="mt-14">
+      <h2 data-reveal class={sectionLabel}>Design process</h2>
+
+      <ol class="m-0 flex list-none flex-col gap-3 p-0">
+        {
+          cs.design.steps.map((step, i) => (
+            <li data-reveal class={panel}>
+              <div class="mb-2.5 flex items-baseline gap-3">
+                <span class="text-[11px] font-bold tabular-nums tracking-[0.14em] text-accent">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <h3 class="m-0 text-[16px] font-bold tracking-[-0.2px] sm:text-[17px]">
+                  {step.title}
+                </h3>
+              </div>
+              <p class="m-0 text-[14.5px] leading-[1.7] text-muted">
+                {step.body}
+              </p>
+
+              {/* The rules and the signature moments belong to the direction
+                  that was picked, so they sit inside step 2. */}
+              {i === 1 && (
+                <div class="mt-5 grid gap-5 border-t border-line pt-5 sm:grid-cols-[1fr_1.6fr]">
+                  <div>
+                    <h4 class={subLabel}>Three rules</h4>
+                    <ol class="m-0 flex list-none flex-col gap-1.5 p-0">
+                      {cs.design.rules.map((rule) => (
+                        <li class="flex gap-2.5 text-[14px] font-semibold leading-[1.6] text-fg">
+                          <span class={bullet} aria-hidden="true" />
+                          <span>{rule}</span>
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                  <div>
+                    <h4 class={subLabel}>Four signature moments</h4>
+                    <ol class="m-0 flex list-none flex-col gap-1.5 p-0">
+                      {cs.design.moments.map((moment) => (
+                        <li class="flex gap-2.5 text-[14px] leading-[1.6] text-muted">
+                          <span class={bullet} aria-hidden="true" />
+                          <span>{moment}</span>
+                        </li>
+                      ))}
+                    </ol>
+                    <p class="m-0 mt-2.5 text-[13px] leading-[1.6] text-faint">
+                      Everything else moves only when you touch it.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </li>
+          ))
+        }
+      </ol>
+
+      {/* Before/after: rendered once the old screenshots are in the data
+          file (design.pairs). Same markup as the Saan Tayo? redesign. */}
+      {
+        designPairs.length > 0 && (
+          <div class="mt-4 flex flex-col gap-4">
+            {designPairs.map((pair, i) => (
+              <div data-reveal class={panel}>
+                <h3 class="m-0 mb-4 text-[15px] font-bold tracking-[-0.2px]">
+                  {pair.label}
+                </h3>
+                <div
+                  class={`grid grid-cols-2 gap-3 sm:gap-4 ${pair.phone ? "mx-auto max-w-[420px]" : ""}`}
+                >
+                  {[
+                    { tag: "Before", shot: pair.before },
+                    { tag: "After", shot: pair.after },
+                  ].map((side) => (
+                    <figure class="m-0">
+                      <ZoomShot
+                        shot={side.shot}
+                        group={`redesign-${i}`}
+                        sizes={
+                          pair.phone
+                            ? "(min-width: 640px) 200px, 42vw"
+                            : "(min-width: 640px) 330px, 42vw"
+                        }
+                        widths={pair.phone ? [400, 600] : [600, 800, 1200]}
+                      />
+                      <figcaption class="mt-2 text-[11px] font-bold uppercase tracking-[0.18em] text-faint">
+                        {side.tag}
+                      </figcaption>
+                    </figure>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )
+      }
+
+      <div data-reveal class={`mt-4 ${panel}`}>
+        <h3 class={subLabel}>Where it ended up</h3>
+        <CaptionedShot shot={cs.design.laptop} group="design" {...FULL} />
+        <div class="mx-auto mt-6 grid max-w-[440px] grid-cols-2 gap-3 sm:gap-4">
+          {
+            cs.design.phones.map((s) => (
+              <CaptionedShot
+                shot={s}
+                group="design"
+                sizes="(min-width: 640px) 210px, 40vw"
+                widths={[400, 600]}
+              />
+            ))
+          }
+        </div>
+
+        <div class="my-6 h-px bg-line"></div>
+
+        <h3 class={subLabel}>Built for budget phones</h3>
+        <p class="m-0 text-[14.5px] leading-[1.7] text-muted">
+          {cs.design.mobile}
+        </p>
+      </div>
+    </section>
+
+    <!-- ── Engineering ────────────────────────────────────────── -->
+    <section class="mt-14">
+      <h2 data-reveal class={sectionLabel}>Engineering highlights</h2>
+      <p data-reveal class="m-0 -mt-2 mb-5 text-[12.5px] text-faint">
+        Numbers as of 21 November 2026.
+      </p>
+
+      <div class="grid gap-4 sm:grid-cols-2">
+        {
+          cs.engineering.map((card) => (
+            <div data-reveal class={panel}>
+              <h3 class="m-0 mb-3 text-[16px] font-bold tracking-[-0.2px]">
+                {card.title}
+              </h3>
+              <ul class="m-0 flex list-none flex-col gap-1.5 p-0">
+                {card.points.map((point) => (
+                  <li class="flex gap-2.5 text-[14px] leading-[1.6] text-muted">
+                    <span class={bullet} aria-hidden="true" />
+                    <span>{point}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+      </div>
+
+      <div data-reveal class={`mt-4 ${panel}`}>
+        <CaptionedShot shot={cs.organizer} group="engineering" {...FULL} />
+      </div>
+    </section>
+
+    <!-- ── Testing ────────────────────────────────────────────── -->
+    <section class="mt-14">
+      <h2 data-reveal class={sectionLabel}>Testing</h2>
+
+      <div data-reveal class={panel}>
+        <ul class="m-0 flex list-none flex-col gap-2.5 p-0">
+          {
+            cs.testing.suites.map((item) => (
+              <li class="flex gap-2.5 text-[14px] leading-[1.6] text-muted">
+                <span class={bullet} aria-hidden="true" />
+                <span>{item}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <div
+        data-reveal
+        class="mt-4 rounded-[16px] border border-accent/25 bg-accent/[0.045] p-5 sm:p-7"
+      >
+        <h3 class="m-0 mb-2.5 text-[16.5px] font-extrabold leading-[1.35] tracking-[-0.3px] sm:text-[18px]">
+          {cs.testing.audit.title}
+        </h3>
+        <div class="grid gap-6 sm:grid-cols-[1fr_190px] sm:items-start">
+          <div>
+            <p class="m-0 mb-3 text-[14.5px] leading-[1.7] text-muted">
+              {cs.testing.audit.intro}
+            </p>
+            <ul class="m-0 flex list-none flex-col gap-2 p-0">
+              {
+                cs.testing.audit.bugs.map((bug) => (
+                  <li class="flex gap-2.5 text-[14px] leading-[1.6] text-muted">
+                    <span class={bullet} aria-hidden="true" />
+                    <span>{bug}</span>
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+          <CaptionedShot
+            shot={cs.testing.audit.shot}
+            group="testing"
+            class="mx-auto w-full max-w-[220px]"
+            sizes="(min-width: 640px) 190px, 220px"
+            widths={[400, 600]}
+          />
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Screenshots ────────────────────────────────────────────
+         Phones: a swipeable row on small screens (three portrait shots side
+         by side at 360px would be 100px wide each), a plain row of three
+         from `sm`. The finale gets the full column. -->
+    <section class="mt-14">
+      <h2 data-reveal class={sectionLabel}>Screenshots</h2>
+
+      <div
+        data-reveal
+        class="-mx-5 flex snap-x snap-mandatory scroll-px-5 gap-3 overflow-x-auto px-5 pb-2 sm:mx-0 sm:grid sm:grid-cols-3 sm:gap-4 sm:overflow-visible sm:scroll-px-0 sm:px-0 sm:pb-0"
+      >
+        {
+          cs.gallery.phones.map((s) => (
+            <CaptionedShot
+              shot={s}
+              group="gallery"
+              class="w-[62%] shrink-0 snap-start sm:w-auto"
+              sizes="(min-width: 640px) 240px, 62vw"
+              widths={[400, 780]}
+            />
+          ))
+        }
+      </div>
+
+      <div class="mt-6 grid gap-5 sm:grid-cols-2 sm:gap-4">
+        {
+          cs.gallery.reveal.map((s) => (
+            <div data-reveal>
+              <CaptionedShot shot={s} group="gallery" {...HALF} />
+            </div>
+          ))
+        }
+      </div>
+
+      <div data-reveal class="mt-6">
+        <CaptionedShot
+          shot={cs.gallery.finale}
+          group="gallery"
+          sizes="(min-width: 860px) 764px, calc(100vw - 40px)"
+          widths={[800, 1200, 1600]}
+        />
+      </div>
+    </section>
+
+    <!-- ── Tech stack ─────────────────────────────────────────── -->
+    <section class="mt-14">
+      <h2 data-reveal class={sectionLabel}>Tech stack</h2>
+      <div data-reveal class={panel}>
+        <div class="flex flex-wrap gap-2">
+          {cs.stack.chips.map((chip) => <span class="tag">{chip}</span>)}
+        </div>
+
+        <p class="m-0 mt-5 text-[14.5px] leading-[1.7] text-muted">
+          {cs.stack.body}
+        </p>
+        <p class="m-0 mt-3 text-[14.5px] leading-[1.7] text-muted">
+          {cs.stack.video}
+        </p>
+
+        <div class="my-5 h-px bg-line"></div>
+
+        <div class="flex flex-wrap items-center gap-x-3 gap-y-2 text-[13px] leading-[1.5]">
+          {
+            cs.stack.facts.map((fact, i) => (
+              <Fragment>
+                {i > 0 && (
+                  <span class="text-faint" aria-hidden="true">
+                    ·
+                  </span>
+                )}
+                <span class="font-semibold text-fg">{fact}</span>
+              </Fragment>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Next ───────────────────────────────────────────────── -->
+    <section class="mt-14">
+      <h2 data-reveal class={sectionLabel}>What I'd do next</h2>
+      <div data-reveal class={panel}>
+        <ul class="m-0 flex list-none flex-col gap-2 p-0">
+          {
+            cs.next.map((item) => (
+              <li class="flex gap-2.5 text-[14px] leading-[1.6] text-muted">
+                <span class={bullet} aria-hidden="true" />
+                <span>{item}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </section>
+
+    <!-- ── CTA ────────────────────────────────────────────────── -->
+    <section class="mt-14">
+      <div
+        data-reveal
+        class="rounded-[20px] border border-line bg-card p-6 text-center sm:p-9"
+      >
+        <h2
+          class="m-0 mb-3 text-[21px] font-extrabold tracking-[-0.5px] sm:text-[25px]"
+        >
+          {cs.cta.title}
+        </h2>
+        <p
+          class="mx-auto m-0 mb-6 max-w-[520px] text-[14.5px] leading-[1.7] text-muted"
+        >
+          {cs.cta.body}
+        </p>
+        <div class="flex flex-wrap items-center justify-center gap-3">
+          <a href="/#contact" class="btn-hover w-fit">
+            <span class="btn-hover-idle">
+              <span class="btn-hover-dot" aria-hidden="true"></span>
+              <span class="btn-hover-idle-text">Let's talk</span>
+            </span>
+            <span class="btn-hover-reveal" aria-hidden="true">
+              <span>Let's talk</span>
+              <span>→</span>
+            </span>
+          </a>
+          <a
+            href={cs.demo}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn-outline btn-sm"
+          >
+            Try the demo
+          </a>
+        </div>
+      </div>
+    </section>
+  </article>
+
+  <ZoomDialog />
+</BaseLayout>
+
+<script is:inline>
+  // Reveal each block as it arrives. One-shot, as on the other case studies.
+  (function () {
+    if (!document.documentElement.classList.contains("reveal-ready")) return;
+
+    const targets = document.querySelectorAll("[data-reveal]");
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add("is-visible");
+          io.unobserve(entry.target);
+        });
+      },
+      { rootMargin: "0px 0px -10% 0px", threshold: 0.04 },
+    );
+
+    targets.forEach((el) => io.observe(el));
+  })();
+</script>

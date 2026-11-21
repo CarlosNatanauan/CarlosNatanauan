@@ -10,12 +10,18 @@ interface Props {
   group: string;
   /** Rendered width at each breakpoint, for the srcset */
   sizes?: string;
+  /**
+   * srcset candidates. The default suits a half-column figure; a shot shown
+   * across the whole column needs bigger ones to stay sharp on 2x screens.
+   */
+  widths?: number[];
   class?: string;
 }
 const {
   shot,
   group,
   sizes = "(min-width: 640px) 370px, 92vw",
+  widths: wantWidths = [400, 800],
   class: className = "",
 } = Astro.props as Props;
 
@@ -27,7 +33,7 @@ const full = await getImage({
   width: fullWidth,
   quality: 80,
 });
-const widths = [400, 800].filter((w) => w <= shot.src.width);
+const widths = wantWidths.filter((w) => w <= shot.src.width);
 if (widths.length === 0) widths.push(shot.src.width);
 ---
 

@@ -1,0 +1,26 @@
+---
+// src/components/CaptionedShot.astro — a ZoomShot with its caption under it.
+// For case-study figures that carry their own caption text.
+import ZoomShot from "./ZoomShot.astro";
+
+interface Props {
+  shot: { src: ImageMetadata; alt: string; caption?: string };
+  /** Scopes the zoom dialog's prev/next */
+  group: string;
+  sizes?: string;
+  widths?: number[];
+  class?: string;
+}
+const { shot, group, sizes, widths, class: className = "" } = Astro.props as Props;
+---
+
+<figure class={`m-0 ${className}`}>
+  <ZoomShot shot={shot} group={group} sizes={sizes} widths={widths} />
+  {
+    shot.caption && (
+      <figcaption class="mt-2 text-[12px] leading-[1.55] text-faint">
+        {shot.caption}
+      </figcaption>
+    )
+  }
+</figure>
