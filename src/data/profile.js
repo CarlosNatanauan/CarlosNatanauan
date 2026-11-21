@@ -46,7 +46,7 @@ export const profile = {
   // Experience section, since those products aren't mine to publicise.
   bio: [
     {
-      text: "I build mobile and full-stack web apps end to end, from design to deployment, and keep them running in production. I have apps live on the App Store and Play Store, including a social cinema platform, a restaurant reservation app, and a field operations tool that replaced paper forms.",
+      text: "I build mobile and full-stack web apps end to end and keep them running in production, with apps live on the App Store and Play Store.",
     },
   ],
 
